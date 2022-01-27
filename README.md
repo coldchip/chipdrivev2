@@ -1,3 +1,1 @@
-# ChipBlog
-
-Simple CMS blogging system using ExpressJS
+# ChipDrive V2
