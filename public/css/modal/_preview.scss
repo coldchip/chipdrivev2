@@ -1,0 +1,36 @@
+.cd-preview-modal {
+	.cd-preview-modal-image, .cd-preview-modal-audio {
+		width: 100%;
+	}
+
+	.cd-preview-modal-video {
+		width: 100%;
+		height: 100%;
+	}
+
+	.cd-preview-modal-code {
+		height: 500px;
+
+		.cd-preview-modal-code-editor {
+			height: calc(100% - 40px - 10px);
+		}
+
+		.cd-preview-modal-code-button {
+			background: $chipGreen;
+			border: none;
+			border-radius: 5px;
+			color: $textColorWhite;
+			height: 40px;
+			margin-top: 10px;
+			width: 100%;
+			font-weight: 600;
+			outline: none;
+		}
+	}
+
+	.cd-preview-modal-error {
+		font-size: 17px;
+		color: $textColorWarning;
+		font-weight: 500;
+	}
+}

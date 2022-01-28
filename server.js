@@ -1,27 +1,22 @@
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
-const minify = require('express-minify');
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const compression = require('compression');
 const path = require('path');
+const webpack = require("webpack");
+const middleware = require("webpack-dev-middleware");
 
 var app = express();
 
+const compiler = webpack(require("./webpack.config.js"));
+app.use(
+	middleware(compiler, {
+		// webpack-dev-middleware options
+	})
+);
 app.use(compression());
-app.use(minify({
-  cache: "cache",
-  uglifyJsModule: null,
-  errorHandler: null,
-  jsMatch: /javascript/,
-  cssMatch: /css/,
-  jsonMatch: /json/,
-  sassMatch: /scss/,
-  lessMatch: /less/,
-  stylusMatch: /stylus/,
-  coffeeScriptMatch: /coffeescript/,
-}));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) =>  {
@@ -34,12 +29,7 @@ app.use((req, res, next) =>  {
 	next();
 });
 
-app.use(express.static(__dirname + '/templates'));
-app.use('/static', express.static("static"));
-
-app.get('/', (req, res) => {
-	res.render('home');
-});
+app.use('/img', express.static("./public/img"));
 
 app.get('*', (req, res) => {
 	res.contentType("application/json");
@@ -48,8 +38,6 @@ app.get('*', (req, res) => {
 	res.send("error 404");
 });
 
-app.set('views', path.join(__dirname, '/templates'));
-app.set('view engine', 'ejs');
 app.set('x-powered-by', false);
 
 const port = 5001;

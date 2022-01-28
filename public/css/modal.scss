@@ -1,0 +1,93 @@
+@import "_colors.scss";
+
+.modal-content {
+  background-color: $modalColor;
+}
+
+.modal-body {
+  padding: 10px 1rem 10px 1rem;
+}
+
+.cd-modal {
+	width: 100%;
+
+	.spinner {
+		color: $chipGreen;
+	}
+
+	.cd-modal-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin: 5px 0 15px 0;
+		width: 100%;
+
+		.cd-modal-title {
+			font-size: 19px;
+			font-weight: 600;
+			color: $textColor;
+			margin: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.cd-modal-x {
+			font-size: 22px;
+			color: $textColor;
+		}
+	}
+
+	.cd-modal-body {
+		.cd-modal-text {
+			font-size: 17px;
+			font-weight: 600;
+			color: $textColor;
+			margin: 0;
+		}
+
+		.cd-modal-form {
+			width: 100%;
+
+			.cd-modal-input {
+				width: 100%;
+				height: 38px;
+				background: none;
+				border-radius: 0;
+				border: 0;
+				border-bottom: 2px solid #797979;
+				font-weight: 500;
+				color: $textColor;
+				outline: 0;
+				padding-left: 0px;
+			}
+		}
+	}
+
+	.cd-modal-footer {
+		display: flex;
+		justify-content: flex-end;
+		margin: 10px 0 0 0;
+		width: 100%;
+
+		.cd-modal-button {
+			border: none;
+			background: none;
+			font-weight: 500;
+			color: $textColor;
+			padding: 10px;
+			outline: 0;
+			border-radius: 2px;
+			font-size: 15px;
+		}
+	}
+
+	.cd-modal-loader-text {
+		color: $textColor;
+		font-size: 18px;
+		font-weight: 500;
+	}
+
+	.cd-modal-footer .cd-modal-button:hover {
+		background-color: $hoverColor;
+	}
+}

@@ -1,0 +1,36 @@
+.cd-copy-toast {
+	display: flex;
+	height: 100%;
+	width: 100%;
+	align-items: center;
+
+	.copy-info {
+		margin: 0 0 0 20px;
+		font-weight: 500;
+		color: $textColor;
+	}
+
+	.copy-cancel {
+		background: $textColorWarning;
+		border: none;
+		border-radius: 5px;
+		color: $textColorWhite;
+		font-weight: 600;
+		height: 42px;
+		margin-right: 16px;
+		outline: 0;
+		width: 105px;
+	}
+
+	.copy-paste {
+		background: $chipGreen;
+		border: none;
+		border-radius: 5px;
+		color: $textColorWhite;
+		font-weight: 600;
+		height: 42px;
+		margin-right: 16px;
+		outline: 0;
+		width: 105px;
+	}
+}

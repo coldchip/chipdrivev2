@@ -1,0 +1,120 @@
+.chipdrive-sidebar {
+	position: fixed;
+	top: 60px;
+	left: 0;
+	width: 300px;
+	height: 100%;
+	z-index: 502;
+	padding: 15px;
+	background: $sidebarColor;
+	transition: left 0.3s ease;
+	.sidebar-close {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		height: 36px;
+
+		.cross {
+			font-size: 25px;
+			color: $textColor;
+		}
+	}
+
+	.sidebar-upload {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 130px;
+		height: 50px;
+		border: none;
+		border-radius: 30px;
+		color: $textColor;
+		background: $buttonColor;
+		font-size: 17px;
+		font-weight: 600;
+		outline: none;
+		box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
+
+		.cross {
+			color: $chipGreen;
+			font-size: 23px;
+		}
+	}
+
+	.sidebar-item {
+		display: flex;
+		align-items: center;
+		font-weight: 600;
+		color: $textColor;
+		background: $buttonColor;
+		width: 100%;
+		height: 50px;
+		border-radius: 5px;
+		margin: 10px 0;
+		font-size: 16px;
+		border: none;
+		padding: 0 15px;
+
+		&:hover {
+			background: $hoverColor;
+		}
+	}
+
+	.sidebar-item-active {
+		background: $hoverColor;
+	}
+
+	.sidebar-seperator {
+		border-bottom: 1px solid $borderColor;
+		margin: 5px 0;
+	}
+
+	.sidebar-quota {
+		padding: 0 15px;
+		.quota-header {
+			font-weight: 600;
+			color: $textColor;
+		}
+
+		.quota-bar {
+			height: 5px;
+			background: $borderColor;
+
+			.quota-bar-used {
+				width: 0%;
+				height: 100%;
+				background: $chipGreen;
+				transition: width .6s ease;
+			}
+		}
+
+		.quota-usage {
+			font-weight: 500;
+			font-size: 15px;
+			color: $textColorLight;
+		}
+
+		.quota-warning {
+			display: none;
+			font-weight: 600;
+			font-size: 13px;
+			color: $textColorWarning;
+		}
+	}
+}
+
+.chipdrive-sidebar-hidden {
+
+}
+
+.chipdrive-sidebar-backdrop {
+	position: fixed;
+	z-index: 501;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}

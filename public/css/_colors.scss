@@ -1,0 +1,54 @@
+:root:not([theme=dark]) {
+	--header-color: #FFFFFF;
+	--body-color: #EFEFEF;
+	--sidebar-color: #FFFFFF;
+	--modal-color: #FFFFFF;
+
+	--border-color: #CCCCCC;
+
+	--button-color: #FFFFFF;
+	--hover-color: rgba(0, 0, 0, 0.2);
+
+	--chip-green: #43833a;
+
+	--text-color-white: #FFFFFF;
+	--text-color: #4D4D4D;
+	--text-color-light: #666666;
+	--text-color-warning: #B90000;
+}
+
+[theme=dark] {
+	--header-color: #2f3136;
+	--body-color: #36393f;
+	--sidebar-color: #2f3136;
+	--modal-color: #2f3136;
+
+	--border-color: #777777;
+
+	--button-color: #2f3136;
+	--hover-color: rgba(0, 0, 0, 0.2);
+
+	--chip-green: #43833a;
+
+	--text-color-white: #FFFFFF;
+	--text-color: #b5b5b5;
+	--text-color-light: var(--text-color);
+	--text-color-warning: #ff4444;
+}
+
+$headerColor: var(--header-color);
+$bodyColor: var(--body-color);
+$sidebarColor: var(--sidebar-color);
+$modalColor: var(--modal-color);
+
+$borderColor: var(--border-color);
+
+$buttonColor: var(--button-color);
+$hoverColor: var(--hover-color);
+
+$chipGreen: var(--chip-green);
+
+$textColorWhite: var(--text-color-white);
+$textColor: var(--text-color);
+$textColorLight: var(--text-color-light);
+$textColorWarning: var(--text-color-warning);

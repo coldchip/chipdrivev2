@@ -1,0 +1,32 @@
+.chipdrive-header {
+	background: $headerColor;
+	z-index: 500;
+	width: 100%;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+
+	.header-bars {
+		width: 23px;
+		margin: 0 0 0 16px;
+		fill: $textColor;
+	}
+
+	.header-logo {
+		margin: 0 0 0 16px;
+		width: 145px;
+	}
+
+	.header-upload {
+		margin-right: 16px;
+		width: 105px;
+		height: 42px;
+		border: none;
+		background: $chipGreen;
+		color: $textColorWhite;
+		font-weight: 600;
+		border-radius: 5px;
+		outline: 0;
+	}
+}

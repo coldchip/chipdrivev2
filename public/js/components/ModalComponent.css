@@ -1,0 +1,40 @@
+.popup-content {
+	margin: auto;
+	background: rgb(255, 255, 255);
+	width: 80%;
+	padding: 5px;
+	transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
+}
+.popup-arrow {
+	color: rgb(255, 255, 255);
+}
+
+[role='tooltip'].popup-content {
+	width: 200px;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
+}
+
+.popup-overlay {
+	background: rgba(0, 0, 0, 0.5);
+	overflow: scroll;
+}
+
+[data-popup='tooltip'].popup-overlay {
+	background: transparent;
+}
+
+.object-modal {
+	width: 100%;
+}
+
+.object-modal .object-modal-image {
+	width: 100%;
+}
+
+.object-modal .object-modal-audio {
+	width: 100%;
+}
+
+.object-modal .object-modal-video {
+	width: 100%;
+}

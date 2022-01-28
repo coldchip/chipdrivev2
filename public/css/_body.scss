@@ -1,0 +1,123 @@
+.chipdrive-body {
+	width: 100%;
+	height: calc(100% - 60px);
+	overflow-y: scroll;
+
+	.label {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin: 15px 20px;
+		border-radius: 5px;
+		padding: 5px 10px;
+
+		.label-text {
+			font-size: 33px;
+			font-weight: 600;
+			color: $textColor;
+			margin: 0;
+			.label-icon {
+				color: $textColor;
+			}
+		}
+
+		.label-sort-icon {
+			font-size: 27px;
+			color: $textColor;
+		}
+	}
+
+	.list-container {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
+		grid-gap: 16px;
+		justify-content: center;
+		padding: initial;
+
+		.list-item {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			justify-content: initial;
+			align-items: center;
+			width: 130px;
+			background: none;
+			margin: 10px;
+			padding: 10px;
+			border-radius: 6px;
+
+			.item-option-icon {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				font-size: 18px;
+				color: $textColorLight;
+			}
+
+			.item-icon {
+				color: $textColorLight;
+				font-size: 70px;
+				margin: 10px 0 0 0;
+			}
+
+			.item-label {
+				margin: 20px 0 0 0;
+				width: 100%;
+				text-align: center;
+				font-weight: 600;
+				color: $textColor;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+
+				&:hover {
+					color: $chipGreen;
+					text-decoration: underline;
+				}
+			}
+		}
+		.list-item-selected {
+			background: $hoverColor;
+		}
+		.list-item-droppable {
+			transition: transform 0.3s ease-in-out;
+			transform: scale(1.1);
+			border: 2px solid $chipGreen;
+		}
+		.list-item-nondroppable {
+			transition: all 0.3s ease-in-out;
+			opacity: 0.4;
+		}
+	}
+
+	.empty-container {
+		padding: 40px 0;
+
+		.empty-text {
+			text-align: center;
+			font-weight: 600;
+			color: $textColor;
+			font-size: 22px;
+		}
+
+		.empty-icon {
+			text-align: center;
+			display: block;
+			color: $textColor;
+			font-size: 118px;
+			margin: 20px auto;
+		}
+	}
+
+	.error-container {
+		padding: 40px 0;
+
+		.error-text {
+			text-align: center;
+			font-weight: 600;
+			color: $textColorWarning;
+			font-size: 22px;
+		}
+	}
+}

@@ -1,0 +1,21 @@
+.spinner-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.spinner {
+		display: block;
+		width: 60px;
+		height: 60px;
+		margin: 0;
+		color: $chipGreen;
+	}
+
+	.spinner-small {
+		display: block;
+		width: 40px;
+		height: 40px;
+		margin: 0;
+		color: $chipGreen;
+	}
+}

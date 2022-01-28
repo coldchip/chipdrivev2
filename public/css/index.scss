@@ -1,0 +1,171 @@
+@import "colors";
+
+* {
+	user-select: none;
+}
+
+body, html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-font-smoothing: antialiased;
+}
+
+.chipdrive {
+	width: 100%;
+	height: 100%;
+	background: $bodyColor;
+	@import "header";
+	@import "sidebar";
+	@import "body";
+}
+
+.text {
+	font-family: 'Montserrat', sans-serif;
+	margin: 0;
+}
+
+.select-box {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 0; 
+	height: 0;
+	border: 2px solid $textColor;
+	border-radius: 5px;
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.draggable-item {
+	display: none;
+	background: #fff;
+	border-radius: 8px;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 200px;
+	height: 40px;
+	background: $buttonColor;
+	box-shadow: 0px 0px 15px 2px #000000;
+	padding: 0 10px;
+	z-index: 600;
+	.draggable-container {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		.draggable-text {
+			color: $textColor;
+			font-size: 16px;
+			font-weight: 600;
+			overflow: hidden;
+			text-align: center;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+}
+
+@import "modal/login";
+@import "modal/preview";
+@import "modal/options";
+@import "modal/info";
+@import "modal/credits";
+@import "modal/settings";
+
+@import "toast/copy";
+
+@import "spinner";
+
+
+@media (min-width: 0px) and (max-width: 767px) {
+	.chipdrive {
+		.chipdrive-header {
+			z-index: 500;
+			.header-bars, .header-upload {
+				display: block;
+			}
+		}
+
+		.chipdrive-sidebar {
+			top: 0;
+			box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.55);
+
+			.sidebar-close {
+				display: flex;
+			}
+
+			.sidebar-upload {
+				display: none;
+			}
+		}
+
+		.chipdrive-sidebar-hidden {
+			left: -300px !important;
+		}
+
+		.chipdrive-sidebar-backdrop {
+
+		}
+
+		.chipdrive-body {
+			padding-left: 0px;
+			.list-container {
+				grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
+				.list-item {
+					width: 130px;
+					.item-icon {
+						font-size: 70px;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media (min-width: 768px) {
+	.chipdrive {
+		.chipdrive-header {
+			z-index: 503;
+			.header-bars, .header-upload {
+				display: none;
+			}
+		}
+
+		.chipdrive-sidebar {
+			top: 60px;
+			box-shadow: none;
+
+			.sidebar-close {
+				display: none;
+			}
+
+			.sidebar-upload {
+				display: block;
+			}
+		}
+
+		.chipdrive-sidebar-hidden {
+
+		}
+
+		.chipdrive-sidebar-backdrop {
+			display: none !important;
+		}
+
+		.chipdrive-body {
+			padding-left: 300px;
+			.list-container {
+				grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+				.list-item {
+					width: 180px;
+					.item-icon {
+						font-size: 100px;
+					}
+				}
+			}
+		}
+	}
+}
