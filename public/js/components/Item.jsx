@@ -1,42 +1,45 @@
 import React from 'react';
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+import ItemOption from './ItemOption.jsx';
+import ItemViewer from './ItemViewer.jsx';
 
-class Folder extends React.Component {
+class Item extends React.Component {
 	constructor(props) {
 		super();
 		this.state = {
             popupOpen: false
         };
 	}
+	onEnter() {
+		this.props.api.setFolder(this.props.item.id);
+		this.props.onEnter();
+	}
 	render() {
-		return (
-			<React.Fragment>
-				<div className="list-item" onClick={() => {
-					this.setState({popupOpen: !this.state.popupOpen});
-				}}>
-					<i class="fas fa-chevron-circle-down item-option-icon"></i>
-					<i class="fas fa-folder item-icon"></i>
-					<p className="item-label text">{this.props.object.name}</p>
-				</div>
-
-				<Popup open={this.state.popupOpen} onClose={() => {
-					this.setState({popupOpen: !this.state.popupOpen});
-				}} closeOnDocumentClick>
-					<div className="modal">
-						<a className="close">
-						&times;
-						</a>
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae magni
-						omnis delectus nemo, maxime molestiae dolorem numquam mollitia, voluptate
-						ea, accusamus excepturi deleniti ratione sapiente! Laudantium, aperiam
-						doloribus. Odit, aut.
+		if(this.props.item.type == 1) {
+			return (
+				<ItemViewer trigger={
+					<div className="list-item">
+						<ItemOption trigger={
+							<i class="fas fa-chevron-circle-down item-option-icon"></i>
+						} item={this.props.item} relist={this.props.relist} api={this.props.api} />
+						
+						<i class="fas fa-file item-icon"></i>
+						<p className="item-label text">{this.props.item.name}</p>
 					</div>
-				</Popup>
-
-			</React.Fragment>
-		);
+				} item={this.props.item} api={this.props.api} />
+			)
+		} else {
+			return (
+				<div className="list-item" onClick={this.onEnter.bind(this)}>
+					<ItemOption trigger={
+						<i class="fas fa-chevron-circle-down item-option-icon"></i>
+					} item={this.props.item} relist={this.props.relist} api={this.props.api} />
+					
+					<i class="fas fa-folder item-icon"></i>
+					<p className="item-label text">{this.props.item.name}</p>
+				</div>
+			)
+		}
 	}
 }
 
-export default Folder;
+export default Item;

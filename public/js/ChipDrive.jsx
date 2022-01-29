@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { createRef } from 'react';
 
-import API from './chipdriveapi.js';
+import API from './API.js';
 
 import Header from './components/Header.jsx';
 import Sidebar from './components/Sidebar.jsx';
@@ -14,6 +15,8 @@ import "../css/index.scss";
 class ChipDrive extends React.Component {
 	constructor() {
 		super();
+		this.list = createRef();
+
 		this.state = {
             sidebarOpen: false
         };
@@ -28,22 +31,28 @@ class ChipDrive extends React.Component {
 	render() {
 		return ( 
 			<React.Fragment>
-				<Header 
-					toggleSidebar={() => {
-						this.setState({sidebarOpen: !this.state.sidebarOpen});
-					}} 
-				/>
+				<div className="chipdrive">
+					<Header 
+						toggleSidebar={() => {
+							this.setState({sidebarOpen: !this.state.sidebarOpen});
+						}}
+						relist={() => {this.list.current.list()}}
+						api={this.api}
+					/>
 
-				<Sidebar 
-					toggleSidebar={() => {
-						this.setState({sidebarOpen: !this.state.sidebarOpen});
-					}} 
-					open={this.state.sidebarOpen}
-					api={this.api}
-				/>
+					<Sidebar 
+						toggleSidebar={() => {
+							this.setState({sidebarOpen: !this.state.sidebarOpen});
+						}} 
+						open={this.state.sidebarOpen}
+						relist={() => {this.list.current.list()}}
+						api={this.api}
+					/>
 
-				<div className="chipdrive-body">
-					<List api={this.api} />
+					<List 
+						api={this.api}
+						ref={this.list}
+					/>
 				</div>
 			</React.Fragment>
 		);

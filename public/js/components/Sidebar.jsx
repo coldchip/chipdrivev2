@@ -1,10 +1,13 @@
 import React from 'react';
+import Upload from './Upload.jsx';
+import Loader from './Loader.jsx';
 
 class Sidebar extends React.Component {
 	constructor() {
 		super();
 		this.state = { 
-			list: [] 
+			list: [],
+			loading: false
 		};
 	}
 	componentDidMount() {
@@ -12,13 +15,45 @@ class Sidebar extends React.Component {
 	}
 	getDrives() {
 		var api = this.props.api;
+
+		this.setState({
+			list: [],
+			loading: true
+		});
 		api.getDriveList().then((list) => {
 			this.setState({
-				list: list
+				list: list,
+				loading: false
 			});
-		}).catch(() => {
-
+		}).catch((e) => {
+			this.setState({
+				list: [],
+				loading: false
+			});
+			alert(e);
 		});
+	}
+	renderDriveList() {
+		var list = [];
+		this.state.list.forEach((drive) => {
+			list.push(
+				<button 
+					className="sidebar-item text" 
+					onClick={
+						() => {
+							this.props.api.setFolder(drive.id);
+							this.props.relist();
+						}
+					} 
+					tabindex="0"
+				>
+					<i className="far fa-hdd me-2"></i>
+					{drive.name}
+				</button>
+			);
+		});
+
+		return list;
 	}
 	render() {
 		return (
@@ -27,21 +62,22 @@ class Sidebar extends React.Component {
 					<div className="text sidebar-close">
 						<i className="fas fa-times cross" onClick={this.props.toggleSidebar}></i>
 					</div>
-					<button className="sidebar-upload text mb-3" tabindex="0">
-						<i className="fas fa-plus cross me-2"></i>
-						New
 
-					</button>
+					<Upload trigger={
+						<button className="sidebar-upload text mb-3" tabindex="0">
+							<i className="fas fa-plus cross me-2"></i>
+							New
+						</button>
+					} relist={this.props.relist} api={this.props.api} />
+
 					<div className="drive-list">
+					{ this.renderDriveList() }
 					{
-						this.state.list.map((item) => {
-							return (
-								<button class="sidebar-item text" tabindex="0">
-									<i class="far fa-hdd me-2"></i>
-									{item.name}
-								</button>
-							)
-						})
+						this.state.loading ? 
+						(
+							<Loader />
+						) 
+						: null
 					}
 					</div>
 					<div className="sidebar-seperator"></div>

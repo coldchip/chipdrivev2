@@ -1,4 +1,5 @@
 import React from 'react';
+import Upload from './Upload.jsx';
 
 class Header extends React.Component {
 	constructor() {
@@ -17,10 +18,12 @@ class Header extends React.Component {
 						<img className="header-logo" src="./img/logo.png" alt="ChipDrive Logo" />	
 					</a>
 					<div className="flex-fill"></div>
-					<button className="header-upload text" id="new_btn">
-						<i className="fas fa-plus me-2"></i>
-						New
-					</button>
+					<Upload trigger={
+						<button className="header-upload text" id="new_btn">
+							<i className="fas fa-plus me-2"></i>
+							New
+						</button>
+					} relist={this.props.relist} api={this.props.api} />
 				</div>
 			</React.Fragment>
 		);
