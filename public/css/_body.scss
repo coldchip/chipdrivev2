@@ -37,10 +37,6 @@
 
 		.list-item {
 			position: relative;
-			display: flex;
-			flex-direction: column;
-			justify-content: initial;
-			align-items: center;
 			width: 130px;
 			background: none;
 			margin: 10px;
@@ -55,31 +51,41 @@
 				color: $textColorLight;
 			}
 
-			.item-icon {
-				color: $textColorLight;
-				font-size: 70px;
-				margin: 10px 0 0 0;
-			}
-
-			.item-label {
-				margin: 20px 0 0 0;
+			.list-item-inner {
+				display: flex;
+				flex-direction: column;
+				justify-content: initial;
+				align-items: center;
 				width: 100%;
-				text-align: center;
-				font-weight: 600;
-				color: $textColor;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
 
-				&:hover {
-					color: $chipGreen;
-					text-decoration: underline;
+				.item-icon {
+					color: $textColorLight;
+					font-size: 70px;
+					margin: 10px 0 0 0;
+				}
+
+				.item-label {
+					margin: 20px 0 0 0;
+					width: 100%;
+					text-align: center;
+					font-weight: 600;
+					color: $textColor;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+
+					&:hover {
+						color: $chipGreen;
+						text-decoration: underline;
+					}
 				}
 			}
 		}
+
 		.list-item-selected {
 			background: $hoverColor;
 		}
+
 		.list-item-droppable {
 			transition: transform 0.3s ease-in-out;
 			transform: scale(1.1);
@@ -91,17 +97,17 @@
 		}
 	}
 
-	.empty-container {
+	.notice-container {
 		padding: 40px 0;
 
-		.empty-text {
+		.notice-text {
 			text-align: center;
 			font-weight: 600;
 			color: $textColor;
 			font-size: 22px;
 		}
 
-		.empty-icon {
+		.notice-icon {
 			text-align: center;
 			display: block;
 			color: $textColor;

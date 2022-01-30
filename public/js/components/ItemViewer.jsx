@@ -1,7 +1,6 @@
 import React from 'react';
 import Types from '../Types';
 import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
 
 class ItemViewer extends React.Component {
 	constructor() {
@@ -15,6 +14,18 @@ class ItemViewer extends React.Component {
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
 				<img className="cd-preview-modal-image" src={ api.getStreamLink(item.id) } />
+			)
+		} else if(Types.video.indexOf(ext) >= 0) {
+			return (
+				<video class="cd-preview-modal-video" controls>
+					<source type="video/mp4" src={ api.getStreamLink(item.id) } />
+				</video>
+			)
+		} else if(Types.audio.indexOf(ext) >= 0) {
+			return (
+				<audio class="cd-preview-modal-audio" controls="true" preload="auto">
+					<source type="audio/mp3" src={ api.getStreamLink(item.id) } />
+				</audio>
 			)
 		} else {
 			return (

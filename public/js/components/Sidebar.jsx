@@ -1,5 +1,5 @@
 import React from 'react';
-import Upload from './Upload.jsx';
+import NewItem from './NewItem.jsx';
 import Loader from './Loader.jsx';
 
 class Sidebar extends React.Component {
@@ -7,7 +7,9 @@ class Sidebar extends React.Component {
 		super();
 		this.state = { 
 			list: [],
-			loading: false
+			loading: false,
+			error: false,
+			reason: ""
 		};
 	}
 	componentDidMount() {
@@ -18,19 +20,24 @@ class Sidebar extends React.Component {
 
 		this.setState({
 			list: [],
-			loading: true
+			loading: true,
+			error: false,
+			reason: ""
 		});
 		api.getDriveList().then((list) => {
 			this.setState({
 				list: list,
-				loading: false
+				loading: false,
+				error: false,
+				reason: ""
 			});
 		}).catch((e) => {
 			this.setState({
 				list: [],
-				loading: false
+				loading: false,
+				error: true,
+				reason: e
 			});
-			alert(e);
 		});
 	}
 	renderDriveList() {
@@ -42,7 +49,7 @@ class Sidebar extends React.Component {
 					onClick={
 						() => {
 							this.props.api.setFolder(drive.id);
-							this.props.relist();
+							this.props.onList();
 						}
 					} 
 					tabindex="0"
@@ -53,33 +60,49 @@ class Sidebar extends React.Component {
 			);
 		});
 
-		return list;
+		if(!this.state.error) {
+			if(!this.state.loading) {
+				return (
+					<div className="drive-list">
+						{list}
+					</div>
+				);
+			} else {
+				return (
+					<Loader />
+				);
+			}
+		} else {
+			return (
+				<div className="mt-2 notice-container">
+					<p className="notice-text text">{this.state.reason}</p>
+					<i className="fas fa-exclamation-circle notice-icon"></i>	
+				</div>
+			);
+		}
 	}
 	render() {
 		return (
 			<React.Fragment>
 				<div className={`chipdrive-sidebar ${!this.props.open ? "chipdrive-sidebar-hidden" : ""} pt-3`}>
 					<div className="text sidebar-close">
-						<i className="fas fa-times cross" onClick={this.props.toggleSidebar}></i>
+						<i className="fas fa-times cross" onClick={this.props.onSidebar}></i>
 					</div>
 
-					<Upload trigger={
-						<button className="sidebar-upload text mb-3" tabindex="0">
-							<i className="fas fa-plus cross me-2"></i>
-							New
-						</button>
-					} relist={this.props.relist} api={this.props.api} />
+					<NewItem 
+						trigger={
+							<button className="sidebar-upload text mb-3" tabindex="0">
+								<i className="fas fa-plus cross me-2"></i>
+								New
+							</button>
+						} 
+						onList={this.props.onList} 
+						onError={this.props.onError} 
+						api={this.props.api} 
+					/>
 
-					<div className="drive-list">
 					{ this.renderDriveList() }
-					{
-						this.state.loading ? 
-						(
-							<Loader />
-						) 
-						: null
-					}
-					</div>
+
 					<div className="sidebar-seperator"></div>
 					<button className="sidebar-item text" tabindex="0" id="cd_sb_5">
 						<i className="fas fa-cog me-2"></i>
@@ -114,7 +137,7 @@ class Sidebar extends React.Component {
 				</div>
 				{
 					this.props.open ? (
-						<div className="chipdrive-sidebar-backdrop" onClick={this.props.toggleSidebar}></div>
+						<div className="chipdrive-sidebar-backdrop" onClick={this.props.onSidebar}></div>
 					) : null
 				}
 			</React.Fragment>

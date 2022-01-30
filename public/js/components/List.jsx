@@ -8,7 +8,9 @@ class List extends React.Component {
 		super();
 		this.state = { 
 			list: [],
-			loading: false
+			loading: false,
+			error: false,
+			reason: ""
 		};
 	}
 	componentDidMount() {
@@ -19,22 +21,27 @@ class List extends React.Component {
 	list() {
 		var api = this.props.api;
 
-		this.setState({
+		this.setState({ 
 			list: [],
-			loading: true
+			loading: true,
+			error: false,
+			reason: ""
 		});
 
 		api.list().then((list) => {
-			this.setState({
+			this.setState({ 
 				list: list,
-				loading: false
+				loading: false,
+				error: false,
+				reason: ""
 			});
 		}).catch((e) => {
-			this.setState({
+			this.setState({ 
 				list: [],
-				loading: false
+				loading: false,
+				error: true,
+				reason: e
 			});
-			alert(e);
 		});
 	}
 	renderList() {
@@ -43,14 +50,42 @@ class List extends React.Component {
 			list.push(
 				<Item 
 					item={item} 
-					onEnter={this.list.bind(this)}
-					relist={this.list.bind(this)}
+					onList={this.list.bind(this)}
+					onError={this.props.onError} 
 					api={this.props.api}
 				/>
 			);
 		});
 
-		return list;
+		if(!this.state.error) {
+			if(!this.state.loading) {
+				if(list.length > 0) {
+					return (
+						<div className="list-container">
+							{list}
+						</div>
+					);
+				} else {
+					return (
+						<div className="mt-2 notice-container">
+							<p className="notice-text text">This Folder is Empty</p>
+							<i className="fab fa-dropbox notice-icon"></i>
+						</div>
+					);
+				}
+			} else {
+				return (
+					<Loader />
+				);
+			}
+		} else {
+			return (
+				<div className="mt-2 notice-container">
+					<p className="notice-text text">{this.state.reason}</p>
+					<i className="fas fa-exclamation-circle notice-icon"></i>	
+				</div>
+			);
+		}
 	}
 	render() {
 		return (
@@ -63,25 +98,7 @@ class List extends React.Component {
 						</p>
 						<i className="fas fa-sort-alpha-up label-sort-icon"></i>
 					</div>
-					<div className="list-container">
-					{
-						this.state.list.length > 0 ?
-						(
-							this.renderList()
-						)
-						:
-						(
-							<h1 class="text">Empty Folder</h1>
-						)
-					}
-					</div>
-					{
-						this.state.loading ? 
-						(
-							<Loader />
-						) 
-						: null
-					}
+					{ this.renderList() }
 				</div>
 			</React.Fragment>
 		);

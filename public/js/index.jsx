@@ -12,10 +12,6 @@ class Main extends React.Component {
 		super();
 	}
 	
-	componentDidMount() {
-		
-	}
-
 	render() {
 		return ( 
 			<ChipDrive token="test" />
@@ -23,4 +19,4 @@ class Main extends React.Component {
 	}
 }
 
-ReactDOM.render(<Main />, document.getElementById('root'));
+ReactDOM.render(<Main />, document.body);

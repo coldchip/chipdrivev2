@@ -212,7 +212,7 @@ class ChipDrive {
 		});
 	}
 
-	deleteItem(id) {
+	delete(id) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: this.getEndpoint() + "/api/v2/drive/object/delete",
@@ -243,7 +243,7 @@ class ChipDrive {
 		});
 	}
 
-	renameItem(id, name) {
+	rename(id, name) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: this.getEndpoint() + "/api/v2/drive/object/rename",

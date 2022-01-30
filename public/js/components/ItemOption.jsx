@@ -1,32 +1,69 @@
 import React from 'react';
-import DeleteItem from './DeleteItem.jsx';
+import { createRef } from 'react';
 import Prompt from './Prompt.jsx';
+import Confirm from './Confirm.jsx';
 import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
 
 class ItemOption extends React.Component {
 	constructor() {
 		super();
+		this.modal = createRef();
+	}
+	closeModal() {
+		this.modal.current.close();
+	}
+	rename(name) {
+		var api = this.props.api;
+		api.rename(this.props.item.id, name).then(() => {
+			this.props.relist();
+		}).catch((e) => {
+			this.props.onError(e);
+		});
+	}
+	delete(name) {
+		var api = this.props.api;
+		api.delete(this.props.item.id).then(() => {
+			this.props.relist();
+		}).catch((e) => {
+			this.props.onError(e);
+		});
+	}
+	download(name) {
+		var api = this.props.api;
+		var link = api.getStreamLink(this.props.item.id);
+			
+		var a = document.createElement("a");
+		a.style.display = "none";
+		a.style.width = "0px";
+		a.style.height = "0px";
+		a.href = link;
+		a.download = this.props.item.name;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+
 	}
 	renderDropdown() {
 		var api = this.props.api;
 		return (
 			<React.Fragment>
-				<Prompt trigger={
-					<button  className="col-12 cd-option-modal-button text">
+				<Prompt title="Rename Item" trigger={
+					<button className="col-12 cd-option-modal-button text">
 						<i className="fas fa-pen-square me-2"></i>Rename
 					</button>
-				} />
+				} onAccept={(name) => this.rename(name)} />
 
-					<button onClick={ () => {
-						api.deleteItem(this.props.item.id).then(() => {
-							this.props.relist();
-						}).catch((e) => {
-							alert(e);
-						});
-					} } className="col-12 cd-option-modal-button text">
+				<Confirm title="Delete Item" trigger={
+					<button className="col-12 cd-option-modal-button text">
 						<i className="fas fa-trash-alt me-2"></i>Delete
 					</button>
+				} onAccept={this.delete.bind(this)} />
+
+				<Confirm title="Download this item?" trigger={
+					<button className="col-12 cd-option-modal-button text">
+						<i className="fas fa-arrow-circle-down me-2"></i>Download
+					</button>
+				} onAccept={this.download.bind(this)} />
 			</React.Fragment>
 		)
 	}
@@ -37,8 +74,9 @@ class ItemOption extends React.Component {
 					trigger={this.props.trigger} 
 					open={this.props.open} 
 					onClose={this.props.onClose} 
-					keepTooltipInside="body"
+					keepTooltipInside=".chipdrive-body"
 					closeOnDocumentClick
+					ref={this.modal}
 					nested
 				>
 					<div className="row cd-option-modal m-0 p-0">

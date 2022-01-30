@@ -41,6 +41,27 @@
 		}
 	}
 
+	.drive-list {
+
+	}
+
+	.notice-container {
+		.notice-text {
+			text-align: center;
+			font-weight: 600;
+			color: $textColorWarning;
+			font-size: 16px;
+		}
+
+		.notice-icon {
+			text-align: center;
+			display: block;
+			color: $textColorWarning;
+			font-size: 56px;
+			margin: 20px auto;
+		}
+	}
+
 	.sidebar-item {
 		display: flex;
 		align-items: center;

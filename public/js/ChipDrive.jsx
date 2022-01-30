@@ -7,6 +7,7 @@ import API from './API.js';
 import Header from './components/Header.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import List from './components/List.jsx';
+import Alert from './components/Alert.jsx';
 
 import "bootstrap"; 
 import "bootstrap/dist/css/bootstrap.css";
@@ -18,7 +19,9 @@ class ChipDrive extends React.Component {
 		this.list = createRef();
 
 		this.state = {
-            sidebarOpen: false
+            sidebarOpen: false,
+            error: false,
+            reason: ""
         };
 		this.api = new API();
 		this.api.setEndpoint("http://localhost:8193");
@@ -28,30 +31,57 @@ class ChipDrive extends React.Component {
 		
 	}
 
+	hideError(error) {
+		this.setState({
+            error: false,
+            reason: ""
+        });
+	}
+
+	onError(error) {
+		this.setState({
+            error: true,
+            reason: error
+        });
+	}
+
+	onSidebar() {
+		this.setState({sidebarOpen: !this.state.sidebarOpen});
+	}
+
+	onList() {
+		this.list.current.list();
+	}
+
 	render() {
 		return ( 
 			<React.Fragment>
 				<div className="chipdrive">
 					<Header 
-						toggleSidebar={() => {
-							this.setState({sidebarOpen: !this.state.sidebarOpen});
-						}}
-						relist={() => {this.list.current.list()}}
+						onSidebar={this.onSidebar.bind(this)}
+						onList={this.onList.bind(this)}
+						onError={this.onError.bind(this)} 
 						api={this.api}
 					/>
 
 					<Sidebar 
-						toggleSidebar={() => {
-							this.setState({sidebarOpen: !this.state.sidebarOpen});
-						}} 
 						open={this.state.sidebarOpen}
-						relist={() => {this.list.current.list()}}
+						onSidebar={this.onSidebar.bind(this)} 
+						onList={this.onList.bind(this)}
+						onError={this.onError.bind(this)} 
 						api={this.api}
 					/>
 
 					<List 
-						api={this.api}
 						ref={this.list}
+						onError={this.onError.bind(this)} 
+						api={this.api}
+					/>
+
+					<Alert
+						title={this.state.reason}
+						open={this.state.error} 
+						onAccept={this.hideError.bind(this)}
 					/>
 				</div>
 			</React.Fragment>
