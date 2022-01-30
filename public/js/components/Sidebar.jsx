@@ -1,6 +1,7 @@
 import React from 'react';
 import NewItem from './NewItem.jsx';
 import Loader from './Loader.jsx';
+import css from "../../css/index.scss";
 
 class Sidebar extends React.Component {
 	constructor() {
@@ -45,7 +46,7 @@ class Sidebar extends React.Component {
 		this.state.list.forEach((drive) => {
 			list.push(
 				<button 
-					className="sidebar-item text" 
+					className={`${css["sidebar-item"]} ${css["text"]}`}
 					onClick={
 						() => {
 							this.props.api.setFolder(drive.id);
@@ -54,7 +55,7 @@ class Sidebar extends React.Component {
 					} 
 					tabindex="0"
 				>
-					<i className="far fa-hdd me-2"></i>
+					<i className={`far fa-hdd ${css["me-2"]}`}></i>
 					{drive.name}
 				</button>
 			);
@@ -63,7 +64,7 @@ class Sidebar extends React.Component {
 		if(!this.state.error) {
 			if(!this.state.loading) {
 				return (
-					<div className="drive-list">
+					<div className={`${css["drive-list"]}`}>
 						{list}
 					</div>
 				);
@@ -74,9 +75,9 @@ class Sidebar extends React.Component {
 			}
 		} else {
 			return (
-				<div className="mt-2 notice-container">
-					<p className="notice-text text">{this.state.reason}</p>
-					<i className="fas fa-exclamation-circle notice-icon"></i>	
+				<div className={`${css["mt-2"]} ${css["notice-container"]}`}>
+					<p className={`${css["notice-text"]} ${css["text"]}`}>{this.state.reason}</p>
+					<i className={`fas fa-exclamation-circle ${css["notice-icon"]}`}></i>	
 				</div>
 			);
 		}
@@ -84,15 +85,15 @@ class Sidebar extends React.Component {
 	render() {
 		return (
 			<React.Fragment>
-				<div className={`chipdrive-sidebar ${!this.props.open ? "chipdrive-sidebar-hidden" : ""} pt-3`}>
-					<div className="text sidebar-close">
-						<i className="fas fa-times cross" onClick={this.props.onSidebar}></i>
+				<div className={`${css["chipdrive-sidebar"]} ${!this.props.open ? css["chipdrive-sidebar-hidden"] : ""} ${css["pt-3"]}`}>
+					<div className={`${css["text"]} ${css["sidebar-close"]}`}>
+						<i className={`${css["fas"]} ${css["fa-times"]} ${css["cross"]}`} onClick={this.props.onSidebar}></i>
 					</div>
 
 					<NewItem 
 						trigger={
-							<button className="sidebar-upload text mb-3" tabindex="0">
-								<i className="fas fa-plus cross me-2"></i>
+							<button className={`${css["sidebar-upload"]} ${css["text"]} ${css["mb-3"]}`} tabindex="0">
+								<i className={`fas fa-plus ${css["cross"]} ${css["me-2"]}`}></i>
 								New
 							</button>
 						} 
@@ -103,41 +104,41 @@ class Sidebar extends React.Component {
 
 					{ this.renderDriveList() }
 
-					<div className="sidebar-seperator"></div>
-					<button className="sidebar-item text" tabindex="0" id="cd_sb_5">
-						<i className="fas fa-cog me-2"></i>
+					<div className={`${css["sidebar-seperator"]}`}></div>
+					<button className={`${css["sidebar-item"]} ${css["text"]}`} tabindex="0" id="cd_sb_5">
+						<i className={`fas fa-cog ${css["me-2"]}`}></i>
 						Settings
 					</button>
-					<button className="sidebar-item text" tabindex="0" id="cd_sb_6">
-						<i className="fas fa-info-circle me-2"></i>
+					<button className={`${css["sidebar-item"]} ${css["text"]}`} tabindex="0" id="cd_sb_6">
+						<i className={`fas fa-info-circle ${css["me-2"]}`}></i>
 						About
 					</button>
-					<button className="sidebar-item text" tabindex="0" id="cd_sb_7">
-						<i className="fas fa-sign-out-alt me-2"></i>
+					<button className={`${css["sidebar-item"]} ${css["text"]}`} tabindex="0" id="cd_sb_7">
+						<i className={`fas fa-sign-out-alt ${css["me-2"]}`}></i>
 						Logout
 					</button>
-					<div className="sidebar-seperator"></div>
-					<div className="sidebar-quota pt-3 pb-3" tabindex="0">
-						<div className="quota-header text">
-							<i className="fas fa-hdd me-2"></i>
+					<div className={`${css["sidebar-seperator"]}`}></div>
+					<div className={`${css["sidebar-quota"]} ${css["pt-3"]} ${css["pb-3"]}`} tabindex="0">
+						<div className={`${css["quota-header"]} ${css["text"]}`}>
+							<i className={`fas fa-hdd ${css["me-2"]}`}></i>
 							My Storage
 						</div>
-						<div className="quota-bar mt-3">
-							<div className="quota-bar-used"></div>
+						<div className={`${css["quota-bar"]} ${css["mt-3"]}`}>
+							<div className={`${css["quota-bar-used"]}`}></div>
 						</div>
-						<div className="quota-usage text mt-2">
+						<div className={`${css["quota-usage"]} ${css["text"]} ${css["mt-2"]}`}>
 							0.0 B of 0 B used
 						</div>
-						<div className="quota-warning text mt-2">
-							<i className="fas fa-info-circle me-2"></i>
+						<div className={`${css["quota-warning"]} ${css["text"]} ${css["mt-2"]}`}>
+							<i className={`fas fa-info-circle ${css["me-2"]}`}></i>
 							Quota almost full
 						</div>
 					</div>
-					<div className="sidebar-seperator"></div>
+					<div className={`${css["sidebar-seperator"]}`}></div>
 				</div>
 				{
 					this.props.open ? (
-						<div className="chipdrive-sidebar-backdrop" onClick={this.props.onSidebar}></div>
+						<div className={`${css["chipdrive-sidebar-backdrop"]}`} onClick={this.props.onSidebar}></div>
 					) : null
 				}
 			</React.Fragment>

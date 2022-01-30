@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRef } from 'react';
 import Popup from 'reactjs-popup';
+import css from "../../css/index.scss";
 
 class Prompt extends React.Component {
 	constructor() {
@@ -42,18 +43,18 @@ class Prompt extends React.Component {
 					nested
 					modal
 				>
-					<div class="cd-modal">
-						<div class="cd-modal-header">
-							<p class="cd-modal-title text">{this.props.title}</p>
+					<div className={`${css["cd-modal"]}`}>
+						<div className={`${css["cd-modal-header"]}`}>
+							<p className={`${css["cd-modal-title"]} ${css["text"]}`}>{this.props.title}</p>
 						</div>
-						<div class="cd-modal-body">
-							<form class="cd-modal-form">
-								<input type="input" onChange={this.onType.bind(this)} class="cd-modal-input text" />
+						<div className={`${css["cd-modal-body"]}`}>
+							<form className={`${css["cd-modal-form"]}`}>
+								<input type="input" onChange={this.onType.bind(this)} className={`${css["cd-modal-input"]} ${css["text"]}`} />
 							</form>
 						</div>
-						<div class="cd-modal-footer">
-							<button class="cd-modal-button text" onClick={this.onReject.bind(this)}>CANCEL</button>
-							<button class="cd-modal-button text" onClick={this.onAccept.bind(this)}>OK</button>
+						<div className={`${css["cd-modal-footer"]}`}>
+							<button className={`${css["cd-modal-button"]} ${css["text"]}`} onClick={this.onReject.bind(this)}>CANCEL</button>
+							<button className={`${css["cd-modal-button"]} ${css["text"]}`} onClick={this.onAccept.bind(this)}>OK</button>
 						</div>
 					</div>
 				</Popup>

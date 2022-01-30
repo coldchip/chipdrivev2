@@ -9,9 +9,7 @@ import Sidebar from './components/Sidebar.jsx';
 import List from './components/List.jsx';
 import Alert from './components/Alert.jsx';
 
-import "bootstrap"; 
-import "bootstrap/dist/css/bootstrap.css";
-import "../css/index.scss";
+import css from "../css/index.scss";
 
 class ChipDrive extends React.Component {
 	constructor() {
@@ -24,7 +22,7 @@ class ChipDrive extends React.Component {
             reason: ""
         };
 		this.api = new API();
-		this.api.setEndpoint("http://localhost:8193");
+		this.api.setEndpoint("http://192.168.10.141:8193");
 	}
 	
 	componentDidMount() {
@@ -50,13 +48,13 @@ class ChipDrive extends React.Component {
 	}
 
 	onList() {
-		this.list.current.list();
+		this.list.current.onList();
 	}
 
 	render() {
 		return ( 
 			<React.Fragment>
-				<div className="chipdrive">
+				<div className={css["chipdrive"]}>
 					<Header 
 						onSidebar={this.onSidebar.bind(this)}
 						onList={this.onList.bind(this)}

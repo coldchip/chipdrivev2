@@ -3,6 +3,7 @@ import { createRef } from 'react';
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
 import Popup from 'reactjs-popup';
+import css from "../../css/index.scss";
 
 class ItemOption extends React.Component {
 	constructor() {
@@ -15,7 +16,7 @@ class ItemOption extends React.Component {
 	rename(name) {
 		var api = this.props.api;
 		api.rename(this.props.item.id, name).then(() => {
-			this.props.relist();
+			this.props.onList();
 		}).catch((e) => {
 			this.props.onError(e);
 		});
@@ -23,7 +24,7 @@ class ItemOption extends React.Component {
 	delete(name) {
 		var api = this.props.api;
 		api.delete(this.props.item.id).then(() => {
-			this.props.relist();
+			this.props.onList();
 		}).catch((e) => {
 			this.props.onError(e);
 		});
@@ -47,23 +48,35 @@ class ItemOption extends React.Component {
 		var api = this.props.api;
 		return (
 			<React.Fragment>
-				<Prompt title="Rename Item" trigger={
-					<button className="col-12 cd-option-modal-button text">
-						<i className="fas fa-pen-square me-2"></i>Rename
-					</button>
-				} onAccept={(name) => this.rename(name)} />
+				<Prompt 
+					title="Rename Item" 
+					trigger={
+						<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
+							<i className={`fas fa-pen-square ${css["me-2"]}`}></i>Rename
+						</button>
+					} 
+					onAccept={(name) => this.rename(name)} 
+				/>
 
-				<Confirm title="Delete Item" trigger={
-					<button className="col-12 cd-option-modal-button text">
-						<i className="fas fa-trash-alt me-2"></i>Delete
-					</button>
-				} onAccept={this.delete.bind(this)} />
+				<Confirm 
+					title="Delete Item" 
+					trigger={
+						<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
+							<i className={`fas fa-trash-alt ${css["me-2"]}`}></i>Delete
+						</button>
+					} 
+					onAccept={this.delete.bind(this)} 
+				/>
 
-				<Confirm title="Download this item?" trigger={
-					<button className="col-12 cd-option-modal-button text">
-						<i className="fas fa-arrow-circle-down me-2"></i>Download
-					</button>
-				} onAccept={this.download.bind(this)} />
+				<Confirm 
+					title="Download this item?" 
+					trigger={
+						<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
+							<i className={`fas fa-arrow-circle-down ${css["me-2"]}`}></i>Download
+						</button>
+					} 
+					onAccept={this.download.bind(this)} 
+				/>
 			</React.Fragment>
 		)
 	}
@@ -79,7 +92,7 @@ class ItemOption extends React.Component {
 					ref={this.modal}
 					nested
 				>
-					<div className="row cd-option-modal m-0 p-0">
+					<div className={`${css["row"]} ${css["cd-option-modal"]} ${css["m-0"]} ${css["p-0"]}`}>
 						{this.renderDropdown()}
 					</div>
 				</Popup>

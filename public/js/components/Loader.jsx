@@ -1,4 +1,5 @@
 import React from 'react';
+import css from "../../css/index.scss";
 
 class Loader extends React.Component {
 	constructor() {
@@ -7,8 +8,8 @@ class Loader extends React.Component {
 	render() {
 		return (
 			<React.Fragment>
-				<div class="spinner-container p-4">
-					<img src="./img/loader.svg" class="spinner" />
+				<div className={`${css["spinner-container"]} ${css["p-4"]}`}>
+					<img src="./img/loader.svg" className={`${css["spinner"]}`}/>
 				</div>
 			</React.Fragment>
 		);

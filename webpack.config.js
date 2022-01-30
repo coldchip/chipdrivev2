@@ -8,11 +8,12 @@ module.exports = {
   performance: {
     hints: false
   },
+  devtool: false,
   entry: ["@babel/polyfill", './public/js/index.jsx'],
   module: {
     rules: [
       {
-        test: /\.jsx$/i,
+        test: /\.(js|jsx)$/i,
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: "babel-loader",
@@ -23,7 +24,34 @@ module.exports = {
       },
       {
         test: /\.scss$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
+        use: [MiniCssExtractPlugin.loader, {
+          loader: 'css-loader',
+          options: {
+            modules: {
+              getLocalIdent: (context, localIdentName, localName, options) => {
+                var exclude = ["popup-overlay", "popup-content", "popup-arrow"];
+
+                if(!exclude.includes(localName)) {
+
+                  var seed = 0;
+                  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+                  for (let i = 0, ch; i < localName.length; i++) {
+                      ch = localName.charCodeAt(i);
+                      h1 = Math.imul(h1 ^ ch, 2654435761);
+                      h2 = Math.imul(h2 ^ ch, 1597334677);
+                  }
+                  h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
+                  h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
+                  var hash = 4294967296 * (2097151 & h2) + (h1>>>0);
+
+                  return Buffer.from(hash.toString()).toString('base64').replace(/\W/g, '');
+                } else {
+                  return localName;
+                }
+              }
+            },
+          }
+        }, "sass-loader"]
       },
       {
         test: /\.css$/i,

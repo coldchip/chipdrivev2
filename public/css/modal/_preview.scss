@@ -28,9 +28,20 @@
 		}
 	}
 
-	.cd-preview-modal-error {
-		font-size: 17px;
-		color: $textColorWarning;
-		font-weight: 500;
+	.notice-container {
+		.notice-text {
+			text-align: center;
+			font-weight: 600;
+			color: $textColorWarning;
+			font-size: 26px;
+		}
+
+		.notice-icon {
+			text-align: center;
+			display: block;
+			color: $textColorWarning;
+			font-size: 56px;
+			margin: 20px auto;
+		}
 	}
 }

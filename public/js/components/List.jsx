@@ -2,6 +2,7 @@ import React from 'react';
 
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';
+import css from "../../css/index.scss";
 
 class List extends React.Component {
 	constructor() {
@@ -16,9 +17,9 @@ class List extends React.Component {
 	componentDidMount() {
 		var api = this.props.api;
 		api.setFolder("root");
-		this.list();
+		this.onList();
 	}
-	list() {
+	onList() {
 		var api = this.props.api;
 
 		this.setState({ 
@@ -50,7 +51,7 @@ class List extends React.Component {
 			list.push(
 				<Item 
 					item={item} 
-					onList={this.list.bind(this)}
+					onList={this.onList.bind(this)}
 					onError={this.props.onError} 
 					api={this.props.api}
 				/>
@@ -61,15 +62,15 @@ class List extends React.Component {
 			if(!this.state.loading) {
 				if(list.length > 0) {
 					return (
-						<div className="list-container">
+						<div className={`${css["list-container"]}`}>
 							{list}
 						</div>
 					);
 				} else {
 					return (
-						<div className="mt-2 notice-container">
-							<p className="notice-text text">This Folder is Empty</p>
-							<i className="fab fa-dropbox notice-icon"></i>
+						<div className={`${css["notice-container"]} ${css["mt-2"]}`}>
+							<p className={`${css["notice-text"]} ${css["text"]}`}>This Folder is Empty</p>
+							<i className={`fas fa-exclamation-circle ${css["notice-icon"]}`}></i>	
 						</div>
 					);
 				}
@@ -80,9 +81,9 @@ class List extends React.Component {
 			}
 		} else {
 			return (
-				<div className="mt-2 notice-container">
-					<p className="notice-text text">{this.state.reason}</p>
-					<i className="fas fa-exclamation-circle notice-icon"></i>	
+				<div className={`${css["notice-container"]} ${css["mt-2"]}`}>
+					<p className={`${css["notice-text"]} ${css["text"]}`}>{this.state.reason}</p>
+					<i className={`fas fa-exclamation-circle ${css["notice-icon"]}`}></i>	
 				</div>
 			);
 		}
@@ -90,13 +91,13 @@ class List extends React.Component {
 	render() {
 		return (
 			<React.Fragment>
-				<div className="chipdrive-body">
-					<div className="label">
-						<p className="label-text text">
-							<i className="fas fa-file label-icon me-2"></i>
+				<div className={`${css["chipdrive-body"]}`}>
+					<div className={`${css["label"]}`}>
+						<p className={`${css["label-text"]} ${css["text"]}`}>
+							<i className={`fas fa-file ${css["label-icon"]} ${css["me-2"]}`}></i>
 							Files
 						</p>
-						<i className="fas fa-sort-alpha-up label-sort-icon"></i>
+						<i className={`fas fa-sort-alpha-up ${css["label-sort-icon"]}`}></i>
 					</div>
 					{ this.renderList() }
 				</div>

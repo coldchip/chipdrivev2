@@ -14,6 +14,7 @@ const compiler = webpack(require("./webpack.config.js"));
 app.use(
 	middleware(compiler, {
 		// webpack-dev-middleware options
+		writeToDisk: true
 	})
 );
 app.use(compression());

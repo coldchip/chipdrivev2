@@ -2,6 +2,7 @@ import React from 'react';
 import { createRef } from 'react';
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
+import css from "../../css/index.scss";
 
 class NewItem extends React.Component {
 	constructor() {
@@ -42,19 +43,19 @@ class NewItem extends React.Component {
 			<React.Fragment>
 				<button onClick={() => {
 					this.uploadRef.current.click()
-				}} class="col-12 cd-option-modal-button text">
-					<i class="fas fa-upload me-2"></i>
+				}} className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
+					<i className={`fas fa-upload ${css["me-2"]}`}></i>
 					Upload
 				</button>
 
 				<Prompt title="Create Folder" trigger={
-					<button class="col-12 cd-option-modal-button text">
-						<i class="fas fa-folder me-2"></i>
+					<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
+						<i className={`fas fa-folder ${css["me-2"]}`}></i>
 						Folder
 					</button>
 				} onAccept={(name) => this.create(name)} />
 
-				<input type="file" className="d-none" ref={this.uploadRef} onChange={this.upload.bind(this)} multiple />
+				<input type="file" className={`${css["d-none"]}`} ref={this.uploadRef} onChange={this.upload.bind(this)} multiple />
 			</React.Fragment>
 		)
 	}
@@ -70,7 +71,7 @@ class NewItem extends React.Component {
 					ref={this.modal}
 					nested
 				>
-					<div class="row cd-option-modal m-0 p-0">
+					<div className={`${css["row"]} ${css["cd-option-modal"]} ${css["m-0"]} ${css["p-0"]}`}>
 						{this.renderDropdown()}
 					</div>
 				</Popup>

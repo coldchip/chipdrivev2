@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRef } from 'react';
 import Popup from 'reactjs-popup';
+import css from "../../css/index.scss";
 
 class Alert extends React.Component {
 	constructor() {
@@ -34,12 +35,12 @@ class Alert extends React.Component {
 					nested
 					modal
 				>
-					<div class="cd-modal">
-						<div class="cd-modal-header">
-							<p class="cd-modal-title text">{this.props.title}</p>
+					<div className={`${css["cd-modal"]}`}>
+						<div className={`${css["cd-modal-header"]}`}>
+							<p className={`${css["cd-modal-title"]} ${css["text"]}`}>{this.props.title}</p>
 						</div>
-						<div class="cd-modal-footer">
-							<button class="cd-modal-button text" onClick={this.onAccept.bind(this)}>OK</button>
+						<div className={`${css["cd-modal-footer"]}`}>
+							<button className={`${css["cd-modal-button"]} ${css["text"]}`} onClick={this.onAccept.bind(this)}>OK</button>
 						</div>
 					</div>
 				</Popup>
