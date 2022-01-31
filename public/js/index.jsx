@@ -20,7 +20,9 @@ class App extends React.Component {
 	
 	render() {
 		return ( 
-			<ChipDrive endpoint="http://192.168.10.141:8193" token={this.genToken()} />
+			<React.StrictMode>
+				<ChipDrive endpoint="http://192.168.10.141:8193" token={this.genToken()} />
+			</React.StrictMode>
 		);
 	}
 }
