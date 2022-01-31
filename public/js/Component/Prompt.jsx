@@ -2,10 +2,11 @@ import React from 'react';
 import { createRef } from 'react';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class Prompt extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.modal = createRef();
 
 		this.state = { 
@@ -36,25 +37,27 @@ class Prompt extends React.Component {
 		return (
 			<React.Fragment>
 				<Popup 
-					trigger={this.props.trigger} 
+					open={this.props.open} 
+					trigger={this.props.trigger}
+					onClose={this.props.onClose}
 					closeOnDocumentClick={false}
 					closeOnEscape={false}
 					ref={this.modal}
 					nested
 					modal
 				>
-					<div className={`${css["cd-modal"]}`}>
-						<div className={`${css["cd-modal-header"]}`}>
-							<p className={`${css["cd-modal-title"]} ${css["text"]}`}>{this.props.title}</p>
+					<div className={cssf(css, "cd-modal")}>
+						<div className={cssf(css, "cd-modal-header")}>
+							<p className={cssf(css, "cd-modal-title text")}>{this.props.title}</p>
 						</div>
-						<div className={`${css["cd-modal-body"]}`}>
-							<form className={`${css["cd-modal-form"]}`}>
-								<input type="input" onChange={this.onType.bind(this)} className={`${css["cd-modal-input"]} ${css["text"]}`} />
+						<div className={cssf(css, "cd-modal-body")}>
+							<form className={cssf(css, "cd-modal-form")}>
+								<input type="input" onChange={this.onType.bind(this)} className={cssf(css, "cd-modal-input text")} />
 							</form>
 						</div>
-						<div className={`${css["cd-modal-footer"]}`}>
-							<button className={`${css["cd-modal-button"]} ${css["text"]}`} onClick={this.onReject.bind(this)}>CANCEL</button>
-							<button className={`${css["cd-modal-button"]} ${css["text"]}`} onClick={this.onAccept.bind(this)}>OK</button>
+						<div className={cssf(css, "cd-modal-footer")}>
+							<button className={cssf(css, "cd-modal-button text")} onClick={this.onReject.bind(this)}>CANCEL</button>
+							<button className={cssf(css, "cd-modal-button text")} onClick={this.onAccept.bind(this)}>OK</button>
 						</div>
 					</div>
 				</Popup>

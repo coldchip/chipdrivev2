@@ -20,11 +20,6 @@
 				color: $textColor;
 			}
 		}
-
-		.label-sort-icon {
-			font-size: 27px;
-			color: $textColor;
-		}
 	}
 
 	.list-container {
@@ -42,6 +37,8 @@
 			margin: 10px;
 			padding: 10px;
 			border-radius: 6px;
+			animation: item-animation 0.3s forwards;
+			-webkit-animation: item-animation 0.3s forwards;
 
 			.item-option-icon {
 				position: absolute;
@@ -99,6 +96,9 @@
 
 	.notice-container {
 		padding: 40px 0;
+		animation: item-animation 0.3s forwards;
+		-webkit-animation: item-animation 0.3s forwards;
+
 
 		.notice-text {
 			text-align: center;
@@ -125,5 +125,16 @@
 			color: $textColorWarning;
 			font-size: 22px;
 		}
+	}
+}
+
+@keyframes item-animation {
+	0% {
+		transform: scale(0.90);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
 	}
 }

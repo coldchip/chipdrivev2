@@ -3,21 +3,20 @@ import React from 'react';
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class List extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = { 
 			list: [],
-			loading: false,
+			loading: true,
 			error: false,
 			reason: ""
 		};
 	}
 	componentDidMount() {
-		var api = this.props.api;
-		api.setFolder("root");
-		this.onList();
+		
 	}
 	onList() {
 		var api = this.props.api;
@@ -52,7 +51,8 @@ class List extends React.Component {
 				<Item 
 					item={item} 
 					onList={this.onList.bind(this)}
-					onError={this.props.onError} 
+					onError={this.props.onError}
+					key={item.id}
 					api={this.props.api}
 				/>
 			);
@@ -62,15 +62,15 @@ class List extends React.Component {
 			if(!this.state.loading) {
 				if(list.length > 0) {
 					return (
-						<div className={`${css["list-container"]}`}>
+						<div className={cssf(css, "list-container")}>
 							{list}
 						</div>
 					);
 				} else {
 					return (
-						<div className={`${css["notice-container"]} ${css["mt-2"]}`}>
-							<p className={`${css["notice-text"]} ${css["text"]}`}>This Folder is Empty</p>
-							<i className={`fas fa-exclamation-circle ${css["notice-icon"]}`}></i>	
+						<div className={cssf(css, "notice-container mt-2")}>
+							<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
+							<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
 						</div>
 					);
 				}
@@ -81,9 +81,9 @@ class List extends React.Component {
 			}
 		} else {
 			return (
-				<div className={`${css["notice-container"]} ${css["mt-2"]}`}>
-					<p className={`${css["notice-text"]} ${css["text"]}`}>{this.state.reason}</p>
-					<i className={`fas fa-exclamation-circle ${css["notice-icon"]}`}></i>	
+				<div className={cssf(css, "notice-container mt-2")}>
+					<p className={cssf(css, "notice-text text")}>{this.state.reason}</p>
+					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
 				</div>
 			);
 		}
@@ -91,13 +91,12 @@ class List extends React.Component {
 	render() {
 		return (
 			<React.Fragment>
-				<div className={`${css["chipdrive-body"]}`}>
-					<div className={`${css["label"]}`}>
-						<p className={`${css["label-text"]} ${css["text"]}`}>
-							<i className={`fas fa-file ${css["label-icon"]} ${css["me-2"]}`}></i>
-							Files
+				<div className={cssf(css, "chipdrive-body")}>
+					<div className={cssf(css, "label")}>
+						<p className={cssf(css, "label-text text")}>
+							<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
+							{this.props.title}
 						</p>
-						<i className={`fas fa-sort-alpha-up ${css["label-sort-icon"]}`}></i>
 					</div>
 					{ this.renderList() }
 				</div>

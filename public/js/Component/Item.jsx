@@ -2,10 +2,11 @@ import React from 'react';
 import ItemOption from './ItemOption.jsx';
 import ItemViewer from './ItemViewer.jsx';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class Item extends React.Component {
 	constructor(props) {
-		super();
+		super(props);
 		this.state = {
             popupOpen: false
         };
@@ -18,10 +19,10 @@ class Item extends React.Component {
 		if(this.props.item.type == 1) {
 			return (
 				
-				<div className={`${css["list-item"]}`}>
+				<div className={cssf(css, "list-item")}>
 					<ItemOption 
 						trigger={
-							<i className={`fas fa-chevron-circle-down ${css["item-option-icon"]}`}></i>
+							<i className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
 						} 
 						item={this.props.item} 
 						onList={this.props.onList} 
@@ -31,9 +32,9 @@ class Item extends React.Component {
 
 					<ItemViewer 
 						trigger={
-							<div className={`${css["list-item-inner"]}`}>
-								<i className={`fas fa-file ${css["item-icon"]}`}></i>
-								<p className={`${css["item-label"]} ${css["text"]}`}>{this.props.item.name}</p>
+							<div className={cssf(css, "list-item-inner")}>
+								<i className={cssf(css, "!fas !fa-file item-icon")}></i>
+								<p className={cssf(css, "item-label text")}>{this.props.item.name}</p>
 							</div>
 						} 
 						item={this.props.item} 
@@ -45,10 +46,10 @@ class Item extends React.Component {
 			)
 		} else {
 			return (
-				<div className={`${css["list-item"]}`}>
+				<div className={cssf(css, "list-item")}>
 					<ItemOption 
 						trigger={
-							<i className={`fas fa-chevron-circle-down ${css["item-option-icon"]}`}></i>
+							<i className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
 						} 
 						item={this.props.item} 
 						onList={this.props.onList} 
@@ -56,9 +57,9 @@ class Item extends React.Component {
 						api={this.props.api} 
 					/>
 
-					<div className={`${css["list-item-inner"]}`} onClick={this.onEnter.bind(this)}>
-						<i className={`fas fa-folder ${css["item-icon"]}`}></i>
-						<p className={`${css["item-label"]} ${css["text"]}`}>{this.props.item.name}</p>
+					<div className={cssf(css, "list-item-inner")} onClick={this.onEnter.bind(this)}>
+						<i className={cssf(css, "!fas !fa-folder item-icon")}></i>
+						<p className={cssf(css, "item-label text")}>{this.props.item.name}</p>
 					</div>
 				</div>
 			)

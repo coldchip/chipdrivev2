@@ -26,6 +26,14 @@ class ChipDrive {
 		this.setACL(0);
 	}
 
+	setToken(token) {
+		this.token = token;
+	}
+
+	getToken() {
+		return this.token;
+	}
+
 	setEndpoint(host) {
 		this.endpoint = host;
 	}
@@ -60,7 +68,7 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/config",
 				type: "POST",
 				data: {
-
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -91,7 +99,8 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/list",
 				type: "POST",
 				data: {
-					"folderid": this.folder
+					folderid: this.getFolder(),
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -122,8 +131,9 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/file",
 				type: "POST",
 				data: {
-					"folderid": this.folder,
-					"name": name
+					folderid: this.getFolder(),
+					name: name,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -154,8 +164,9 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/folder",
 				type: "POST",
 				data: {
-					"folderid": this.folder,
-					"name": name
+					folderid: this.getFolder(),
+					name: name,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -186,8 +197,9 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/hostingfolder",
 				type: "POST",
 				data: {
-					"folderid": this.folder,
-					"name": name
+					folderid: this.getFolder(),
+					name: name,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -218,7 +230,8 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/object/delete",
 				type: "POST",
 				data: {
-					"id": id
+					id: id,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -249,8 +262,9 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/object/rename",
 				type: "POST",
 				data: {
-					"id": id,
-					"name": name
+					id: id,
+					name: name,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -323,7 +337,8 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/object/info",
 				type: "POST",
 				data: {
-					"id": id
+					id: id,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -354,8 +369,9 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/copy",
 				type: "POST",
 				data: {
-					"src": this.serialize(src),
-					"dst": dst
+					src: this.serialize(src),
+					dst: dst,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -386,8 +402,9 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/cut",
 				type: "POST",
 				data: {
-					"src": this.serialize(src),
-					"dst": dst
+					src: this.serialize(src),
+					dst: dst,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -418,7 +435,7 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/status",
 				type: "POST",
 				data: {
-
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -449,7 +466,8 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/object/gettext",
 				type: "POST",
 				data: {
-					"id": id
+					id: id,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -480,7 +498,8 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/drive/sitesettings",
 				type: "POST",
 				data: {
-					"id": id
+					id: id,
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -506,7 +525,11 @@ class ChipDrive {
 	}
 
 	getStreamLink(id) {
-		return this.getEndpoint() + "/api/v2/drive/object/" + encodeURI(id);
+		const url = new URL(this.getEndpoint());
+		url.pathname = `/api/v2/drive/object/${encodeURI(id)}`;
+		url.searchParams.append("token", this.getToken());
+
+		return url.href;
 	}
 
 	oauth(token) {
@@ -515,7 +538,7 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/login/oauth",
 				type: "POST",
 				data: {
-
+					token: this.getToken()
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
@@ -546,7 +569,7 @@ class ChipDrive {
 				url: this.getEndpoint() + "/api/v2/oauth",
 				type: "POST",
 				data: {
-					"token": token
+					token: token
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {

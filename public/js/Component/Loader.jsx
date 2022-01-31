@@ -1,15 +1,16 @@
 import React from 'react';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class Loader extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 	}
 	render() {
 		return (
 			<React.Fragment>
-				<div className={`${css["spinner-container"]} ${css["p-4"]}`}>
-					<img src="./img/loader.svg" className={`${css["spinner"]}`}/>
+				<div className={cssf(css, "spinner-container p-4")}>
+					<img src="./img/loader.svg" className={cssf(css, "spinner")}/>
 				</div>
 			</React.Fragment>
 		);

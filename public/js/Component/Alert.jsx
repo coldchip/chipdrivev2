@@ -2,10 +2,11 @@ import React from 'react';
 import { createRef } from 'react';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class Alert extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.modal = createRef();
 
 		this.state = { 
@@ -28,19 +29,20 @@ class Alert extends React.Component {
 			<React.Fragment>
 				<Popup 
 					open={this.props.open} 
-					trigger={this.props.trigger} 
+					trigger={this.props.trigger}
+					onClose={this.props.onClose} 
 					closeOnDocumentClick={false}
 					closeOnEscape={false}
 					ref={this.modal}
 					nested
 					modal
 				>
-					<div className={`${css["cd-modal"]}`}>
-						<div className={`${css["cd-modal-header"]}`}>
-							<p className={`${css["cd-modal-title"]} ${css["text"]}`}>{this.props.title}</p>
+					<div className={cssf(css, "cd-modal")}>
+						<div className={cssf(css, "cd-modal-header")}>
+							<p className={cssf(css, "cd-modal-title text")}>{this.props.title}</p>
 						</div>
-						<div className={`${css["cd-modal-footer"]}`}>
-							<button className={`${css["cd-modal-button"]} ${css["text"]}`} onClick={this.onAccept.bind(this)}>OK</button>
+						<div className={cssf(css, "cd-modal-footer")}>
+							<button className={cssf(css, "cd-modal-button text")} onClick={this.onAccept.bind(this)}>OK</button>
 						</div>
 					</div>
 				</Popup>

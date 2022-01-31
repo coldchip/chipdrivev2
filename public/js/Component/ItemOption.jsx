@@ -4,10 +4,11 @@ import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class ItemOption extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.modal = createRef();
 	}
 	closeModal() {
@@ -51,8 +52,8 @@ class ItemOption extends React.Component {
 				<Prompt 
 					title="Rename Item" 
 					trigger={
-						<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
-							<i className={`fas fa-pen-square ${css["me-2"]}`}></i>Rename
+						<button className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
 						</button>
 					} 
 					onAccept={(name) => this.rename(name)} 
@@ -61,22 +62,31 @@ class ItemOption extends React.Component {
 				<Confirm 
 					title="Delete Item" 
 					trigger={
-						<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
-							<i className={`fas fa-trash-alt ${css["me-2"]}`}></i>Delete
+						<button className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
 						</button>
 					} 
 					onAccept={this.delete.bind(this)} 
 				/>
-
-				<Confirm 
-					title="Download this item?" 
-					trigger={
-						<button className={`${css["col-12"]} ${css["cd-option-modal-button"]} ${css["text"]}`}>
-							<i className={`fas fa-arrow-circle-down ${css["me-2"]}`}></i>Download
-						</button>
-					} 
-					onAccept={this.download.bind(this)} 
-				/>
+				
+				{
+					this.props.item.type == 1
+					?
+					(
+						<Confirm 
+							title="Download this item?" 
+							trigger={
+								<button className={cssf(css, "col-12 cd-option-modal-button text")}>
+									<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
+								</button>
+							} 
+							onAccept={this.download.bind(this)} 
+						/>
+					)
+					:
+					null
+				}
+				
 			</React.Fragment>
 		)
 	}
@@ -84,15 +94,15 @@ class ItemOption extends React.Component {
 		return (
 			<React.Fragment>
 				<Popup 
-					trigger={this.props.trigger} 
 					open={this.props.open} 
-					onClose={this.props.onClose} 
+					trigger={this.props.trigger}
+					onClose={this.props.onClose}
 					keepTooltipInside=".chipdrive-body"
 					closeOnDocumentClick
 					ref={this.modal}
 					nested
 				>
-					<div className={`${css["row"]} ${css["cd-option-modal"]} ${css["m-0"]} ${css["p-0"]}`}>
+					<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
 						{this.renderDropdown()}
 					</div>
 				</Popup>

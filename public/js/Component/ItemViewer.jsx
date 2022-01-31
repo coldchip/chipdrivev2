@@ -2,10 +2,11 @@ import React from 'react';
 import Types from '../Types';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 class ItemViewer extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 	}
 	renderView() {
 		var api = this.props.api;
@@ -14,25 +15,25 @@ class ItemViewer extends React.Component {
 		var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
-				<img className={`${css["cd-preview-modal-image"]}`} src={ api.getStreamLink(item.id) } />
+				<img className={cssf(css, "cd-preview-modal-image")} src={ api.getStreamLink(item.id) } />
 			)
 		} else if(Types.video.indexOf(ext) >= 0) {
 			return (
-				<video className={`${css["cd-preview-modal-video"]}`} controls>
+				<video className={cssf(css, "cd-preview-modal-video")} controls>
 					<source type="video/mp4" src={ api.getStreamLink(item.id) } />
 				</video>
 			)
 		} else if(Types.audio.indexOf(ext) >= 0) {
 			return (
-				<audio className={`${css["cd-preview-modal-audio"]}`} controls="true" preload="auto">
+				<audio className={cssf(css, "cd-preview-modal-audio")} controls="true" preload="auto">
 					<source type="audio/mp3" src={ api.getStreamLink(item.id) } />
 				</audio>
 			)
 		} else {
 			return (
-				<div className={`${css["notice-container"]} ${css["mt-2"]}`}>
-					<p className={`${css["notice-text"]} ${css["text"]}`}>Unable to preview</p>
-					<i className={`fas fa-exclamation-circle ${css["notice-icon"]}`}></i>	
+				<div className={cssf(css, "notice-container mt-2")}>
+					<p className={cssf(css, "notice-text text")}>Unable to preview</p>
+					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
 				</div>
 			)
 		}
@@ -41,13 +42,13 @@ class ItemViewer extends React.Component {
 		return (
 			<React.Fragment>
 				<Popup 
-					trigger={this.props.trigger} 
 					open={this.props.open} 
-					onClose={this.props.onClose} 
+					trigger={this.props.trigger}
+					onClose={this.props.onClose}
 					closeOnDocumentClick
 					modal
 				>
-					<div className={`${css["cd-preview-modal"]}`}>
+					<div className={cssf(css, "cd-preview-modal")}>
 						{this.renderView()}
 					</div>
 				</Popup>
