@@ -15,31 +15,54 @@ class ItemOption extends React.Component {
 		this.modal.current.close();
 	}
 	rename(name) {
-		var api = this.props.api;
+		var {api} = this.props;
+
+		var taskid = 'task_' + Math.random();
+		this.props.onTask(taskid, {
+			name: `Renaming '${name}'`,
+			progress: 0.0
+		});
+
 		api.rename(this.props.item.id, name).then(() => {
+			this.props.onTask(taskid, {
+				name: `Renamed '${name}'`,
+				progress: 100.0
+			});
 			this.props.onList();
 		}).catch((e) => {
 			this.props.onError(e);
 		});
 	}
-	delete(name) {
-		var api = this.props.api;
+	delete() {
+		var {api, item} = this.props;
+
+		var taskid = 'task_' + Math.random();
+		this.props.onTask(taskid, {
+			name: `Deleting '${item.name}'`,
+			progress: 0.0
+		});
+
 		api.delete(this.props.item.id).then(() => {
+			this.props.onTask(taskid, {
+				name: `Deleted '${item.name}'`,
+				progress: 100.0
+			});
 			this.props.onList();
 		}).catch((e) => {
 			this.props.onError(e);
 		});
 	}
-	download(name) {
-		var api = this.props.api;
-		var link = api.getStreamLink(this.props.item.id);
+	download() {
+		var {api, item} = this.props;
+
+		var link = api.getStreamLink(item.id);
 			
 		var a = document.createElement("a");
 		a.style.display = "none";
 		a.style.width = "0px";
 		a.style.height = "0px";
 		a.href = link;
-		a.download = this.props.item.name;
+		a.download = item.name;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -97,9 +120,10 @@ class ItemOption extends React.Component {
 					open={this.props.open} 
 					trigger={this.props.trigger}
 					onClose={this.props.onClose}
-					keepTooltipInside=".chipdrive-body"
+					keepTooltipInside="body"
 					closeOnDocumentClick
 					ref={this.modal}
+					arrow={false}
 					nested
 				>
 					<div className={cssf(css, "row cd-option-modal m-0 p-0")}>

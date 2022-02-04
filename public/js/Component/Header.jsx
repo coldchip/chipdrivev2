@@ -30,6 +30,7 @@ class Header extends React.Component {
 							</button>
 						} 
 						onList={this.props.onList}
+						onTask={this.props.onTask}
 						onError={this.props.onError} 
 						api={this.props.api} 
 					/>

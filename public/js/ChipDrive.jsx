@@ -7,6 +7,7 @@ import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';
 import List from './Component/List.jsx';
 import Alert from './Component/Alert.jsx';
+import TaskModal from './Component/TaskModal.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
@@ -18,6 +19,7 @@ class ChipDrive extends React.Component {
 
 		this.state = {
             sidebarOpen: false,
+            tasks: {},
             currentDriveName: "Unknown",
             error: false,
             reason: ""
@@ -45,6 +47,22 @@ class ChipDrive extends React.Component {
         });
 	}
 
+	onTask(id, task) {
+		var tasks = this.state.tasks;
+
+		tasks[id] = task
+
+		this.setState({
+            tasks: tasks
+        });
+	}
+
+	onClose(task) {
+		this.setState({
+            tasks: []
+        });
+	}
+
 	onSetDrive(name) {
 		this.setState({
             currentDriveName: name
@@ -65,6 +83,7 @@ class ChipDrive extends React.Component {
 				<Header 
 					onSidebar={this.onSidebar.bind(this)}
 					onList={this.onList.bind(this)}
+					onTask={this.onTask.bind(this)}
 					onError={this.onError.bind(this)} 
 					api={this.api}
 				/>
@@ -74,6 +93,7 @@ class ChipDrive extends React.Component {
 					onSidebar={this.onSidebar.bind(this)} 
 					onList={this.onList.bind(this)}
 					onSetDrive={this.onSetDrive.bind(this)}
+					onTask={this.onTask.bind(this)}
 					onError={this.onError.bind(this)} 
 					api={this.api}
 				/>
@@ -81,6 +101,7 @@ class ChipDrive extends React.Component {
 				<List 
 					title={this.state.currentDriveName}
 					ref={this.listref}
+					onTask={this.onTask.bind(this)}
 					onError={this.onError.bind(this)} 
 					api={this.api}
 				/>
@@ -89,6 +110,11 @@ class ChipDrive extends React.Component {
 					title={this.state.reason}
 					open={this.state.error} 
 					onAccept={this.hideError.bind(this)}
+				/>
+
+				<TaskModal 
+					tasks={this.state.tasks}
+					onClear={this.onClose.bind(this)}
 				/>
 			</div>
 		);

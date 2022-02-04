@@ -10,9 +10,7 @@ class List extends React.Component {
 		super(props);
 		this.state = { 
 			list: [],
-			loading: true,
-			error: false,
-			reason: ""
+			loading: true
 		};
 	}
 	componentDidMount() {
@@ -23,25 +21,16 @@ class List extends React.Component {
 
 		this.setState({ 
 			list: [],
-			loading: true,
-			error: false,
-			reason: ""
+			loading: true
 		});
 
 		api.list().then((list) => {
 			this.setState({ 
 				list: list,
-				loading: false,
-				error: false,
-				reason: ""
+				loading: false
 			});
 		}).catch((e) => {
-			this.setState({ 
-				list: [],
-				loading: false,
-				error: true,
-				reason: e
-			});
+			this.props.onError(e);
 		});
 	}
 	renderList() {
@@ -51,6 +40,7 @@ class List extends React.Component {
 				<Item 
 					item={item} 
 					onList={this.onList.bind(this)}
+					onTask={this.props.onTask}
 					onError={this.props.onError}
 					key={item.id}
 					api={this.props.api}
@@ -58,33 +48,24 @@ class List extends React.Component {
 			);
 		});
 
-		if(!this.state.error) {
-			if(!this.state.loading) {
-				if(list.length > 0) {
-					return (
-						<div className={cssf(css, "list-container")}>
-							{list}
-						</div>
-					);
-				} else {
-					return (
-						<div className={cssf(css, "notice-container mt-2")}>
-							<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
-							<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
-						</div>
-					);
-				}
+		if(!this.state.loading) {
+			if(list.length > 0) {
+				return (
+					<div className={cssf(css, "list-container")}>
+						{list}
+					</div>
+				);
 			} else {
 				return (
-					<Loader />
+					<div className={cssf(css, "notice-container mt-2")}>
+						<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
+						<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
+					</div>
 				);
 			}
 		} else {
 			return (
-				<div className={cssf(css, "notice-container mt-2")}>
-					<p className={cssf(css, "notice-text text")}>{this.state.reason}</p>
-					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
-				</div>
+				<Loader />
 			);
 		}
 	}

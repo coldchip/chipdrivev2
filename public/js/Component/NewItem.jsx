@@ -15,16 +15,32 @@ class NewItem extends React.Component {
 		this.modal.current.close();
 	}
 	async upload(e) {
-		var api = this.props.api;
+		var {api} = this.props;
+
 		try {
-			var completed = 0;
 			var files = e.target.files;
 			for(var i = 0; i < files.length; i++) {
+				var taskid = 'task_' + Math.random();
+				this.props.onTask(taskid, {
+					name: `Uploading ${files[i].name}`,
+					progress: 0.0
+				});
+
 				var res = await api.createFile(files[i].name); // stage 1 - create the file
 				await api.put(files[i], res.id, (e) => { // state 2 - PUT the data
-					console.log(`Uploading ${(((completed + e) / (files.length))).toFixed(2)}%`);
+					var progress = e.toFixed(2);
+					console.log(`Uploading ${progress}%`);
+
+					this.props.onTask(taskid, {
+						name: `Uploading ${files[i].name}`,
+						progress: progress
+					});
 				});
-				completed += 100;
+
+				this.props.onTask(taskid, {
+					name: `Uploaded ${files[i].name}`,
+					progress: 100.0
+				});
 			}
 			this.props.onList();
 		} catch(e) {
@@ -32,8 +48,19 @@ class NewItem extends React.Component {
 		}
 	}
 	create(name) {
-		var api = this.props.api;
+		var {api} = this.props;
+
+		var taskid = 'task_' + Math.random();
+		this.props.onTask(taskid, {
+			name: `Creating '${name}'`,
+			progress: 0.0
+		});
+
 		api.createFolder(name).then(() => {
+			this.props.onTask(taskid, {
+				name: `Created '${name}'`,
+				progress: 100.0
+			});
 			this.props.onList();
 		}).catch((e) => {
 			this.props.onError(e);
@@ -70,6 +97,7 @@ class NewItem extends React.Component {
 					keepTooltipInside="body"
 					closeOnDocumentClick
 					ref={this.modal}
+					arrow={false}
 					nested
 				>
 					<div className={cssf(css, "row cd-option-modal m-0 p-0")}>

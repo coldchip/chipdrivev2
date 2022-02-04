@@ -9,9 +9,7 @@ class Sidebar extends React.Component {
 		super(props);
 		this.state = { 
 			list: [],
-			loading: true,
-			error: false,
-			reason: ""
+			loading: true
 		};
 	}
 	componentDidMount() {
@@ -27,16 +25,12 @@ class Sidebar extends React.Component {
 
 		this.setState({
 			list: [],
-			loading: true,
-			error: false,
-			reason: ""
+			loading: true
 		});
 		api.getDriveList().then((list) => {
 			this.setState({
 				list: list,
-				loading: false,
-				error: false,
-				reason: ""
+				loading: false
 			});
 
 			if(list.length > 0) {
@@ -44,12 +38,7 @@ class Sidebar extends React.Component {
 				this.onSetDrive(drive);
 			}
 		}).catch((e) => {
-			this.setState({
-				list: [],
-				loading: false,
-				error: true,
-				reason: e
-			});
+			this.props.onError(e);
 		});
 	}
 	renderDriveList() {
@@ -68,24 +57,15 @@ class Sidebar extends React.Component {
 			);
 		});
 
-		if(!this.state.error) {
-			if(!this.state.loading) {
-				return (
-					<div className={cssf(css, "drive-list")}>
-						{list}
-					</div>
-				);
-			} else {
-				return (
-					<Loader />
-				);
-			}
+		if(!this.state.loading) {
+			return (
+				<div className={cssf(css, "drive-list")}>
+					{list}
+				</div>
+			);
 		} else {
 			return (
-				<div className={cssf(css, "notice-container mt-2")}>
-					<p className={cssf(css, "notice-text text")}>{this.state.reason}</p>
-					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
-				</div>
+				<Loader />
 			);
 		}
 	}
@@ -105,6 +85,7 @@ class Sidebar extends React.Component {
 							</button>
 						} 
 						onList={this.props.onList} 
+						onTask={this.props.onTask}
 						onError={this.props.onError} 
 						api={this.props.api} 
 					/>
