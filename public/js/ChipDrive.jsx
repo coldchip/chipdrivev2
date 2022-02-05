@@ -98,13 +98,20 @@ class ChipDrive extends React.Component {
 					api={this.api}
 				/>
 
-				<List 
-					title={this.state.currentDriveName}
-					ref={this.listref}
-					onTask={this.onTask.bind(this)}
-					onError={this.onError.bind(this)} 
-					api={this.api}
-				/>
+				<div className={cssf(css, "chipdrive-body")}>
+					<div className={cssf(css, "label")}>
+						<p className={cssf(css, "label-text text")}>
+							<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
+							{this.state.currentDriveName}
+						</p>
+					</div>
+					<List 
+						ref={this.listref}
+						onTask={this.onTask.bind(this)}
+						onError={this.onError.bind(this)} 
+						api={this.api}
+					/>
+				</div>
 
 				<Alert
 					title={this.state.reason}

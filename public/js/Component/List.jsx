@@ -70,19 +70,7 @@ class List extends React.Component {
 		}
 	}
 	render() {
-		return (
-			<React.Fragment>
-				<div className={cssf(css, "chipdrive-body")}>
-					<div className={cssf(css, "label")}>
-						<p className={cssf(css, "label-text text")}>
-							<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
-							{this.props.title}
-						</p>
-					</div>
-					{ this.renderList() }
-				</div>
-			</React.Fragment>
-		);
+		return (this.renderList());
 	}
 }
 
