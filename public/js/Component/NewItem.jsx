@@ -1,27 +1,20 @@
-import React from 'react';
-import { createRef } from 'react';
+import React, { useRef, useContext } from 'react';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-class NewItem extends React.Component {
-	constructor(props) {
-		super(props);
-		this.uploadRef = createRef();
-		this.modal = createRef();
-	}
-	closeModal() {
-		this.modal.current.close();
-	}
-	async upload(e) {
-		var {api} = this.props;
+function CreateDropdown(props) {
+	const uploadRef = useRef(null);
+	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
 
+	async function upload(e) {
 		try {
 			var files = e.target.files;
 			for(var i = 0; i < files.length; i++) {
 				var taskid = 'task_' + Math.random();
-				this.props.onTask(taskid, {
+				onTask(taskid, {
 					name: `Uploading ${files[i].name}`,
 					progress: 0.0
 				});
@@ -31,82 +24,80 @@ class NewItem extends React.Component {
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 
-					this.props.onTask(taskid, {
+					onTask(taskid, {
 						name: `Uploading ${files[i].name}`,
 						progress: progress
 					});
 				});
 
-				this.props.onTask(taskid, {
+				onTask(taskid, {
 					name: `Uploaded ${files[i].name}`,
 					progress: 100.0
 				});
 			}
-			this.props.onList();
+			onList();
 		} catch(e) {
-			this.props.onError(e);
+			onError(e);
 		}
 	}
-	create(name) {
-		var {api} = this.props;
 
+	function create(name) {
 		var taskid = 'task_' + Math.random();
-		this.props.onTask(taskid, {
+		onTask(taskid, {
 			name: `Creating '${name}'`,
 			progress: 0.0
 		});
 
 		api.createFolder(name).then(() => {
-			this.props.onTask(taskid, {
+			onTask(taskid, {
 				name: `Created '${name}'`,
 				progress: 100.0
 			});
-			this.props.onList();
+			onList();
 		}).catch((e) => {
-			this.props.onError(e);
+			onError(e);
 		});
 	}
-	renderDropdown() {
-		return (
-			<React.Fragment>
-				<button onClick={() => {
-					this.uploadRef.current.click()
-				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-					<i className={cssf(css, "!fas !fa-upload me-2")}></i>
-					Upload
+
+	return (
+		<React.Fragment>
+			<button onClick={() => {
+				uploadRef.current.click()
+			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+				<i className={cssf(css, "!fas !fa-upload me-2")}></i>
+				Upload
+			</button>
+
+			<Prompt title="Create Folder" trigger={
+				<button className={cssf(css, "col-12 cd-option-modal-button text")}>
+					<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+					Folder
 				</button>
+			} onAccept={(name) => create(name)} />
 
-				<Prompt title="Create Folder" trigger={
-					<button className={cssf(css, "col-12 cd-option-modal-button text")}>
-						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
-						Folder
-					</button>
-				} onAccept={(name) => this.create(name)} />
+			<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
+		</React.Fragment>
+	)
+}
 
-				<input type="file" className={cssf(css, "d-none")} ref={this.uploadRef} onChange={this.upload.bind(this)} multiple />
-			</React.Fragment>
-		)
-	}
-	render() {
-		return (
-			<React.Fragment>
-				<Popup 
-					open={this.props.open} 
-					trigger={this.props.trigger}
-					onClose={this.props.onClose}
-					keepTooltipInside="body"
-					closeOnDocumentClick
-					ref={this.modal}
-					arrow={false}
-					nested
-				>
-					<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-						{this.renderDropdown()}
-					</div>
-				</Popup>
-			</React.Fragment>
-		);
-	}
+function NewItem(props) {
+	return (
+		<React.Fragment>
+			<Popup 
+				open={props.open} 
+				trigger={props.trigger}
+				keepTooltipInside="body"
+				closeOnDocumentClick
+				// ref={this.modal}
+				arrow={false}
+				nested
+			>
+				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
+					<CreateDropdown />
+				</div>
+			</Popup>
+		</React.Fragment>
+	);
 }
 
 export default NewItem;

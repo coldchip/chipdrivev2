@@ -1,59 +1,54 @@
-import React from 'react';
-import { createRef } from 'react';
+import React, { useContext } from 'react';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-class ItemOption extends React.Component {
-	constructor(props) {
-		super(props);
-		this.modal = createRef();
-	}
-	closeModal() {
-		this.modal.current.close();
-	}
-	rename(name) {
-		var {api} = this.props;
+function ItemOption(props) {
+	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
 
+	function rename(name) {
 		var taskid = 'task_' + Math.random();
-		this.props.onTask(taskid, {
+		onTask(taskid, {
 			name: `Renaming '${name}'`,
 			progress: 0.0
 		});
 
-		api.rename(this.props.item.id, name).then(() => {
-			this.props.onTask(taskid, {
+		api.rename(props.item.id, name).then(() => {
+			onTask(taskid, {
 				name: `Renamed '${name}'`,
 				progress: 100.0
 			});
-			this.props.onList();
+			onList();
 		}).catch((e) => {
-			this.props.onError(e);
+			onError(e);
 		});
 	}
-	delete() {
-		var {api, item} = this.props;
+
+	function remove() {
+		var {item} = props;
 
 		var taskid = 'task_' + Math.random();
-		this.props.onTask(taskid, {
+		onTask(taskid, {
 			name: `Deleting '${item.name}'`,
 			progress: 0.0
 		});
 
-		api.delete(this.props.item.id).then(() => {
-			this.props.onTask(taskid, {
+		api.delete(props.item.id).then(() => {
+			onTask(taskid, {
 				name: `Deleted '${item.name}'`,
 				progress: 100.0
 			});
-			this.props.onList();
+			onList();
 		}).catch((e) => {
-			this.props.onError(e);
+			onError(e);
 		});
 	}
-	download() {
-		var {api, item} = this.props;
+
+	function download() {
+		var {item} = props;
 
 		var link = api.getStreamLink(item.id);
 			
@@ -68,8 +63,8 @@ class ItemOption extends React.Component {
 		document.body.removeChild(a);
 
 	}
-	renderDropdown() {
-		var api = this.props.api;
+
+	function renderDropdown() {
 		return (
 			<React.Fragment>
 				<Prompt 
@@ -79,7 +74,7 @@ class ItemOption extends React.Component {
 							<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
 						</button>
 					} 
-					onAccept={(name) => this.rename(name)} 
+					onAccept={(name) => rename(name)} 
 				/>
 
 				<Confirm 
@@ -89,11 +84,11 @@ class ItemOption extends React.Component {
 							<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
 						</button>
 					} 
-					onAccept={this.delete.bind(this)} 
+					onAccept={remove} 
 				/>
 				
 				{
-					this.props.item.type == 1
+					props.item.type == 1
 					?
 					(
 						<Confirm 
@@ -103,7 +98,7 @@ class ItemOption extends React.Component {
 									<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
 								</button>
 							} 
-							onAccept={this.download.bind(this)} 
+							onAccept={download} 
 						/>
 					)
 					:
@@ -113,26 +108,23 @@ class ItemOption extends React.Component {
 			</React.Fragment>
 		)
 	}
-	render() {
-		return (
-			<React.Fragment>
-				<Popup 
-					open={this.props.open} 
-					trigger={this.props.trigger}
-					onClose={this.props.onClose}
-					keepTooltipInside="body"
-					closeOnDocumentClick
-					ref={this.modal}
-					arrow={false}
-					nested
-				>
-					<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-						{this.renderDropdown()}
-					</div>
-				</Popup>
-			</React.Fragment>
-		);
-	}
+
+	return (
+		<React.Fragment>
+			<Popup 
+				open={props.open} 
+				trigger={props.trigger}
+				keepTooltipInside="body"
+				closeOnDocumentClick
+				arrow={false}
+				nested
+			>
+				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
+					{renderDropdown()}
+				</div>
+			</Popup>
+		</React.Fragment>
+	);
 }
 
 export default ItemOption;

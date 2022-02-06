@@ -1,4 +1,4 @@
-import React, { createRef } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import API from './API.js';
@@ -9,123 +9,81 @@ import List from './Component/List.jsx';
 import Alert from './Component/Alert.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
+import ChipDriveContext from './Context/ChipDriveContext.jsx';
+
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
 
-class ChipDrive extends React.Component {
-	constructor(props) {
-		super(props);
-		this.listref = createRef();
+var api = new API();
 
-		this.state = {
-            sidebarOpen: false,
-            tasks: {},
-            currentDriveName: "Unknown",
-            error: false,
-            reason: ""
-        };
-		this.api = new API();
-		this.api.setEndpoint(this.props.endpoint);
-		this.api.setToken(this.props.token);
-	}
-	
-	componentDidMount() {
-		
+function ChipDrive(props) {
+
+	var [sidebar, setSidebar] = useState(false);
+	var [folderID, setFolderID] = useState("");
+	var [tasks, setTasks] = useState({});
+	var [error, setError] = useState(false);
+	var [reason, setReason] = useState("");
+
+	function onError(reason) {
+		setError(true);
+		setReason(reason);
 	}
 
-	hideError(error) {
-		this.setState({
-            error: false,
-            reason: ""
-        });
+	function onTask(id, task) {
+        setTasks((prev) => ({...prev, [id]: task }));
 	}
 
-	onError(error) {
-		this.setState({
-            error: true,
-            reason: error
-        });
+	function onList(folderid) {
+		setFolderID(folderid);
 	}
 
-	onTask(id, task) {
-		var tasks = this.state.tasks;
+	api.setEndpoint(props.endpoint);
+	api.setToken(props.token);
 
-		tasks[id] = task
+	var context = {
+		onList: onList,
+		onTask: onTask,
+		onError: onError,
+		api: api
+	};
 
-		this.setState({
-            tasks: tasks
-        });
-	}
-
-	onClose(task) {
-		this.setState({
-            tasks: []
-        });
-	}
-
-	onSetDrive(name) {
-		this.setState({
-            currentDriveName: name
-        });
-	}
-
-	onSidebar() {
-		this.setState({sidebarOpen: !this.state.sidebarOpen});
-	}
-
-	onList() {
-		this.listref.current.onList();
-	}
-
-	render() {
-		return ( 
+	return ( 
+		<ChipDriveContext.Provider value={context}>
 			<div className={cssf(css, "!chipdrive-app chipdrive")}>
 				<Header 
-					onSidebar={this.onSidebar.bind(this)}
-					onList={this.onList.bind(this)}
-					onTask={this.onTask.bind(this)}
-					onError={this.onError.bind(this)} 
-					api={this.api}
+					onSidebar={()=> {setSidebar(!sidebar)}}
 				/>
 
 				<Sidebar 
-					open={this.state.sidebarOpen}
-					onSidebar={this.onSidebar.bind(this)} 
-					onList={this.onList.bind(this)}
-					onSetDrive={this.onSetDrive.bind(this)}
-					onTask={this.onTask.bind(this)}
-					onError={this.onError.bind(this)} 
-					api={this.api}
+					open={sidebar}
+					onSidebar={()=> {setSidebar(!sidebar)}} 
 				/>
 
 				<div className={cssf(css, "chipdrive-body")}>
 					<div className={cssf(css, "label")}>
 						<p className={cssf(css, "label-text text")}>
 							<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
-							{this.state.currentDriveName}
+							My Drive
 						</p>
 					</div>
 					<List 
-						ref={this.listref}
-						onTask={this.onTask.bind(this)}
-						onError={this.onError.bind(this)} 
-						api={this.api}
+						folderid={folderID}
 					/>
 				</div>
 
 				<Alert
-					title={this.state.reason}
-					open={this.state.error} 
-					onAccept={this.hideError.bind(this)}
+					title={reason}
+					open={error} 
+					onAccept={() => { setError(false) }}
 				/>
 
 				<TaskModal 
-					tasks={this.state.tasks}
-					onClear={this.onClose.bind(this)}
+					tasks={tasks}
+					onClear={() => { setTasks([]) }}
 				/>
 			</div>
-		);
-	}
+		</ChipDriveContext.Provider>
+	);
 }
 
 export default ChipDrive;

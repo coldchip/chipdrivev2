@@ -1,76 +1,61 @@
-import React from 'react';
+import React, {useContext, useState, useCallback, useEffect} from 'react';
+
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-class List extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = { 
-			list: [],
-			loading: true
-		};
-	}
-	componentDidMount() {
-		
-	}
-	onList() {
-		var api = this.props.api;
+function List(props) {
+	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
 
-		this.setState({ 
-			list: [],
-			loading: true
-		});
+	const [list, setList] = useState([]);
+	const [loading, setLoading] = useState(false);
 
-		api.list().then((list) => {
-			this.setState({ 
-				list: list,
-				loading: false
-			});
+	useEffect(() => {
+		var {folderid} = props;
+
+		api.setFolder(folderid);
+		setLoading(true);
+		setList([]);
+
+		api.list().then((_list) => {
+			setLoading(false);
+			setList(_list);
 		}).catch((e) => {
-			this.props.onError(e);
+			onError(e);
 		});
-	}
-	renderList() {
-		var list = [];
-		this.state.list.forEach((item) => {
-			list.push(
-				<Item 
-					item={item} 
-					onList={this.onList.bind(this)}
-					onTask={this.props.onTask}
-					onError={this.props.onError}
-					key={item.id}
-					api={this.props.api}
-				/>
-			);
-		});
+	}, [props.folderid]);
 
-		if(!this.state.loading) {
-			if(list.length > 0) {
-				return (
-					<div className={cssf(css, "list-container")}>
-						{list}
-					</div>
-				);
-			} else {
-				return (
-					<div className={cssf(css, "notice-container mt-2")}>
-						<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
-						<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
-					</div>
-				);
-			}
+	if(!loading) {
+		if(list.length > 0) {
+			return (
+				<div className={cssf(css, "list-container")}>
+					{
+						list.map((item) => {
+							return (
+								<Item 
+									item={item} 
+									key={item.id}
+								/>
+							);
+						})
+					}
+				</div>
+			);
 		} else {
 			return (
-				<Loader />
+				<div className={cssf(css, "notice-container mt-2")}>
+					<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
+					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
+				</div>
 			);
 		}
-	}
-	render() {
-		return (this.renderList());
+	} else {
+		return (
+			<Loader />
+		);
 	}
 }
 

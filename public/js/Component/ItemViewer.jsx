@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 import Types from '../Types';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-class ItemViewer extends React.Component {
-	constructor(props) {
-		super(props);
-	}
-	renderView() {
-		var api = this.props.api;
+function ItemViewer(props) {
+	var {api} = useContext(ChipDriveContext);
 
-		var item = this.props.item;
+	function renderView() {
+
+		var {item} = props;
+
 		var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
@@ -38,23 +38,22 @@ class ItemViewer extends React.Component {
 			)
 		}
 	}
-	render() {
-		return (
-			<React.Fragment>
-				<Popup 
-					open={this.props.open} 
-					trigger={this.props.trigger}
-					onClose={this.props.onClose}
-					closeOnDocumentClick
-					modal
-				>
-					<div className={cssf(css, "cd-preview-modal")}>
-						{this.renderView()}
-					</div>
-				</Popup>
-			</React.Fragment>
-		);
-	}
+
+	return (
+		<React.Fragment>
+			<Popup 
+				open={props.open} 
+				trigger={props.trigger}
+				onClose={props.onClose}
+				closeOnDocumentClick
+				modal
+			>
+				<div className={cssf(css, "cd-preview-modal")}>
+					{renderView()}
+				</div>
+			</Popup>
+		</React.Fragment>
+	);
 }
 
 export default ItemViewer;
