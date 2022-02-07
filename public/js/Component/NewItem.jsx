@@ -1,13 +1,22 @@
 import React, { useRef, useContext } from 'react';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+
+import APIContext from './../Context/APIContext.jsx';
+import ErrorContext from './../Context/ErrorContext.jsx';
+import TaskContext from './../Context/TaskContext.jsx';
+import ReloadContext from './../Context/ReloadContext.jsx';
+
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function CreateDropdown(props) {
+	var api = useContext(APIContext);
+	var onError = useContext(ErrorContext);
+	var onTask = useContext(TaskContext);
+	var onReload = useContext(ReloadContext);
+
 	const uploadRef = useRef(null);
-	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
 
 	async function upload(e) {
 		try {
@@ -35,7 +44,7 @@ function CreateDropdown(props) {
 					progress: 100.0
 				});
 			}
-			onList();
+			onReload();
 		} catch(e) {
 			onError(e);
 		}
@@ -53,7 +62,7 @@ function CreateDropdown(props) {
 				name: `Created '${name}'`,
 				progress: 100.0
 			});
-			onList();
+			onReload();
 		}).catch((e) => {
 			onError(e);
 		});

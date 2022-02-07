@@ -1,5 +1,10 @@
 import React, { useContext } from 'react';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+
+import APIContext from './../Context/APIContext.jsx';
+import ErrorContext from './../Context/ErrorContext.jsx';
+import TaskContext from './../Context/TaskContext.jsx';
+import ReloadContext from './../Context/ReloadContext.jsx';
+
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
 import Popup from 'reactjs-popup';
@@ -7,7 +12,10 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemOption(props) {
-	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
+	var api = useContext(APIContext);
+	var onError = useContext(ErrorContext);
+	var onTask = useContext(TaskContext);
+	var onReload = useContext(ReloadContext);
 
 	function rename(name) {
 		var taskid = 'task_' + Math.random();
@@ -21,7 +29,7 @@ function ItemOption(props) {
 				name: `Renamed '${name}'`,
 				progress: 100.0
 			});
-			onList();
+			onReload();
 		}).catch((e) => {
 			onError(e);
 		});
@@ -41,7 +49,7 @@ function ItemOption(props) {
 				name: `Deleted '${item.name}'`,
 				progress: 100.0
 			});
-			onList();
+			onReload();
 		}).catch((e) => {
 			onError(e);
 		});

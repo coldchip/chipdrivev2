@@ -4,6 +4,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Header(props) {
+	console.log("hello header");
 	return (
 		<React.Fragment>
 			<div className={cssf(css, "chipdrive-header")}>
@@ -31,4 +32,4 @@ function Header(props) {
 	);
 }
 
-export default Header;
+export default React.memo(Header);

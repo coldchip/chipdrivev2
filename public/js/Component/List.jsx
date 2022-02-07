@@ -1,6 +1,7 @@
 import React, {useContext, useState, useCallback, useEffect} from 'react';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import APIContext from './../Context/APIContext.jsx';
+import ErrorContext from './../Context/ErrorContext.jsx';
 
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';
@@ -8,15 +9,13 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function List(props) {
-	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
+	var api = useContext(APIContext);
+	var onError = useContext(ErrorContext);
 
 	const [list, setList] = useState([]);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		var {folderid} = props;
-
-		api.setFolder(folderid);
 		setLoading(true);
 		setList([]);
 
@@ -26,7 +25,7 @@ function List(props) {
 		}).catch((e) => {
 			onError(e);
 		});
-	}, [props.folderid]);
+	}, [props.reload]);
 
 	if(!loading) {
 		if(list.length > 0) {
@@ -59,4 +58,4 @@ function List(props) {
 	}
 }
 
-export default List;
+export default React.memo(List);

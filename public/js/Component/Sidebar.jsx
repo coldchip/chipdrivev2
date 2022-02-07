@@ -1,5 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+
+import APIContext from './../Context/APIContext.jsx';
+import ErrorContext from './../Context/ErrorContext.jsx';
+import ReloadContext from './../Context/ReloadContext.jsx';
 
 import NewItem from './NewItem.jsx';
 import Loader from './Loader.jsx';
@@ -7,7 +10,9 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Sidebar(props) {
-	var {api, onList, onTask, onError} = useContext(ChipDriveContext);
+	var api = useContext(APIContext);
+	var onError = useContext(ErrorContext);
+	var onReload = useContext(ReloadContext);
 
 	var [list, setList] = useState([]);
 	var [loading, setLoading] = useState(false);
@@ -22,7 +27,8 @@ function Sidebar(props) {
 
 			if(list.length > 0) {
 				var drive = list[0];
-				onList(drive.id);
+				api.setFolder(drive.id);
+				onReload();
 			}
 		}).catch((e) => {
 			setList([]);
@@ -39,7 +45,10 @@ function Sidebar(props) {
 							return (
 								<button 
 									className={cssf(css, "sidebar-item text")}
-									onClick={() => { onList(drive.id) }} 
+									onClick={() => { 
+										api.setFolder(drive.id);
+										onReload();
+									}} 
 									tabIndex="0"
 									key={drive.id}
 								>
@@ -117,4 +126,4 @@ function Sidebar(props) {
 	);
 }
 
-export default Sidebar;
+export default React.memo(Sidebar);

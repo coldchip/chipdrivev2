@@ -2,13 +2,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
+var cssLookup = [];
+
 module.exports = {
   mode: 'production',
   devtool: false,
   performance: {
     hints: false
   },
-  devtool: false,
+  devtool : 'source-map',
   entry: ["@babel/polyfill", './public/js/index.jsx'],
   module: {
     rules: [
@@ -33,23 +35,22 @@ module.exports = {
 
                 if(!exclude.includes(localName)) {
 
-                  var seed = 0;
-                  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-                  for (let i = 0, ch; i < localName.length; i++) {
-                      ch = localName.charCodeAt(i);
-                      h1 = Math.imul(h1 ^ ch, 2654435761);
-                      h2 = Math.imul(h2 ^ ch, 1597334677);
+                  if(!cssLookup.includes(localName)) {
+                    cssLookup.push(localName);
                   }
-                  h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
-                  h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
-                  var hash = 4294967296 * (2097151 & h2) + (h1>>>0);
 
-                  return "css-" + Buffer
-                  .from(hash.toString())
-                  .toString('base64')
-                  .replace(/\W/g, '')
-                  .toLowerCase();
+                  var prefix = cssLookup.indexOf(localName);
 
+                  function numberToLetters(num) {
+                    let letters = ''
+                    while (num >= 0) {
+                      letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[num % 52] + letters
+                      num = Math.floor(num / 52) - 1
+                    }
+                    return letters
+                  }
+
+                  return "cd-" + numberToLetters(prefix);
                 } else {
                   return localName;
                 }

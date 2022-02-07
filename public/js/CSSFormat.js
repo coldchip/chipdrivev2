@@ -10,7 +10,7 @@ function cssf(css, format) {
 			}
 		}
 	}
-	return result;
+	return result.trim();
 }
 
 export default cssf;

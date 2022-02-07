@@ -9,80 +9,97 @@ import List from './Component/List.jsx';
 import Alert from './Component/Alert.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
-import ChipDriveContext from './Context/ChipDriveContext.jsx';
+import APIContext from './Context/APIContext.jsx';
+import ErrorContext from './Context/ErrorContext.jsx';
+import TaskContext from './Context/TaskContext.jsx';
+import ReloadContext from './Context/ReloadContext.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
 
-var api = new API();
-
 function ChipDrive(props) {
-
 	var [sidebar, setSidebar] = useState(false);
-	var [folderID, setFolderID] = useState("");
+	var [reload, setReload] = useState("");
 	var [tasks, setTasks] = useState({});
 	var [error, setError] = useState(false);
 	var [reason, setReason] = useState("");
 
-	function onError(reason) {
+	var api = React.useMemo(() => {
+		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
+		console.log(`%cChipDrive • Warning:%c Unless you are a developer, please do not type or insert anything here if someone asks you to do it. It might be malicious. Your data may be compromised if you do so. `, 'color: #FFFFFF; background: red;', '');
+
+		var api = new API();
+		api.setEndpoint(props.endpoint);
+		api.setToken(props.token);
+		api.setFolder("root");
+
+		return api;
+	}, [props.endpoint, props.token]);
+
+	var onError = React.useCallback((reason) => {
 		setError(true);
 		setReason(reason);
-	}
+	}, []);
 
-	function onTask(id, task) {
+	var onTask = React.useCallback((id, task) => {
         setTasks((prev) => ({...prev, [id]: task }));
-	}
+	}, [])
 
-	function onList(folderid) {
-		setFolderID(folderid);
-	}
+	var onReload = React.useCallback(() => {
+		setReload(Math.random());
+	}, []);
 
-	api.setEndpoint(props.endpoint);
-	api.setToken(props.token);
+	var onSidebar = React.useCallback(() => {
+		setSidebar((state) => !state);
+	}, []);
 
-	var context = {
-		onList: onList,
-		onTask: onTask,
-		onError: onError,
-		api: api
-	};
+	var app = (
+		<div className={cssf(css, "!chipdrive-app chipdrive")}>
+			<Header 
+				onSidebar={onSidebar}
+			/>
 
-	return ( 
-		<ChipDriveContext.Provider value={context}>
-			<div className={cssf(css, "!chipdrive-app chipdrive")}>
-				<Header 
-					onSidebar={()=> {setSidebar(!sidebar)}}
-				/>
+			<Sidebar 
+				open={sidebar}
+				onSidebar={onSidebar} 
+			/>
 
-				<Sidebar 
-					open={sidebar}
-					onSidebar={()=> {setSidebar(!sidebar)}} 
-				/>
-
-				<div className={cssf(css, "chipdrive-body")}>
-					<div className={cssf(css, "label")}>
-						<p className={cssf(css, "label-text text")}>
-							<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
-							My Drive
-						</p>
-					</div>
-					<List 
-						folderid={folderID}
-					/>
+			<div className={cssf(css, "chipdrive-body")}>
+				<div className={cssf(css, "label")}>
+					<p className={cssf(css, "label-text text")}>
+						<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
+						My Drive
+					</p>
 				</div>
-
-				<Alert
-					title={reason}
-					open={error} 
-					onAccept={() => { setError(false) }}
-				/>
-
-				<TaskModal 
-					tasks={tasks}
-					onClear={() => { setTasks([]) }}
+				<List 
+					reload={reload}
 				/>
 			</div>
-		</ChipDriveContext.Provider>
+
+			<Alert
+				title={reason}
+				open={error} 
+				onAccept={() => { setError(false) }}
+			/>
+
+			<TaskModal 
+				tasks={tasks}
+				onClear={() => { setTasks([]) }}
+			/>
+		</div>
+	);
+
+
+	return (
+		<APIContext.Provider value={api}>
+			<ErrorContext.Provider value={onError}>
+				<TaskContext.Provider value={onTask}>
+					<ReloadContext.Provider value={onReload}>
+						{app}
+					</ReloadContext.Provider>
+				</TaskContext.Provider>
+			</ErrorContext.Provider>
+		</APIContext.Provider>
 	);
 }
 

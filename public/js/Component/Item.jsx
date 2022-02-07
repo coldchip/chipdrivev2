@@ -1,12 +1,23 @@
 import React, { useContext } from 'react';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+
+import APIContext from './../Context/APIContext.jsx';
+import ReloadContext from './../Context/ReloadContext.jsx';
+
 import ItemOption from './ItemOption.jsx';
 import ItemViewer from './ItemViewer.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Item(props) {
-	var {onList, onTask} = useContext(ChipDriveContext);
+	var api = useContext(APIContext);
+	var onReload = useContext(ReloadContext);
+
+	function onEnter() {
+		var {item} = props;
+
+		api.setFolder(item.id);
+		onReload();
+	}
 
 	if(props.item.type == 1) {
 		return (
@@ -40,7 +51,7 @@ function Item(props) {
 					item={props.item} 
 				/>
 
-				<div className={cssf(css, "list-item-inner")} onClick={() => { onList(props.item.id) }}>
+				<div className={cssf(css, "list-item-inner")} onClick={onEnter}>
 					<i className={cssf(css, "!fas !fa-folder item-icon")}></i>
 					<p className={cssf(css, "item-label text")}>{props.item.name}</p>
 				</div>

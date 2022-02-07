@@ -1,12 +1,14 @@
 import React, { useContext } from 'react';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+
+import APIContext from './../Context/APIContext.jsx';
+
 import Types from '../Types';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemViewer(props) {
-	var {api} = useContext(ChipDriveContext);
+	var api = useContext(APIContext);
 
 	function renderView() {
 
