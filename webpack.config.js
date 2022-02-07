@@ -10,7 +10,6 @@ module.exports = {
   performance: {
     hints: false
   },
-  devtool : 'source-map',
   entry: ["@babel/polyfill", './public/js/index.jsx'],
   module: {
     rules: [
