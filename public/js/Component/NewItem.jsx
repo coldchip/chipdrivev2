@@ -1,20 +1,16 @@
 import React, { useRef, useContext } from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
-import ErrorContext from './../Context/ErrorContext.jsx';
-import TaskContext from './../Context/TaskContext.jsx';
-import ReloadContext from './../Context/ReloadContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function CreateDropdown(props) {
+function NewItem(props) {
 	var api = useContext(APIContext);
-	var onError = useContext(ErrorContext);
-	var onTask = useContext(TaskContext);
-	var onReload = useContext(ReloadContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	const uploadRef = useRef(null);
 
@@ -23,9 +19,14 @@ function CreateDropdown(props) {
 			var files = e.target.files;
 			for(var i = 0; i < files.length; i++) {
 				var taskid = 'task_' + Math.random();
-				onTask(taskid, {
-					name: `Uploading ${files[i].name}`,
-					progress: 0.0
+				
+				dispatch({
+					type: "task", 
+					id: taskid, 
+					task: {
+						name: `Uploading ${files[i].name}`,
+						progress: 0.0
+					}
 				});
 
 				var res = await api.createFile(files[i].name); // stage 1 - create the file
@@ -33,63 +34,82 @@ function CreateDropdown(props) {
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 
-					onTask(taskid, {
-						name: `Uploading ${files[i].name}`,
-						progress: progress
+					dispatch({
+						type: "task", 
+						id: taskid, 
+						task: {
+							name: `Uploading ${files[i].name}`,
+							progress: progress
+						}
 					});
 				});
 
-				onTask(taskid, {
-					name: `Uploaded ${files[i].name}`,
-					progress: 100.0
+				dispatch({
+					type: "task", 
+					id: taskid, 
+					task: {
+						name: `Uploaded ${files[i].name}`,
+						progress: 100.0
+					}
 				});
 			}
-			onReload();
+			
+			dispatch({type: "list"});
 		} catch(e) {
-			onError(e);
+			dispatch({type: "error", reason: e});
 		}
 	}
 
 	function create(name) {
 		var taskid = 'task_' + Math.random();
-		onTask(taskid, {
-			name: `Creating '${name}'`,
-			progress: 0.0
+
+		dispatch({
+			type: "task", 
+			id: taskid, 
+			task: {
+				name: `Creating '${name}'`,
+				progress: 0.0
+			}
 		});
 
 		api.createFolder(name).then(() => {
-			onTask(taskid, {
-				name: `Created '${name}'`,
-				progress: 100.0
+			dispatch({
+				type: "task", 
+				id: taskid, 
+				task: {
+					name: `Created '${name}'`,
+					progress: 100
+				}
 			});
-			onReload();
+
+			dispatch({type: "list"});
 		}).catch((e) => {
-			onError(e);
+			dispatch({type: "error", reason: e});
 		});
 	}
 
-	return (
-		<React.Fragment>
-			<button onClick={() => {
-				uploadRef.current.click()
-			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-upload me-2")}></i>
-				Upload
-			</button>
-
-			<Prompt title="Create Folder" trigger={
-				<button className={cssf(css, "col-12 cd-option-modal-button text")}>
-					<i className={cssf(css, "!fas !fa-folder me-2")}></i>
-					Folder
+	function renderDropdown() {
+		return (
+			<React.Fragment>
+				<button onClick={() => {
+					uploadRef.current.click()
+				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+					<i className={cssf(css, "!fas !fa-upload me-2")}></i>
+					Upload
 				</button>
-			} onAccept={(name) => create(name)} />
 
-			<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
-		</React.Fragment>
-	)
-}
+				<Prompt title="Create Folder" trigger={
+					<button className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+						Folder
+					</button>
+				} onAccept={(name) => create(name)} />
 
-function NewItem(props) {
+				<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
+			</React.Fragment>
+		)
+	}
+
 	return (
 		<React.Fragment>
 			<Popup 
@@ -97,12 +117,11 @@ function NewItem(props) {
 				trigger={props.trigger}
 				keepTooltipInside="body"
 				closeOnDocumentClick
-				// ref={this.modal}
 				arrow={false}
 				nested
 			>
 				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-					<CreateDropdown />
+					{renderDropdown()}
 				</div>
 			</Popup>
 		</React.Fragment>

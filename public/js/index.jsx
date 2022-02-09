@@ -21,7 +21,7 @@ class App extends React.Component {
 	render() {
 		return ( 
 			<React.StrictMode>
-				<ChipDrive endpoint="http://192.168.10.141:8193" token={this.genToken()} />
+				<ChipDrive endpoint="http://127.0.0.1:8193" token={this.genToken()} />
 			</React.StrictMode>
 		);
 	}

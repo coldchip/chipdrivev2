@@ -1,5 +1,5 @@
 import { createContext } from 'react';
 
-var ChipDriveContext = createContext({});
+var APIContext = createContext({});
 
-export default ChipDriveContext;
+export default APIContext;

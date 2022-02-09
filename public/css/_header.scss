@@ -8,9 +8,9 @@
 	box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
 
 	.header-bars {
-		width: 23px;
+		font-size: 23px;
 		margin: 0 0 0 16px;
-		fill: $textColor;
+		color: $textColor;
 	}
 
 	.header-logo {
@@ -25,6 +25,7 @@
 		border: none;
 		background: $chipGreen;
 		color: $textColorWhite;
+		font-size: 16px;
 		font-weight: 600;
 		border-radius: 5px;
 		outline: 0;

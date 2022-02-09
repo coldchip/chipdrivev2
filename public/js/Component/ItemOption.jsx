@@ -1,9 +1,7 @@
 import React, { useContext } from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
-import ErrorContext from './../Context/ErrorContext.jsx';
-import TaskContext from './../Context/TaskContext.jsx';
-import ReloadContext from './../Context/ReloadContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
@@ -13,25 +11,33 @@ import cssf from "../CSSFormat";
 
 function ItemOption(props) {
 	var api = useContext(APIContext);
-	var onError = useContext(ErrorContext);
-	var onTask = useContext(TaskContext);
-	var onReload = useContext(ReloadContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	function rename(name) {
 		var taskid = 'task_' + Math.random();
-		onTask(taskid, {
-			name: `Renaming '${name}'`,
-			progress: 0.0
+
+		dispatch({
+			type: "task", 
+			id: taskid, 
+			task: {
+				name: `Renaming '${name}'`,
+				progress: 0.0
+			}
 		});
 
 		api.rename(props.item.id, name).then(() => {
-			onTask(taskid, {
-				name: `Renamed '${name}'`,
-				progress: 100.0
+			dispatch({
+				type: "task", 
+				id: taskid, 
+				task: {
+					name: `Renamed '${name}'`,
+					progress: 100.0
+				}
 			});
-			onReload();
+
+			dispatch({type: "list"});
 		}).catch((e) => {
-			onError(e);
+			dispatch({type: "error", reason: e});
 		});
 	}
 
@@ -39,19 +45,29 @@ function ItemOption(props) {
 		var {item} = props;
 
 		var taskid = 'task_' + Math.random();
-		onTask(taskid, {
-			name: `Deleting '${item.name}'`,
-			progress: 0.0
+
+		dispatch({
+			type: "task", 
+			id: taskid, 
+			task: {
+				name: `Deleting '${item.name}'`,
+				progress: 0.0
+			}
 		});
 
 		api.delete(props.item.id).then(() => {
-			onTask(taskid, {
-				name: `Deleted '${item.name}'`,
-				progress: 100.0
+			dispatch({
+				type: "task", 
+				id: taskid, 
+				task: {
+					name: `Deleted '${item.name}'`,
+					progress: 100.0
+				}
 			});
-			onReload();
+
+			dispatch({type: "list"});
 		}).catch((e) => {
-			onError(e);
+			dispatch({type: "error", reason: e});
 		});
 	}
 

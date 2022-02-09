@@ -1,7 +1,7 @@
 import React, {useContext, useState, useCallback, useEffect} from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
-import ErrorContext from './../Context/ErrorContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';
@@ -10,7 +10,7 @@ import cssf from "../CSSFormat";
 
 function List(props) {
 	var api = useContext(APIContext);
-	var onError = useContext(ErrorContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	const [list, setList] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -19,13 +19,14 @@ function List(props) {
 		setLoading(true);
 		setList([]);
 
+		api.setFolder(props.folder);
 		api.list().then((_list) => {
 			setLoading(false);
 			setList(_list);
 		}).catch((e) => {
-			onError(e);
+			dispatch({type: "error", reason: e});
 		});
-	}, [props.reload]);
+	}, [props.folder]);
 
 	if(!loading) {
 		if(list.length > 0) {

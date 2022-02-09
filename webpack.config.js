@@ -38,18 +38,15 @@ module.exports = {
                     cssLookup.push(localName);
                   }
 
-                  var prefix = cssLookup.indexOf(localName);
+                  var index = cssLookup.indexOf(localName);
 
-                  function numberToLetters(num) {
-                    let letters = ''
-                    while (num >= 0) {
-                      letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'[num % 52] + letters
-                      num = Math.floor(num / 52) - 1
-                    }
-                    return letters
+                  let prefix = ''
+                  while(index >= 0) {
+                    prefix = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[index % 62] + prefix
+                    index = Math.floor(index / 62) - 1
                   }
 
-                  return "cd-" + numberToLetters(prefix);
+                  return "cd-" + prefix;
                 } else {
                   return localName;
                 }
@@ -99,7 +96,8 @@ module.exports = {
       chunkFilename: 'chipdrive.[contenthash:16].css'
     }),
     new HtmlWebpackPlugin({
-      template: './public/index.html'
+      template: './public/index.html',
+      favicon: './public/img/favicon.ico'
     })
   ]
 }

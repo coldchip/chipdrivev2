@@ -1,8 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
-import ErrorContext from './../Context/ErrorContext.jsx';
-import ReloadContext from './../Context/ReloadContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import NewItem from './NewItem.jsx';
 import Loader from './Loader.jsx';
@@ -11,8 +10,7 @@ import cssf from "../CSSFormat";
 
 function Sidebar(props) {
 	var api = useContext(APIContext);
-	var onError = useContext(ErrorContext);
-	var onReload = useContext(ReloadContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var [list, setList] = useState([]);
 	var [loading, setLoading] = useState(false);
@@ -27,12 +25,11 @@ function Sidebar(props) {
 
 			if(list.length > 0) {
 				var drive = list[0];
-				api.setFolder(drive.id);
-				onReload();
+				dispatch({type: "list", id: drive.id});
 			}
 		}).catch((e) => {
 			setList([]);
-			onError(e);
+			dispatch({type: "error", reason: e});
 		});
 	}, []);
 
@@ -46,8 +43,7 @@ function Sidebar(props) {
 								<button 
 									className={cssf(css, "sidebar-item text")}
 									onClick={() => { 
-										api.setFolder(drive.id);
-										onReload();
+										dispatch({type: "list", id: drive.id});
 									}} 
 									tabIndex="0"
 									key={drive.id}
@@ -71,7 +67,9 @@ function Sidebar(props) {
 		<React.Fragment>
 			<div className={cssf(css, `chipdrive-sidebar ${!props.open ? `chipdrive-sidebar-hidden` : ""} pt-3`)}>
 				<div className={cssf(css, "text sidebar-close")}>
-					<i className={cssf(css, "!fas !fa-times cross")} onClick={props.onSidebar}></i>
+					<i className={cssf(css, "!fas !fa-times cross")} onClick={() => {
+						dispatch({type: "sidebar"});
+					}}></i>
 				</div>
 
 				<NewItem 
@@ -119,7 +117,9 @@ function Sidebar(props) {
 			</div>
 			{
 				props.open ? (
-					<div className={cssf(css, "chipdrive-sidebar-backdrop")} onClick={props.onSidebar}></div>
+					<div className={cssf(css, "chipdrive-sidebar-backdrop")} onClick={() => {
+						dispatch({type: "sidebar"});
+					}}></div>
 				) : null
 			}
 		</React.Fragment>
