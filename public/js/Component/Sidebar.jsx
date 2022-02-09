@@ -105,7 +105,7 @@ function Sidebar(props) {
 					<div className={cssf(css, "quota-bar mt-3")}>
 						<div className={cssf(css, "quota-bar-used")}></div>
 					</div>
-					<div className={cssf(css, "quota-usage text")}>
+					<div className={cssf(css, "quota-usage text mt-2")}>
 						0.0 B of 0 B used
 					</div>
 					<div className={cssf(css, "quota-warning text mt-2")}>
