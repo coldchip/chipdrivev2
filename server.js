@@ -30,8 +30,6 @@ app.use((req, res, next) =>  {
 	next();
 });
 
-app.use('/img', express.static("./public/img"));
-
 app.get('*', (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');

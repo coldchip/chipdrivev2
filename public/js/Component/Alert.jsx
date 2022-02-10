@@ -1,17 +1,17 @@
-import React, { useCallback, useRef } from 'react';
-import Popup from 'reactjs-popup';
+import React, { useRef } from 'react';
+import Popup from './Modal.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Alert(props) {
 	var modal = useRef(null);
 
-	var onAccept = useCallback(() => {
+	function onAccept() {
 		modal.current.close();
 		if(typeof props.onAccept === 'function') {
 			props.onAccept();
 		}
-	});
+	}
 
 	return (
 		<React.Fragment>

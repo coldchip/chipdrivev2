@@ -25,13 +25,14 @@ function Sidebar(props) {
 
 			if(list.length > 0) {
 				var drive = list[0];
+				dispatch({type: "drive", name: drive.name});
 				dispatch({type: "list", id: drive.id});
 			}
 		}).catch((e) => {
 			setList([]);
 			dispatch({type: "error", reason: e});
 		});
-	}, []);
+	}, [api, dispatch]);
 
 	function renderDriveList() {
 		if(!loading) {
@@ -42,7 +43,8 @@ function Sidebar(props) {
 							return (
 								<button 
 									className={cssf(css, "sidebar-item text")}
-									onClick={() => { 
+									onClick={() => {
+										dispatch({type: "drive", name: drive.name});
 										dispatch({type: "list", id: drive.id});
 									}} 
 									tabIndex="0"
@@ -87,10 +89,6 @@ function Sidebar(props) {
 				<button className={cssf(css, "sidebar-item text")} tabIndex="0">
 					<i className={cssf(css, "!fas !fa-cog me-2")}></i>
 					Settings
-				</button>
-				<button className={cssf(css, "sidebar-item text")} tabIndex="0">
-					<i className={cssf(css, "!fas !fa-info-circle me-2")}></i>
-					About
 				</button>
 				<button className={cssf(css, "sidebar-item text")} tabIndex="0">
 					<i className={cssf(css, "!fas !fa-sign-out-alt me-2")}></i>

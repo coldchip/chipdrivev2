@@ -10,7 +10,7 @@ import cssf from "../CSSFormat";
 function Item(props) {
 	var dispatch = useContext(ChipDriveContext);
 
-	if(props.item.type == 1) {
+	if(props.item.type === 1) {
 		return (
 			<div className={cssf(css, "list-item")}>
 				<ItemOption 

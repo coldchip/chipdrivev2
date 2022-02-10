@@ -112,7 +112,7 @@ function ItemOption(props) {
 				/>
 				
 				{
-					props.item.type == 1
+					props.item.type === 1
 					?
 					(
 						<Confirm 
@@ -136,7 +136,6 @@ function ItemOption(props) {
 	return (
 		<React.Fragment>
 			<Popup 
-				open={props.open} 
 				trigger={props.trigger}
 				keepTooltipInside="body"
 				closeOnDocumentClick

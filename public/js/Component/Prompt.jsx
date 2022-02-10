@@ -1,5 +1,5 @@
-import React, { useRef, useCallback, useState } from 'react';
-import Popup from 'reactjs-popup';
+import React, { useRef, useState } from 'react';
+import Popup from './Modal.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -7,25 +7,26 @@ function Prompt(props) {
 	var modal = useRef(null);
 	var [input, setInput] = useState("");
 
-	var onReject = useCallback(() => {
+	function onReject() {
 		modal.current.close();
 		if(typeof props.onReject === 'function') {
 			props.onReject();
 		}
-	});
+	}
 
-	var onAccept = useCallback(() => {
+	function onAccept() {
 		modal.current.close();
 		if(typeof props.onAccept === 'function') {
 			props.onAccept(input);
 		}
-	});
+	}
 
 	return (
 		<React.Fragment>
 			<Popup 
 				open={props.open} 
 				trigger={props.trigger}
+				onOpen={props.onOpen}
 				closeOnDocumentClick={false}
 				closeOnEscape={false}
 				ref={modal}

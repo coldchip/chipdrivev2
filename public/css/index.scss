@@ -37,6 +37,7 @@ body, html {
 }
 
 @import "modal";
+@import "modal/account";
 @import "modal/login";
 @import "modal/preview";
 @import "modal/options";
@@ -53,7 +54,7 @@ body, html {
 	.chipdrive {
 		.chipdrive-header {
 			z-index: 500;
-			.header-bars, .header-upload {
+			.header-bars {
 				display: block;
 			}
 		}
@@ -92,6 +93,10 @@ body, html {
 					}
 				}
 			}
+
+			.upload-round {
+				display: block;
+			}
 		}
 	}
 }
@@ -100,7 +105,7 @@ body, html {
 	.chipdrive {
 		.chipdrive-header {
 			z-index: 503;
-			.header-bars, .header-upload {
+			.header-bars {
 				display: none;
 			}
 		}
@@ -138,6 +143,10 @@ body, html {
 						}
 					}
 				}
+			}
+
+			.upload-round {
+				display: none;
 			}
 		}
 	}

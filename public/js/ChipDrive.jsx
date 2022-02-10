@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import ReactDOM from 'react-dom';
 
 import API from './API.js';
@@ -22,6 +22,12 @@ const reducer = (state, action) => {
 			return {
 				...state, 
 				sidebar: !state.sidebar 
+			};
+		}
+		case 'drive': {
+			return { 
+				...state, 
+				drive: action.name
 			};
 		}
 		case 'list': {
@@ -81,8 +87,9 @@ function ChipDrive(props) {
 		return api;
 	}, [props.endpoint, props.token]);
 
-	var [{sidebar, folder, tasks, error, reason}, dispatch] = useReducer(reducer, {
+	var [{sidebar, drive, folder, tasks, error, reason}, dispatch] = useReducer(reducer, {
 		sidebar: false,
+		drive: "Unknown",
 		folder: "root",
 		tasks: {},
 		error: false,
@@ -93,22 +100,27 @@ function ChipDrive(props) {
 		<div className={cssf(css, "!chipdrive-app chipdrive")}>
 			<Header />
 
-			<Sidebar open={sidebar} />
+			<Sidebar 
+				open={sidebar} 
+			/>
 
-			<Body folder={folder} />
-
-			<Alert
-				title={reason}
-				open={error} 
-				onAccept={() => {
-					dispatch({type: "closeError"})
-				}}
+			<Body 
+				title={drive} 
+				folder={folder} 
 			/>
 
 			<TaskModal 
 				tasks={tasks}
 				onClear={() => {
 					dispatch({type: "closeTask"})
+				}}
+			/>
+
+			<Alert
+				title={reason}
+				open={error} 
+				onAccept={() => {
+					dispatch({type: "closeError"})
 				}}
 			/>
 		</div>

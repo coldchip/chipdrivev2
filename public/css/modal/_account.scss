@@ -1,0 +1,19 @@
+.cd-account-modal {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	.account-profile {
+		width: 100px;
+		height: 100px;
+		border-radius: 100%;
+	}
+	.account-name {
+		font-size: 16px;
+		font-weight: 600;
+		color: $textColor;
+	}
+	.account-email {
+		font-size: 16px;
+		color: $textColor;
+	}
+}

@@ -1,4 +1,4 @@
-import React, {useContext, useState, useCallback, useEffect} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
@@ -26,7 +26,7 @@ function List(props) {
 		}).catch((e) => {
 			dispatch({type: "error", reason: e});
 		});
-	}, [props.folder]);
+	}, [api, dispatch, props.folder]);
 
 	if(!loading) {
 		if(list.length > 0) {

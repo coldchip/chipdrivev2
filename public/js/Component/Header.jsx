@@ -3,8 +3,11 @@ import React, { useContext } from 'react';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import NewItem from './NewItem.jsx';
+import Account from './Account.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
+
+import logo from "../../img/logo.png";
 
 function Header(props) {
 	var dispatch = useContext(ChipDriveContext);
@@ -17,18 +20,15 @@ function Header(props) {
 				}}></i>
 
 				<a href="#">
-					<img className={cssf(css, "header-logo")} src="./img/logo.png" alt="ChipDrive Logo" />	
+					<img className={cssf(css, "header-logo ms-3")} src={logo} alt="ChipDrive Logo" />	
 				</a>
 
 				<div className={cssf(css, "flex-fill")}></div>
 
-				<NewItem 
+				<Account
 					trigger={
-						<button className={cssf(css, "header-upload text")}>
-							<i className={cssf(css, "!fas !fa-plus me-2")}></i>
-							New
-						</button>
-					} 
+						<img className={cssf(css, "header-profile me-3")} src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" />
+					}
 				/>
 			</div>
 		</React.Fragment>

@@ -4,7 +4,7 @@
 	@description: A library to perform CRUD requests to ChipDrive server
 */
 
-import $ from './Ajax';
+import $ from 'jquery';
 
 class ChipDrive {
 	static SUCCESS_CODE = 1 << 0;

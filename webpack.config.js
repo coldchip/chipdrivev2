@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 var cssLookup = [];
 
@@ -10,7 +11,7 @@ module.exports = {
   performance: {
     hints: false
   },
-  entry: ["@babel/polyfill", './public/js/index.jsx'],
+  entry: ['./public/js/index.jsx'],
   module: {
     rules: [
       {
@@ -19,7 +20,8 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react']
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+            plugins: ["@babel/plugin-transform-runtime"]
           }
         }
       },
@@ -66,7 +68,7 @@ module.exports = {
         }]
       },
       {
-        test: /\.(woff|ttf|otf|eot|woff2|svg)$/i,
+        test: /\.(woff2|woff|ttf|otf|eot)$/i,
         use: [{
           loader: "file-loader?name=font.[contenthash].[ext]"
         }]
@@ -78,11 +80,7 @@ module.exports = {
     minimizer: [
       '...',
       new CssMinimizerPlugin(),
-    ],
-    splitChunks: {
-      minSize: 350000,
-      maxSize: 350000,
-    },
+    ]
   },
   output: {
     path: __dirname + '/bin/',
@@ -91,6 +89,9 @@ module.exports = {
     publicPath: "/"
   },
   plugins: [
+    new ESLintPlugin({
+      files: 'public/js/**/*.jsx'
+    }),
     new MiniCssExtractPlugin({
       filename: 'chipdrive.[contenthash:16].css',
       chunkFilename: 'chipdrive.[contenthash:16].css'

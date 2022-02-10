@@ -11,6 +11,120 @@
 	}
 }
 
+.p-overlay {
+	background: rgba(0, 0, 0, 0.5);
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.p-content {
+		background: $modalColor;
+		padding: 10px;
+		border-radius: 5px;
+		animation: popup-animation 0.3s forwards;
+		-webkit-animation: popup-animation 0.3s forwards;
+
+		@media (min-width: 0px) and (max-width: 767px) {
+			width: 90%;
+		}
+
+		@media (min-width: 768px) {
+			width: 50%;
+		}
+
+		.cd-modal {
+			width: 100%;
+
+			.spinner {
+				color: $chipGreen;
+			}
+
+			.cd-modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin: 5px 0 15px 0;
+				width: 100%;
+
+				.cd-modal-title {
+					font-size: 19px;
+					font-weight: 600;
+					color: $textColor;
+					margin: 0;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				.cd-modal-x {
+					font-size: 22px;
+					color: $textColor;
+				}
+			}
+
+			.cd-modal-body {
+				.cd-modal-text {
+					font-size: 17px;
+					font-weight: 600;
+					color: $textColor;
+					margin: 0;
+				}
+
+				.cd-modal-form {
+					width: 100%;
+
+					.cd-modal-input {
+						width: 100%;
+						height: 38px;
+						background: none;
+						border-radius: 0;
+						border: 0;
+						border-bottom: 2px solid #797979;
+						font-weight: 500;
+						color: $textColor;
+						outline: 0;
+						padding-left: 0px;
+					}
+				}
+			}
+
+			.cd-modal-footer {
+				display: flex;
+				justify-content: flex-end;
+				margin: 10px 0 0 0;
+				width: 100%;
+
+				.cd-modal-button {
+					border: none;
+					background: none;
+					font-weight: 500;
+					color: $textColor;
+					padding: 10px;
+					outline: 0;
+					border-radius: 2px;
+					font-size: 15px;
+					outline: none;
+				}
+			}
+
+			.cd-modal-loader-text {
+				color: $textColor;
+				font-size: 18px;
+				font-weight: 500;
+			}
+
+			.cd-modal-footer .cd-modal-button:hover {
+				background-color: $hoverColor;
+			}
+		}
+	}
+}
+
 .popup-overlay {
 	background: rgba(0, 0, 0, 0.5);
 
@@ -21,14 +135,13 @@
 
 .popup-content {
 	margin: auto;
-	background: rgb(255, 255, 255);
-	width: 50%;
+	background: $modalColor;
 	padding: 10px;
 	border-radius: 5px;
 	animation: popup-animation 0.3s forwards;
 	-webkit-animation: popup-animation 0.3s forwards;
 
-	&:not([role='tooltip']) {
+	&[role='dialog'] {
 		@media (min-width: 0px) and (max-width: 767px) {
 			width: 90%;
 		}
@@ -39,7 +152,6 @@
 	}
 
 	&[role='tooltip'] {
-		width: 200px;
 		box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
 	}
 

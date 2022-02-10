@@ -12,6 +12,7 @@ function NewItem(props) {
 	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
+	var modal = useRef(null);
 	const uploadRef = useRef(null);
 
 	async function upload(e) {
@@ -103,7 +104,11 @@ function NewItem(props) {
 						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
 						Folder
 					</button>
-				} onAccept={(name) => create(name)} />
+				} onOpen={() => {
+					modal.current.close();
+				}} onAccept={(name) => {
+					create(name);
+				}} />
 
 				<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
 			</React.Fragment>
@@ -113,10 +118,10 @@ function NewItem(props) {
 	return (
 		<React.Fragment>
 			<Popup 
-				open={props.open} 
 				trigger={props.trigger}
 				keepTooltipInside="body"
 				closeOnDocumentClick
+				ref={modal}
 				arrow={false}
 				nested
 			>
