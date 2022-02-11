@@ -22,9 +22,15 @@ const reducer = (state, action) => {
 		case 'alert': {
 			return {
 				...state, 
-				alert: !state.alert,
-				alertTitle: action.title,
-				alertAccept: action.onAccept,
+				alert: true,
+				alertTitle: action.title
+			};
+		}
+		case 'unalert': {
+			return {
+				...state, 
+				alert: false,
+				alertTitle: ""
 			};
 		}
 		case 'sidebar': {
@@ -89,8 +95,7 @@ function ChipDrive(props) {
 			tasks, 
 
 			alert,
-			alertTitle,
-			alertAccept,
+			alertTitle
 		}, dispatch] = useReducer(reducer, {
 		sidebar: false,
 		drive: "Unknown",
@@ -98,8 +103,7 @@ function ChipDrive(props) {
 		tasks: {},
 
 		alert: false,
-		alertTitle: "",
-		alertAccept: () => {},
+		alertTitle: ""
 	});
 
 	var app = (
@@ -125,13 +129,12 @@ function ChipDrive(props) {
 			<Alert
 				title={alertTitle}
 				open={alert} 
-				onAccept={(input) => {
-					alertAccept(input);
+				onAccept={() => {
+					dispatch({type: "unalert"});
 				}}
 			/>
 		</div>
 	);
-
 
 	return (
 		<APIContext.Provider value={api}>
