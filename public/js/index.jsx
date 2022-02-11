@@ -17,11 +17,21 @@ class App extends React.Component {
 		}
 		return result;
 	}
+
+	getQuery(name, url = window.location.href) {
+		name = name.replace(/[\[\]]/g, '\\$&');
+		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+		    results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	}
 	
 	render() {
+		var endpoint = this.getQuery("endpoint") || "http://192.168.10.141:8193";
 		return ( 
 			<React.StrictMode>
-				<ChipDrive endpoint="http://192.168.10.141:8193" token={this.genToken()} />
+				<ChipDrive endpoint={endpoint} token={this.genToken()} />
 			</React.StrictMode>
 		);
 	}
