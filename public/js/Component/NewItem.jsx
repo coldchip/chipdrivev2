@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from 'react';
+import React, { useRef, useState, useContext } from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
@@ -12,7 +12,8 @@ function NewItem(props) {
 	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	var modal = useRef(null);
+	var dropdown = useRef(null);
+	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
 	async function upload(e) {
@@ -57,7 +58,7 @@ function NewItem(props) {
 			
 			dispatch({type: "list"});
 		} catch(e) {
-			dispatch({type: "error", reason: e});
+			dispatch({type: "alert", title: e});
 		}
 	}
 
@@ -85,7 +86,7 @@ function NewItem(props) {
 
 			dispatch({type: "list"});
 		}).catch((e) => {
-			dispatch({type: "error", reason: e});
+			dispatch({type: "alert", title: e});
 		});
 	}
 
@@ -93,24 +94,20 @@ function NewItem(props) {
 		return (
 			<React.Fragment>
 				<button onClick={() => {
+					dropdown.current.close();
 					uploadRef.current.click()
 				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
 					<i className={cssf(css, "!fas !fa-upload me-2")}></i>
 					Upload
 				</button>
 
-				<Prompt title="Create Folder" trigger={
-					<button className={cssf(css, "col-12 cd-option-modal-button text")}>
-						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
-						Folder
-					</button>
-				} onOpen={() => {
-					modal.current.close();
-				}} onAccept={(name) => {
-					create(name);
-				}} />
-
-				<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
+				<button onClick={() => {
+					dropdown.current.close();
+					setCreatePrompt(true);
+				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+					<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+					Folder
+				</button>
 			</React.Fragment>
 		)
 	}
@@ -121,7 +118,7 @@ function NewItem(props) {
 				trigger={props.trigger}
 				keepTooltipInside="body"
 				closeOnDocumentClick
-				ref={modal}
+				ref={dropdown}
 				arrow={false}
 				nested
 			>
@@ -129,6 +126,19 @@ function NewItem(props) {
 					{renderDropdown()}
 				</div>
 			</Popup>
+			<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
+
+			<Prompt
+				title="Create Folder"
+				open={createPrompt} 
+				onAccept={(input) => {
+					setCreatePrompt(false);
+					create(input);
+				}}
+				onReject={() => {
+					setCreatePrompt(false);
+				}}
+			/>
 		</React.Fragment>
 	);
 }

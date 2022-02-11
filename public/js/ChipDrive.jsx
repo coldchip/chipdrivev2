@@ -7,6 +7,7 @@ import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';
 import Body from './Component/Body.jsx';
 import Alert from './Component/Alert.jsx';
+import Prompt from './Component/Prompt.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
 import APIContext from './Context/APIContext.jsx';
@@ -18,6 +19,14 @@ import cssf from "./CSSFormat";
 const reducer = (state, action) => {
 	console.log(state, action);
 	switch (action.type) {
+		case 'alert': {
+			return {
+				...state, 
+				alert: !state.alert,
+				alertTitle: action.title,
+				alertAccept: action.onAccept,
+			};
+		}
 		case 'sidebar': {
 			return {
 				...state, 
@@ -55,20 +64,6 @@ const reducer = (state, action) => {
 				tasks: {}
 			};
 		}
-		case 'error': {
-			return { 
-				...state, 
-				error: true,
-				reason: action.reason
-			};
-		}
-		case 'closeError': {
-			return { 
-				...state, 
-				error: false,
-				reason: ""
-			};
-		}
 		default: {
 			return state;
 		}
@@ -87,13 +82,24 @@ function ChipDrive(props) {
 		return api;
 	}, [props.endpoint, props.token]);
 
-	var [{sidebar, drive, folder, tasks, error, reason}, dispatch] = useReducer(reducer, {
+	var [{
+			sidebar, 
+			drive, 
+			folder, 
+			tasks, 
+
+			alert,
+			alertTitle,
+			alertAccept,
+		}, dispatch] = useReducer(reducer, {
 		sidebar: false,
 		drive: "Unknown",
 		folder: "root",
 		tasks: {},
-		error: false,
-		reason: ""
+
+		alert: false,
+		alertTitle: "",
+		alertAccept: () => {},
 	});
 
 	var app = (
@@ -117,10 +123,10 @@ function ChipDrive(props) {
 			/>
 
 			<Alert
-				title={reason}
-				open={error} 
-				onAccept={() => {
-					dispatch({type: "closeError"})
+				title={alertTitle}
+				open={alert} 
+				onAccept={(input) => {
+					alertAccept(input);
 				}}
 			/>
 		</div>

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useRef, useState, useContext } from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
@@ -12,6 +12,11 @@ import cssf from "../CSSFormat";
 function ItemOption(props) {
 	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
+
+	var dropdown = useRef(null);
+	var [renamePrompt, setRenamePrompt] = useState(false);
+	var [deletePrompt, setDeletePrompt] = useState(false);
+	var [downloadPrompt, setDownloadPrompt] = useState(false);
 
 	function rename(name) {
 		var taskid = 'task_' + Math.random();
@@ -37,7 +42,7 @@ function ItemOption(props) {
 
 			dispatch({type: "list"});
 		}).catch((e) => {
-			dispatch({type: "error", reason: e});
+			dispatch({type: "alert", title: e});
 		});
 	}
 
@@ -67,7 +72,7 @@ function ItemOption(props) {
 
 			dispatch({type: "list"});
 		}).catch((e) => {
-			dispatch({type: "error", reason: e});
+			dispatch({type: "alert", title: e});
 		});
 	}
 
@@ -91,39 +96,30 @@ function ItemOption(props) {
 	function renderDropdown() {
 		return (
 			<React.Fragment>
-				<Prompt 
-					title="Rename Item" 
-					trigger={
-						<button className={cssf(css, "col-12 cd-option-modal-button text")}>
-							<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
-						</button>
-					} 
-					onAccept={(name) => rename(name)} 
-				/>
+				<button onClick={() => {
+					dropdown.current.close();
+					setRenamePrompt(true);
+				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+					<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
+				</button>
 
-				<Confirm 
-					title="Delete Item" 
-					trigger={
-						<button className={cssf(css, "col-12 cd-option-modal-button text")}>
-							<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
-						</button>
-					} 
-					onAccept={remove} 
-				/>
+				<button onClick={() => {
+					dropdown.current.close();
+					setDeletePrompt(true);
+				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+					<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
+				</button>
 				
 				{
 					props.item.type === 1
 					?
 					(
-						<Confirm 
-							title="Download this item?" 
-							trigger={
-								<button className={cssf(css, "col-12 cd-option-modal-button text")}>
-									<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
-								</button>
-							} 
-							onAccept={download} 
-						/>
+						<button onClick={() => {
+							dropdown.current.close();
+							setDownloadPrompt(true);
+						}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
+						</button>
 					)
 					:
 					null
@@ -139,6 +135,7 @@ function ItemOption(props) {
 				trigger={props.trigger}
 				keepTooltipInside="body"
 				closeOnDocumentClick
+				ref={dropdown}
 				arrow={false}
 				nested
 			>
@@ -146,6 +143,42 @@ function ItemOption(props) {
 					{renderDropdown()}
 				</div>
 			</Popup>
+
+			<Prompt 
+				title="Rename this item?" 
+				open={renamePrompt}
+				onAccept={(name) => {
+					setRenamePrompt(false);
+					rename(name);
+				}}
+				onReject={() => {
+					setRenamePrompt(false);
+				}} 
+			/>
+			
+			<Confirm 
+				title="Delete this item?" 
+				open={deletePrompt}
+				onAccept={() => {
+					setDeletePrompt(false);
+					remove();
+				}}
+				onReject={() => {
+					setDeletePrompt(false);
+				}} 
+			/>
+
+			<Confirm 
+				title="Download this item?" 
+				open={downloadPrompt}
+				onAccept={() => {
+					setDownloadPrompt(false);
+					download();
+				}}
+				onReject={() => {
+					setDownloadPrompt(false);
+				}} 
+			/>
 		</React.Fragment>
 	);
 }

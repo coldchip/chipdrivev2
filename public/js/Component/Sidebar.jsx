@@ -30,7 +30,7 @@ function Sidebar(props) {
 			}
 		}).catch((e) => {
 			setList([]);
-			dispatch({type: "error", reason: e});
+			dispatch({type: "alert", title: e});
 		});
 	}, [api, dispatch]);
 

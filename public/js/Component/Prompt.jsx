@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import Popup from './Modal.jsx';
+import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -26,7 +26,6 @@ function Prompt(props) {
 			<Popup 
 				open={props.open} 
 				trigger={props.trigger}
-				onOpen={props.onOpen}
 				closeOnDocumentClick={false}
 				closeOnEscape={false}
 				ref={modal}

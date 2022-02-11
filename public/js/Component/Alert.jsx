@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import Popup from './Modal.jsx';
+import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 

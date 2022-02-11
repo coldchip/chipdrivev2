@@ -24,7 +24,7 @@ function List(props) {
 			setLoading(false);
 			setList(_list);
 		}).catch((e) => {
-			dispatch({type: "error", reason: e});
+			dispatch({type: "alert", title: e});
 		});
 	}, [api, dispatch, props.folder]);
 
