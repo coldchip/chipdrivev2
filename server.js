@@ -39,7 +39,7 @@ app.get('*', (req, res) => {
 
 app.set('x-powered-by', false);
 
-const port = 5001;
+const port = process.env.PORT || 5001;
 
 app.listen(port, () =>  {
 	if(process.env.NODE_ENV) {
