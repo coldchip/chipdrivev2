@@ -10,6 +10,22 @@ import cssf from "../CSSFormat";
 function ItemViewer(props) {
 	var api = useContext(APIContext);
 
+	function download() {
+		var {item} = props;
+
+		var link = api.getStreamLink(item.id);
+			
+		var a = document.createElement("a");
+		a.style.display = "none";
+		a.style.width = "0px";
+		a.style.height = "0px";
+		a.href = link;
+		a.download = item.name;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	}
+
 	function renderView() {
 
 		var {item} = props;
@@ -35,7 +51,11 @@ function ItemViewer(props) {
 			return (
 				<div className={cssf(css, "notice-container mt-2")}>
 					<p className={cssf(css, "notice-text text")}>Unable to preview</p>
-					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
+					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon mt-3")}></i>	
+					<button className={cssf(css, "download-button text mt-4")} onClick={download}>
+						<i className={cssf(css, "!fa !fa-download me-2")}></i>
+						Download Instead
+					</button>
 				</div>
 			)
 		}

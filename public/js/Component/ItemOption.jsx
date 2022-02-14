@@ -90,7 +90,6 @@ function ItemOption(props) {
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
-
 	}
 
 	function renderDropdown() {

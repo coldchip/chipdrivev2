@@ -14,7 +14,10 @@ function Account(props) {
 				<img className={cssf(css, "account-profile")} src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" />
 				<p className={cssf(css, "account-name text mt-3")}>Ryan Loh</p>
 				<p className={cssf(css, "account-email text mt-2")}>ryan@coldchip.ru</p>
-				<button className={cssf(css, "account-manage text mt-3")}>Manage Account</button>
+				<button className={cssf(css, "account-manage text mt-4")}>
+					<i className={cssf(css, "!fas !fa-pen me-2")}></i>
+					Manage Account
+				</button>
 			</div>
 		</Popup>
 	);

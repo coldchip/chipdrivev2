@@ -19,7 +19,7 @@ function Header(props) {
 					dispatch({type:"sidebar"});
 				}}></i>
 
-				<a href="#">
+				<a href="/">
 					<img className={cssf(css, "header-logo ms-3")} src={logo} alt="ChipDrive Logo" />	
 				</a>
 

@@ -29,8 +29,11 @@
 	}
 
 	.notice-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
 		.notice-text {
-			text-align: center;
 			font-weight: 600;
 			color: $textColorWarning;
 			font-size: 26px;
@@ -41,7 +44,18 @@
 			display: block;
 			color: $textColorWarning;
 			font-size: 56px;
-			margin: 20px auto;
+		}
+
+		.download-button {
+			background: $chipGreen;
+			border: none;
+			border-radius: 5px;
+			color: #fff;
+			font-size: 16px;
+			font-weight: 500;
+			height: 40px;
+			outline: 0;
+			padding: 0 10px;
 		}
 	}
 }
