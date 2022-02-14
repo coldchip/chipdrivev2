@@ -530,7 +530,7 @@ class ChipDrive {
 	}
 
 	getStreamLink(id) {
-		const url = new URL(window.location.href);
+		const url = new URL(window.location.href.split('?')[0]);
 		url.pathname = `/api/v2/drive/object/${encodeURI(id)}`;
 		url.searchParams.append("token", this.getToken());
 
