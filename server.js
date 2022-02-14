@@ -40,7 +40,7 @@ app.use((req, res, next) =>  {
 var db = [{"name": "", "id": "root", "parent": "?"}];
 
 function validate(token) {
-	return true;
+	return token === "DZ9Xtv9NqdhGRHqVaRHfUu6rmKNA7bku";
 }
 
 app.post('/api/v2/drive/config', function(req, res) {
