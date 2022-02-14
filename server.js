@@ -5,15 +5,22 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const compression = require('compression');
 const path = require('path');
+const { pipeline } = require('stream');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
+
+const ResponseCode = require("./ResponseCode");
+const ChipDrive = require("./ChipDrive");
+
+if(!fs.existsSync("database")){
+	fs.mkdirSync("database");
+}
 
 var app = express();
 
 const compiler = webpack(require("./webpack.config.js"));
 app.use(
 	middleware(compiler, {
-		// webpack-dev-middleware options
 		writeToDisk: true
 	})
 );
@@ -30,11 +37,241 @@ app.use((req, res, next) =>  {
 	next();
 });
 
-app.get('*', (req, res) => {
-	res.contentType("application/json");
-	res.set('Cache-Control', 'no-store');
-	res.status(404);
-	res.send("error 404");
+var db = [{"name": "", "id": "root", "parent": "?"}];
+
+function validate(token) {
+	return true;
+}
+
+app.post('/api/v2/drive/config', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
+
+		setTimeout(() => {
+
+			let list = [{
+				"name": "Virtual Drive",
+				"id": "root"
+			}, {
+				"name": "Shared",
+				"id": "c37a134e4be06e94840b6082135cb0d1"
+			}, {
+				"name": "Recently Deleted",
+				"id": "c37a134e4be06e94840b6082135cb0d2"
+			}];
+			res.send({
+				code: ResponseCode.SUCCESS,
+				reason: "",
+				data: list
+			});
+		}, 600);
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.post('/api/v2/drive/list', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var folderid = req.body.folderid;
+		if(folderid) {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var cd = new ChipDrive("ryan@coldchip.ru", db);
+
+			res.send({
+				code: ResponseCode.SUCCESS,
+				reason: "",
+				data: cd.list(folderid)
+			});
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.post('/api/v2/drive/file', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var folderid = req.body.folderid;
+		var name = req.body.name;
+		if(folderid && name) {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var cd = new ChipDrive("ryan@coldchip.ru", db);
+
+			res.send({
+				code: ResponseCode.SUCCESS,
+				reason: "",
+				data: cd.create(folderid, name, ChipDrive.FILE)
+			});
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.post('/api/v2/drive/folder', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var name = req.body.name;
+		var folderid = req.body.folderid;
+		if(name && folderid) {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var cd = new ChipDrive("ryan@coldchip.ru", db);
+
+			res.send({
+				code: ResponseCode.SUCCESS,
+				reason: "",
+				data: cd.create(folderid, name, ChipDrive.FOLDER)
+			});
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.post('/api/v2/drive/object/rename', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var id = req.body.id;
+		var name = req.body.name;
+		if(id && name) {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var cd = new ChipDrive("ryan@coldchip.ru", db);
+
+			res.send({
+				code: ResponseCode.SUCCESS,
+				reason: "",
+				data: cd.rename(id, name)
+			});
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.post('/api/v2/drive/object/delete', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var id = req.body.id;
+		if(id) {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			db = db.filter((node) => {
+				return node.id !== id;
+			});
+
+			res.send({
+				code: ResponseCode.SUCCESS,
+				reason: ""
+			});
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.put('/api/v2/drive/object/:id', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var id = req.params.id;
+		if(id) {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
+				if(!err) {
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: ""
+					});
+				} else {
+					res.send({
+						code: ResponseCode.ERROR,
+						reason: "Upload Error"
+					});
+				}
+			});	
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
+});
+
+app.get('/api/v2/drive/object/:id', function(req, res) {
+	if(validate(req.query.token || req.body.token)) {
+		var id = req.params.id;
+		if(id) {
+			res.contentType("application/octet-stream");
+			res.set('Cache-Control', 'no-store');
+
+			res.sendFile(path.join(__dirname, `./database/${id}`));
+		} else {
+			res.send({
+				code: ResponseCode.ERROR,
+				reason: "Unable to fulfill params"
+			});
+		}
+	} else {
+		res.send({
+			code: ResponseCode.LOGIN,
+			reason: "Please provide a proper authentication token"
+		});
+	}
 });
 
 app.set('x-powered-by', false);

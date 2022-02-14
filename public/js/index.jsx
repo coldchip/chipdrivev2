@@ -28,7 +28,7 @@ class App extends React.Component {
 	}
 	
 	render() {
-		var endpoint = this.getQuery("endpoint") || "http://192.168.10.141:8193";
+		var endpoint = this.getQuery("endpoint") || "";
 		var token = this.getQuery("token") || this.genToken();
 		return ( 
 			<React.StrictMode>

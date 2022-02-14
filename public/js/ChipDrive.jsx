@@ -89,14 +89,14 @@ function ChipDrive(props) {
 	}, [props.endpoint, props.token]);
 
 	var [{
-			sidebar, 
-			drive, 
-			folder, 
-			tasks, 
+		sidebar, 
+		drive, 
+		folder, 
+		tasks, 
 
-			alert,
-			alertTitle
-		}, dispatch] = useReducer(reducer, {
+		alert,
+		alertTitle
+	}, dispatch] = useReducer(reducer, {
 		sidebar: false,
 		drive: "Unknown",
 		folder: "root",
@@ -106,43 +106,40 @@ function ChipDrive(props) {
 		alertTitle: ""
 	});
 
-	var app = (
-		<div className={cssf(css, "!chipdrive-app chipdrive")}>
-			<Header />
-
-			<Sidebar 
-				open={sidebar} 
-			/>
-
-			<Body 
-				title={drive} 
-				folder={folder} 
-			/>
-
-			<TaskModal 
-				tasks={tasks}
-				onClear={() => {
-					dispatch({type: "closeTask"})
-				}}
-			/>
-
-			<Alert
-				title={alertTitle}
-				open={alert} 
-				onAccept={() => {
-					dispatch({type: "unalert"});
-				}}
-			/>
-		</div>
-	);
-
 	return (
 		<APIContext.Provider value={api}>
 			<ChipDriveContext.Provider value={dispatch}>
-				{app}
+				<div className={cssf(css, "!chipdrive-app chipdrive")}>
+					<Header />
+
+					<Sidebar 
+						open={sidebar} 
+					/>
+
+					<Body 
+						title={drive} 
+						folder={folder} 
+					/>
+
+					<TaskModal 
+						tasks={tasks}
+						onClear={() => {
+							dispatch({type: "closeTask"})
+						}}
+					/>
+
+					<Alert
+						title={alertTitle}
+						open={alert} 
+						onAccept={() => {
+							dispatch({type: "unalert"});
+						}}
+					/>
+				</div>
 			</ChipDriveContext.Provider>
 		</APIContext.Provider>
 	);
+
 }
 
 export default ChipDrive;

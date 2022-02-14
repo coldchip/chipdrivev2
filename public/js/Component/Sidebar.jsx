@@ -29,7 +29,6 @@ function Sidebar(props) {
 				dispatch({type: "list", id: drive.id});
 			}
 		}).catch((e) => {
-			setList([]);
 			dispatch({type: "alert", title: e});
 		});
 	}, [api, dispatch]);

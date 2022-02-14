@@ -6,11 +6,16 @@
 
 import $ from 'jquery';
 
-class ChipDrive {
-	static SUCCESS_CODE = 1 << 0;
-	static FAILURE_CODE = 1 << 1;
-	static LOGIN_CODE   = 1 << 2;
+class ResponseCode {
+	static SUCCESS = 1 << 0;
+	static ERROR   = 1 << 1;
+	static LOGIN   = 1 << 2;
+}
 
+class ChipDrive {
+	static FILE   = 1;
+	static FOLDER = 2;
+	
 	static ACL_READABLE  = 1 << 0;
 	static ACL_WRITEABLE = 1 << 1;
 
@@ -72,7 +77,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -104,7 +109,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -137,7 +142,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -170,7 +175,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -203,7 +208,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -235,7 +240,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -268,7 +273,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -308,7 +313,7 @@ class ChipDrive {
 				data: file,
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -342,7 +347,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -375,7 +380,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -408,7 +413,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -439,7 +444,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -471,7 +476,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -503,7 +508,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -525,7 +530,7 @@ class ChipDrive {
 	}
 
 	getStreamLink(id) {
-		const url = new URL(this.getEndpoint());
+		const url = new URL(window.location.href);
 		url.pathname = `/api/v2/drive/object/${encodeURI(id)}`;
 		url.searchParams.append("token", this.getToken());
 
@@ -542,7 +547,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -573,7 +578,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -605,7 +610,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
@@ -636,7 +641,7 @@ class ChipDrive {
 				},
 				success: (res) => {
 					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ChipDrive.SUCCESS_CODE) {
+						if(res["code"] === ResponseCode.SUCCESS) {
 							resolve(res["data"]);
 						} else {
 							reject(res["reason"]);
