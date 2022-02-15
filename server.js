@@ -11,10 +11,13 @@ const middleware = require("webpack-dev-middleware");
 
 const ResponseCode = require("./ResponseCode");
 const ChipDrive = require("./ChipDrive");
+const Queue = require("./Queue");
 
 if(!fs.existsSync("database")){
 	fs.mkdirSync("database");
 }
+
+var queue = new Queue();
 
 var app = express();
 
@@ -67,6 +70,7 @@ app.post('/api/v2/drive/config', function(req, res) {
 			});
 		}, 600);
 	} else {
+		// res.status(401)
 		res.send({
 			code: ResponseCode.LOGIN,
 			reason: "Please provide a proper authentication token"
@@ -81,12 +85,25 @@ app.post('/api/v2/drive/list', function(req, res) {
 			res.contentType("application/json");
 			res.set('Cache-Control', 'no-store');
 
-			var cd = new ChipDrive("ryan@coldchip.ru", db);
+			queue.enqueue(async (done) => {
+				var cd = new ChipDrive("ryan@coldchip.ru", db);
 
-			res.send({
-				code: ResponseCode.SUCCESS,
-				reason: "",
-				data: cd.list(folderid)
+				try {
+					var list = await cd.list(folderid);
+
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: "",
+						data: list
+					});
+				} catch(err) {
+					res.send({
+						code: ResponseCode.ERROR,
+						reason: err
+					});
+				} finally {
+					done();
+				}
 			});
 		} else {
 			res.send({
@@ -110,12 +127,25 @@ app.post('/api/v2/drive/file', function(req, res) {
 			res.contentType("application/json");
 			res.set('Cache-Control', 'no-store');
 
-			var cd = new ChipDrive("ryan@coldchip.ru", db);
+			queue.enqueue(async (done) => {
+				var cd = new ChipDrive("ryan@coldchip.ru", db);
 
-			res.send({
-				code: ResponseCode.SUCCESS,
-				reason: "",
-				data: cd.create(folderid, name, ChipDrive.FILE)
+				try {
+					var node = await cd.create(folderid, name, ChipDrive.FILE);
+
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: "",
+						data: node
+					});
+				} catch(err) {
+					res.send({
+						code: ResponseCode.ERROR,
+						reason: err
+					});
+				} finally {
+					done();
+				}
 			});
 		} else {
 			res.send({
@@ -139,12 +169,25 @@ app.post('/api/v2/drive/folder', function(req, res) {
 			res.contentType("application/json");
 			res.set('Cache-Control', 'no-store');
 
-			var cd = new ChipDrive("ryan@coldchip.ru", db);
+			queue.enqueue(async (done) => {
+				var cd = new ChipDrive("ryan@coldchip.ru", db);
 
-			res.send({
-				code: ResponseCode.SUCCESS,
-				reason: "",
-				data: cd.create(folderid, name, ChipDrive.FOLDER)
+				try {
+					var node = await cd.create(folderid, name, ChipDrive.FOLDER);
+
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: "",
+						data: node
+					});
+				} catch(err) {
+					res.send({
+						code: ResponseCode.ERROR,
+						reason: err
+					});
+				} finally {
+					done();
+				}
 			});
 		} else {
 			res.send({
@@ -168,12 +211,24 @@ app.post('/api/v2/drive/object/rename', function(req, res) {
 			res.contentType("application/json");
 			res.set('Cache-Control', 'no-store');
 
-			var cd = new ChipDrive("ryan@coldchip.ru", db);
+			queue.enqueue(async (done) => {
+				var cd = new ChipDrive("ryan@coldchip.ru", db);
 
-			res.send({
-				code: ResponseCode.SUCCESS,
-				reason: "",
-				data: cd.rename(id, name)
+				try {
+					await cd.rename(id, name);
+
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: ""
+					});
+				} catch(err) {
+					res.send({
+						code: ResponseCode.ERROR,
+						reason: err
+					});
+				} finally {
+					done();
+				}
 			});
 		} else {
 			res.send({
@@ -196,13 +251,24 @@ app.post('/api/v2/drive/object/delete', function(req, res) {
 			res.contentType("application/json");
 			res.set('Cache-Control', 'no-store');
 
-			db = db.filter((node) => {
-				return node.id !== id;
-			});
+			queue.enqueue(async (done) => {
+				var cd = new ChipDrive("ryan@coldchip.ru", db);
 
-			res.send({
-				code: ResponseCode.SUCCESS,
-				reason: ""
+				try {
+					await cd.delete(id);
+
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: ""
+					});
+				} catch(err) {
+					res.send({
+						code: ResponseCode.ERROR,
+						reason: err
+					});
+				} finally {
+					done();
+				}
 			});
 		} else {
 			res.send({
@@ -284,3 +350,5 @@ app.listen(port, () =>  {
 	}
     console.log('ChipDrive is running on http://localhost:' + port);
 });
+
+queue.run();

@@ -19,33 +19,64 @@ class ChipDrive {
 		return result.join('');
 	}
 
-	list(id) {
-		return this.db.filter((node) => {
-			return node.parent === id;
+	has(id) {
+		return this.db.find((node) => {
+			return node.id === id;
 		});
 	}
 
-	create(parent, name, type) {
-		var node = {"type": type, "name": name, "id": ChipDrive.randID(32), "parent": parent};
-		this.db.push(node);
+	async list(id) {
+		return new Promise((resolve, reject) => {
+			if(this.has(id)) {
 
-		return node;
+				var list = this.db.filter((node) => {
+					return node.parent === id;
+				});
+
+				resolve(list);
+			} else {
+				reject("Folder not found");
+			}
+		});
 	}
 
-	rename(id, name) {
-		this.db.forEach((node) => {
-			if(node.id == id) {
-				node.name = name;
+	async create(parent, name, type) {
+		return new Promise((resolve, reject) => {
+			if(this.has(parent)) {
+				var node = {"type": type, "name": name, "id": ChipDrive.randID(32), "parent": parent};
+				this.db.push(node);
+				resolve(node);
+			} else {
+				reject("Folder not found");
+			}
+		});
+	}
+
+	async rename(id, name) {
+		return new Promise((resolve, reject) => {
+			if(this.has(id)) {
+				this.db.forEach((node) => {
+					if(node.id == id) {
+						node.name = name;
+					}
+				});
+				resolve();
+			} else {
+				reject("Item not found");
 			}
 		});
 	}
 
 	delete(id) {
-		this.db.forEach((node) => {
-			if(node.id == id) {
-				node = null;
-			}
-		});
+		if(this.has(id)) {
+			this.db.forEach((node) => {
+				if(node.id == id) {
+					node = null;
+				}
+			});
+		} else {
+			reject("Item not found");
+		}
 	}
 
 }
