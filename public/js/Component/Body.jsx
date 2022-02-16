@@ -17,6 +17,7 @@ function Body(props) {
 			</div>
 			<List 
 				folder={props.folder}
+				filter={props.filter}
 			/>
 			<NewItem 
 				trigger={

@@ -19,6 +19,12 @@ import cssf from "./CSSFormat";
 const reducer = (state, action) => {
 	console.log(state, action);
 	switch (action.type) {
+		case 'filter': {
+			return {
+				...state, 
+				filter: action.filter,
+			};
+		}
 		case 'alert': {
 			return {
 				...state, 
@@ -89,6 +95,7 @@ function ChipDrive(props) {
 	}, [props.endpoint, props.token]);
 
 	var [{
+		filter,
 		sidebar, 
 		drive, 
 		folder, 
@@ -97,6 +104,7 @@ function ChipDrive(props) {
 		alert,
 		alertTitle
 	}, dispatch] = useReducer(reducer, {
+		filter: "",
 		sidebar: false,
 		drive: "Unknown",
 		folder: "root",
@@ -118,7 +126,8 @@ function ChipDrive(props) {
 
 					<Body 
 						title={drive} 
-						folder={folder} 
+						folder={folder}
+						filter={filter} 
 					/>
 
 					<TaskModal 

@@ -20,13 +20,13 @@ function List(props) {
 		setList([]);
 
 		api.setFolder(props.folder);
-		api.list().then((_list) => {
+		api.list(props.filter).then((_list) => {
 			setLoading(false);
 			setList(_list);
 		}).catch((e) => {
 			dispatch({type: "alert", title: e});
 		});
-	}, [api, dispatch, props.folder]);
+	}, [api, dispatch, props.folder, props.filter]);
 
 	if(!loading) {
 		if(list.length > 0) {

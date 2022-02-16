@@ -17,6 +17,18 @@
 		width: 145px;
 	}
 
+	.header-search {
+		width: 500px;
+		height: 45px;
+		border-radius: 10px;
+		background: $bodyColor;
+		border: none;
+		outline: none;
+		font-size: 16px;
+		color: $textColor;
+		font-weight: 500;
+	}
+
 	.header-profile {
 		width: 45px;
 		height: 45px;

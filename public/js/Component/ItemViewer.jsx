@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 
 import APIContext from './../Context/APIContext.jsx';
 
+import ButtonGreen from './ButtonGreen.jsx';
+
 import Types from '../Types';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
@@ -52,10 +54,10 @@ function ItemViewer(props) {
 				<div className={cssf(css, "notice-container mt-2")}>
 					<p className={cssf(css, "notice-text text")}>Unable to preview</p>
 					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon mt-3")}></i>	
-					<button className={cssf(css, "download-button text mt-4")} onClick={download}>
+					<ButtonGreen className={cssf(css, "mt-4")} onClick={download}>
 						<i className={cssf(css, "!fa !fa-download me-2")}></i>
 						Download Instead
-					</button>
+					</ButtonGreen>
 				</div>
 			)
 		}

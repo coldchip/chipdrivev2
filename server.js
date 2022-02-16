@@ -81,6 +81,7 @@ app.post('/api/v2/drive/config', function(req, res) {
 app.post('/api/v2/drive/list', function(req, res) {
 	if(validate(req.query.token || req.body.token)) {
 		var folderid = req.body.folderid;
+		var filter = req.body.filter;
 		if(folderid) {
 			res.contentType("application/json");
 			res.set('Cache-Control', 'no-store');
@@ -91,11 +92,23 @@ app.post('/api/v2/drive/list', function(req, res) {
 				try {
 					var list = await cd.list(folderid);
 
-					res.send({
-						code: ResponseCode.SUCCESS,
-						reason: "",
-						data: list
-					});
+					if(filter) {
+						list = list.filter((node) => {
+							return node.name.toLowerCase().includes(filter.toLowerCase());
+						});
+
+						res.send({
+							code: ResponseCode.SUCCESS,
+							reason: "",
+							data: list
+						});
+					} else {
+						res.send({
+							code: ResponseCode.SUCCESS,
+							reason: "",
+							data: list
+						});
+					}
 				} catch(err) {
 					res.send({
 						code: ResponseCode.ERROR,

@@ -98,13 +98,14 @@ class ChipDrive {
 		});
 	}
 
-	list() {
+	list(filter) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: this.getEndpoint() + "/api/v2/drive/list",
 				type: "POST",
 				data: {
 					folderid: this.getFolder(),
+					filter: filter,
 					token: this.getToken()
 				},
 				success: (res) => {
