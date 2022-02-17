@@ -26,13 +26,17 @@ class App extends React.Component {
 		if (!results[2]) return '';
 		return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	}
+
+	login() {
+
+	}
 	
 	render() {
 		var endpoint = this.getQuery("endpoint") || "";
 		var token = this.getQuery("token") || this.genToken();
 		return ( 
 			<React.StrictMode>
-				<ChipDrive endpoint={endpoint} token={token} />
+				<ChipDrive endpoint={endpoint} token={token} login={this.login} />
 			</React.StrictMode>
 		);
 	}

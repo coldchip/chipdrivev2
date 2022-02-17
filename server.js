@@ -43,16 +43,17 @@ app.use((req, res, next) =>  {
 var db = [{"name": "", "id": "root", "parent": "?"}];
 
 function validate(token) {
-	return token === "DZ9Xtv9NqdhGRHqVaRHfUu6rmKNA7bku";
+	return true;
 }
 
 app.post('/api/v2/drive/config', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
 
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		setTimeout(() => {
-
 			let list = [{
 				"name": "Virtual Drive",
 				"id": "root"
@@ -79,15 +80,17 @@ app.post('/api/v2/drive/config', function(req, res) {
 });
 
 app.post('/api/v2/drive/list', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var folderid = req.body.folderid;
 		var filter = req.body.filter;
 		if(folderid) {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive("ryan@coldchip.ru", db);
+				var cd = new ChipDrive(token, db);
 
 				try {
 					var list = await cd.list(folderid);
@@ -96,19 +99,13 @@ app.post('/api/v2/drive/list', function(req, res) {
 						list = list.filter((node) => {
 							return node.name.toLowerCase().includes(filter.toLowerCase());
 						});
-
-						res.send({
-							code: ResponseCode.SUCCESS,
-							reason: "",
-							data: list
-						});
-					} else {
-						res.send({
-							code: ResponseCode.SUCCESS,
-							reason: "",
-							data: list
-						});
-					}
+					} 
+					
+					res.send({
+						code: ResponseCode.SUCCESS,
+						reason: "",
+						data: list
+					});
 				} catch(err) {
 					res.send({
 						code: ResponseCode.ERROR,
@@ -133,15 +130,17 @@ app.post('/api/v2/drive/list', function(req, res) {
 });
 
 app.post('/api/v2/drive/file', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var folderid = req.body.folderid;
 		var name = req.body.name;
 		if(folderid && name) {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive("ryan@coldchip.ru", db);
+				var cd = new ChipDrive(token, db);
 
 				try {
 					var node = await cd.create(folderid, name, ChipDrive.FILE);
@@ -175,15 +174,17 @@ app.post('/api/v2/drive/file', function(req, res) {
 });
 
 app.post('/api/v2/drive/folder', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var name = req.body.name;
 		var folderid = req.body.folderid;
 		if(name && folderid) {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive("ryan@coldchip.ru", db);
+				var cd = new ChipDrive(token, db);
 
 				try {
 					var node = await cd.create(folderid, name, ChipDrive.FOLDER);
@@ -217,15 +218,17 @@ app.post('/api/v2/drive/folder', function(req, res) {
 });
 
 app.post('/api/v2/drive/object/rename', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var id = req.body.id;
 		var name = req.body.name;
 		if(id && name) {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive("ryan@coldchip.ru", db);
+				var cd = new ChipDrive(token, db);
 
 				try {
 					await cd.rename(id, name);
@@ -258,14 +261,16 @@ app.post('/api/v2/drive/object/rename', function(req, res) {
 });
 
 app.post('/api/v2/drive/object/delete', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var id = req.body.id;
 		if(id) {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive("ryan@coldchip.ru", db);
+				var cd = new ChipDrive(token, db);
 
 				try {
 					await cd.delete(id);
@@ -297,26 +302,37 @@ app.post('/api/v2/drive/object/delete', function(req, res) {
 	}
 });
 
-app.put('/api/v2/drive/object/:id', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+app.put('/api/v2/drive/object/:id', async function(req, res) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var id = req.params.id;
 		if(id) {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
-			pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
-				if(!err) {
-					res.send({
-						code: ResponseCode.SUCCESS,
-						reason: ""
+			var cd = new ChipDrive(token, db);
+			try {
+				if(await cd.has(id)) {
+					pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
+						if(!err) {
+							res.send({
+								code: ResponseCode.SUCCESS,
+								reason: ""
+							});
+						} else {
+							throw "Upload error";
+						}
 					});
 				} else {
-					res.send({
-						code: ResponseCode.ERROR,
-						reason: "Upload Error"
-					});
+					throw "Unauthorized to access content";
 				}
-			});	
+			} catch(err) {
+				res.send({
+					code: ResponseCode.ERROR,
+					reason: err
+				});
+			}
 		} else {
 			res.send({
 				code: ResponseCode.ERROR,
@@ -331,14 +347,30 @@ app.put('/api/v2/drive/object/:id', function(req, res) {
 	}
 });
 
-app.get('/api/v2/drive/object/:id', function(req, res) {
-	if(validate(req.query.token || req.body.token)) {
+app.get('/api/v2/drive/object/:id', async function(req, res) {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var token = req.query.token || req.body.token;
+
+	if(validate(token)) {
 		var id = req.params.id;
 		if(id) {
-			res.contentType("application/octet-stream");
-			res.set('Cache-Control', 'no-store');
-
-			res.sendFile(path.join(__dirname, `./database/${id}`));
+			var cd = new ChipDrive(token, db);
+			try {
+				if(await cd.has(id)) {
+					res.contentType("application/octet-stream");
+					res.set('Cache-Control', 'no-store');
+					res.sendFile(path.join(__dirname, `./database/${id}`));
+				} else {
+					throw "Unauthorized to access content";
+				}
+			} catch(err) {
+				res.send({
+					code: ResponseCode.ERROR,
+					reason: err
+				});
+			}
 		} else {
 			res.send({
 				code: ResponseCode.ERROR,

@@ -1,4 +1,25 @@
+const { Sequelize, Model, DataTypes } = require('sequelize');
+const sequelize = new Sequelize({
+	dialect: 'sqlite',
+	storage: './database/node.db'
+});
 
+class Node extends Model {}
+
+Node.init({
+	rid: {
+		type: DataTypes.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	type: DataTypes.INTEGER,
+	name: DataTypes.STRING,
+	id: DataTypes.STRING,
+	parent: DataTypes.STRING,
+	user: DataTypes.STRING
+}, { sequelize, modelName: 'node' });
+
+module.exports = Node || {};
 
 class ChipDrive {
 	static FILE   = 1;
@@ -7,6 +28,22 @@ class ChipDrive {
 	constructor(user, db) {
 		this.user = user;
 		this.db = db;
+
+		sequelize.sync().then(() => {
+			Node.findOrCreate({
+				where: {
+					id: "root",
+					user: this.user
+				},
+				defaults:{
+					type: 2, 
+					name: "root", 
+					id: "root", 
+					parent: this.user,
+					user: this.user
+				}
+			})
+		});
 	}
 
 	static randID(length) {
@@ -19,21 +56,34 @@ class ChipDrive {
 		return result.join('');
 	}
 
-	has(id) {
-		return this.db.find((node) => {
-			return node.id === id;
+	async has(id) {
+		return new Promise((resolve, reject) => {
+			Node.findAll({
+				where: {
+					id: id,
+					user: this.user
+				}
+			}).then((nodes) => {
+				resolve(nodes.length > 0)
+			}).catch((err) => {
+				reject(err);
+			});
 		});
 	}
 
 	async list(id) {
-		return new Promise((resolve, reject) => {
-			if(this.has(id)) {
-
-				var list = this.db.filter((node) => {
-					return node.parent === id;
+		return new Promise(async (resolve, reject) => {
+			if(await this.has(id)) {
+				Node.findAll({
+					where: {
+						parent: id,
+						user: this.user
+					}
+				}).then((nodes) => {
+					resolve(nodes);
+				}).catch((err) => {
+					reject(err);
 				});
-
-				resolve(list);
 			} else {
 				reject("Folder not found");
 			}
@@ -43,9 +93,17 @@ class ChipDrive {
 	async create(parent, name, type) {
 		return new Promise((resolve, reject) => {
 			if(this.has(parent)) {
-				var node = {"type": type, "name": name, "id": ChipDrive.randID(32), "parent": parent};
-				this.db.push(node);
-				resolve(node);
+				Node.create({
+					type: type, 
+					name: name, 
+					id: ChipDrive.randID(32), 
+					parent: parent,
+					user: this.user
+				}).then((node) => {
+					resolve(node.dataValues);
+				}).catch((err) => {
+					reject(err);
+				});
 			} else {
 				reject("Folder not found");
 			}
@@ -53,30 +111,43 @@ class ChipDrive {
 	}
 
 	async rename(id, name) {
-		return new Promise((resolve, reject) => {
-			if(this.has(id)) {
-				this.db.forEach((node) => {
-					if(node.id == id) {
-						node.name = name;
+		return new Promise(async (resolve, reject) => {
+			if(await this.has(id)) {
+				Node.update({
+					name: name, 
+				}, {
+					where: { 
+						id: id,
+						user: this.user
 					}
+				}).then((results) => {
+					resolve();
+				}).catch((err) => {
+					reject(err);
 				});
-				resolve();
 			} else {
 				reject("Item not found");
 			}
 		});
 	}
 
-	delete(id) {
-		if(this.has(id)) {
-			this.db.forEach((node) => {
-				if(node.id == id) {
-					node = null;
-				}
-			});
-		} else {
-			reject("Item not found");
-		}
+	async delete(id) {
+		return new Promise(async (resolve, reject) => {
+			if(await this.has(id)) {
+				Node.destroy({
+					where: {
+						id: id,
+						user: this.user
+					}
+				}).then((results) => {
+					resolve();
+				}).catch((err) => {
+					reject(err);
+				});
+			} else {
+				reject("Item not found");
+			}
+		});
 	}
 
 }
