@@ -60,7 +60,7 @@ app.get('/api/v2/drive/version', auth, (req, res) => {
 		res.contentType("application/json");
 		res.set('Cache-Control', 'no-store');
 
-		return res.status(200).json({"version": "v1.0.0"});
+		return res.status(200).json({version: "v1.0.0"});
 	});
 });
 
@@ -70,14 +70,14 @@ app.get('/api/v2/drive/config', auth, (req, res) => {
 		res.set('Cache-Control', 'no-store');
 
 		let list = [{
-			"name": "Virtual Drive",
-			"id": "root"
+			name: "Virtual Drive",
+			id: "root"
 		}, {
-			"name": "Shared",
-			"id": "c37a134e4be06e94840b6082135cb0d1"
+			name: "Shared",
+			id: "c37a134e4be06e94840b6082135cb0d1"
 		}, {
-			"name": "Recently Deleted",
-			"id": "c37a134e4be06e94840b6082135cb0d2"
+			name: "Recently Deleted",
+			id: "c37a134e4be06e94840b6082135cb0d2"
 		}];
 
 		// await new Promise((resolve, reject) => {
