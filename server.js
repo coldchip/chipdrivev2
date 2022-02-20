@@ -44,7 +44,7 @@ app.use((req, res, next) =>  {
 
 function auth(req, res, next) {
 	var token = req.query.token || req.body.token;
-	if(token === "abc") {
+	if(process.env.token && token === process.env.token) {
 		req.token = token;
 		next();
 	} else {

@@ -29,12 +29,7 @@ class ResponseCode {
 class ChipDrive {
 	static FILE   = 1;
 	static FOLDER = 2;
-	
-	static ACL_READABLE  = 1 << 0;
-	static ACL_WRITEABLE = 1 << 1;
 
-	static MSG_RESPONSE_MALFORMED = "Unreadable response from server";
-	static MSG_RESPONSE_ERROR = "An error occurred with the server";
 	static MSG_RESPONSE_TIMEOUT = "Connection timeout with the server";
 
 	static TIMEOUT = 15000;
