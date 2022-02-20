@@ -1,7 +1,8 @@
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const sequelize = new Sequelize({
 	dialect: 'sqlite',
-	storage: './database/node.db'
+	storage: './database/node.db',
+	logging: false
 });
 
 class Node extends Model {}
@@ -79,9 +80,28 @@ class ChipDrive {
 		});
 	}
 
+	async getType(id) {
+		return new Promise((resolve, reject) => {
+			Node.findAll({
+				where: {
+					id: id,
+					user: this.user
+				}
+			}).then((nodes) => {
+				if(nodes.length > 0) {
+					resolve(nodes[0].type)
+				} else {
+					reject("Node not found");
+				}
+			}).catch((err) => {
+				reject(err);
+			});
+		});
+	}
+
 	async list(id) {
 		return new Promise(async (resolve, reject) => {
-			if(await this.has(id)) {
+			if((await this.has(id)) && (await this.getType(id)) === ChipDrive.FOLDER) {
 				Node.findAll({
 					where: {
 						parent: id,

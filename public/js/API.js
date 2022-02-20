@@ -12,10 +12,14 @@ class ResponseCode {
 	static LOGIN   = 1 << 2;
 	static code(httpCode) {
 		switch(httpCode) {
-			case 404:
-				return "Item not found or has been deleted"
 			case 400:
 				return "The server did not understood the request you provided";
+			case 401:
+				return "Unauthorized request to the server";
+			case 404:
+				return "Item not found or has been deleted"
+			case 500:
+				return "Unknown error occurred with the server"
 			default:
 				return "Server sent an unknown error";
 		}
@@ -68,7 +72,7 @@ class ChipDrive {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: this.getEndpoint() + "/api/v2/drive/config",
-				type: "POST",
+				type: "GET",
 				data: {
 					token: this.getToken()
 				},
@@ -91,7 +95,7 @@ class ChipDrive {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				url: this.getEndpoint() + "/api/v2/drive/list",
-				type: "POST",
+				type: "GET",
 				data: {
 					folderid: this.getFolder(),
 					filter: filter,
