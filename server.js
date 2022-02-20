@@ -55,6 +55,15 @@ function auth(req, res, next) {
 	}
 }
 
+app.get('/api/v2/drive/version', auth, (req, res) => {
+	queue.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
+
+		return res.status(200).json({"version": "v1.0.0"});
+	});
+});
+
 app.get('/api/v2/drive/config', auth, (req, res) => {
 	queue.push(async () => {
 		res.contentType("application/json");
