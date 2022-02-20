@@ -10,6 +10,16 @@ class ResponseCode {
 	static SUCCESS = 1 << 0;
 	static ERROR   = 1 << 1;
 	static LOGIN   = 1 << 2;
+	static code(httpCode) {
+		switch(httpCode) {
+			case 404:
+				return "Item not found or has been deleted"
+			case 400:
+				return "The server did not understood the request you provided";
+			default:
+				return "Server sent an unknown error";
+		}
+	}
 }
 
 class ChipDrive {
@@ -28,7 +38,6 @@ class ChipDrive {
 	constructor() {
 		this.setEndpoint("");
 		this.setFolder("");
-		this.setACL(0);
 	}
 
 	setToken(token) {
@@ -55,18 +64,6 @@ class ChipDrive {
 		return this.folder;
 	}
 
-	setACL(acl) {
-		this.acl = acl;
-	}
-
-	getACL() {
-		return this.acl;
-	}
-
-	serialize(array) {
-		return array.join("|");
-	}
-
 	getDriveList() {
 		return new Promise((resolve, reject) => {
 			$.ajax({
@@ -76,21 +73,13 @@ class ChipDrive {
 					token: this.getToken()
 				},
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				timeout: ChipDrive.TIMEOUT
@@ -109,21 +98,13 @@ class ChipDrive {
 					token: this.getToken()
 				},
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				timeout: ChipDrive.TIMEOUT
@@ -142,21 +123,13 @@ class ChipDrive {
 					token: this.getToken()
 				},
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				timeout: ChipDrive.TIMEOUT
@@ -175,21 +148,13 @@ class ChipDrive {
 					token: this.getToken()
 				},
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				timeout: ChipDrive.TIMEOUT
@@ -200,28 +165,19 @@ class ChipDrive {
 	delete(id) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
-				url: this.getEndpoint() + "/api/v2/drive/object/delete",
-				type: "POST",
+				url: this.getStreamLink(id),
+				type: "DELETE",
 				data: {
-					id: id,
 					token: this.getToken()
 				},
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				timeout: ChipDrive.TIMEOUT
@@ -232,29 +188,20 @@ class ChipDrive {
 	rename(id, name) {
 		return new Promise((resolve, reject) => {
 			$.ajax({
-				url: this.getEndpoint() + "/api/v2/drive/object/rename",
-				type: "POST",
+				url: this.getStreamLink(id),
+				type: "PATCH",
 				data: {
-					id: id,
 					name: name,
 					token: this.getToken()
 				},
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				timeout: ChipDrive.TIMEOUT
@@ -280,21 +227,13 @@ class ChipDrive {
 				type: "PUT",
 				data: file,
 				success: (res) => {
-					if('object' === typeof res || Object.prototype.toString.call(res) === '[object Array]') {
-						if(res["code"] === ResponseCode.SUCCESS) {
-							resolve(res["data"]);
-						} else {
-							reject(res["reason"]);
-						}
-					} else {
-						reject(ChipDrive.MSG_RESPONSE_MALFORMED);
-					}
+					resolve(res);
 				},
 				error: (e) => {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
-						reject(ChipDrive.MSG_RESPONSE_ERROR);
+						reject(ResponseCode.code(e.status));
 					}
 				},
 				cache: false,
