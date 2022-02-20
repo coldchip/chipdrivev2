@@ -28,21 +28,29 @@ class ChipDrive {
 	constructor(user, db) {
 		this.user = user;
 		this.db = db;
+	}
 
-		sequelize.sync().then(() => {
-			Node.findOrCreate({
-				where: {
-					id: "root",
-					user: this.user
-				},
-				defaults:{
-					type: 2, 
-					name: "root", 
-					id: "root", 
-					parent: this.user,
-					user: this.user
-				}
-			})
+	async init() {
+		return new Promise((resolve, reject) => {
+			sequelize.sync().then(() => {
+				return Node.findOrCreate({
+					where: {
+						id: "root",
+						user: this.user
+					},
+					defaults:{
+						type: 2, 
+						name: "root", 
+						id: "root", 
+						parent: this.user,
+						user: this.user
+					}
+				});
+			}).then(() => {
+				resolve();
+			}).catch((err) => {
+				reject(err);
+			});
 		});
 	}
 

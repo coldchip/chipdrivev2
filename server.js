@@ -90,9 +90,10 @@ app.post('/api/v2/drive/list', function(req, res) {
 		var filter = req.body.filter;
 		if(folderid) {
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive(token, db);
-
 				try {
+					var cd = new ChipDrive(token, db);
+
+					await cd.init();
 					var list = await cd.list(folderid);
 
 					if(filter) {
@@ -140,9 +141,11 @@ app.post('/api/v2/drive/file', function(req, res) {
 		var name = req.body.name;
 		if(folderid && name) {
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive(token, db);
-
 				try {
+					var cd = new ChipDrive(token, db);
+
+					await cd.init();
+
 					var node = await cd.create(folderid, name, ChipDrive.FILE);
 
 					res.send({
@@ -184,9 +187,11 @@ app.post('/api/v2/drive/folder', function(req, res) {
 		var folderid = req.body.folderid;
 		if(name && folderid) {
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive(token, db);
-
 				try {
+					var cd = new ChipDrive(token, db);
+
+					await cd.init();
+
 					var node = await cd.create(folderid, name, ChipDrive.FOLDER);
 
 					res.send({
@@ -228,9 +233,11 @@ app.post('/api/v2/drive/object/rename', function(req, res) {
 		var name = req.body.name;
 		if(id && name) {
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive(token, db);
-
 				try {
+					var cd = new ChipDrive(token, db);
+
+					await cd.init();
+
 					await cd.rename(id, name);
 
 					res.send({
@@ -270,9 +277,11 @@ app.post('/api/v2/drive/object/delete', function(req, res) {
 		var id = req.body.id;
 		if(id) {
 			queue.enqueue(async (done) => {
-				var cd = new ChipDrive(token, db);
-
 				try {
+					var cd = new ChipDrive(token, db);
+
+					await cd.init();
+
 					await cd.delete(id);
 
 					res.send({
@@ -311,8 +320,11 @@ app.put('/api/v2/drive/object/:id', async function(req, res) {
 	if(validate(token)) {
 		var id = req.params.id;
 		if(id) {
-			var cd = new ChipDrive(token, db);
 			try {
+				var cd = new ChipDrive(token, db);
+
+				await cd.init();
+
 				if(await cd.has(id)) {
 					pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
 						if(!err) {
@@ -356,8 +368,11 @@ app.get('/api/v2/drive/object/:id', async function(req, res) {
 	if(validate(token)) {
 		var id = req.params.id;
 		if(id) {
-			var cd = new ChipDrive(token, db);
 			try {
+				var cd = new ChipDrive(token, db);
+
+				await cd.init();
+
 				if(await cd.has(id)) {
 					res.contentType("application/octet-stream");
 					res.set('Cache-Control', 'no-store');
