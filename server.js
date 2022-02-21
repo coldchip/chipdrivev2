@@ -29,6 +29,15 @@ app.use(
 		writeToDisk: true
 	})
 );
+app.use(session({
+	name: "chipdrive-session",
+	secret: "thereisnospoon",
+	resave: false,
+	saveUninitialized: true,
+	cookie: {
+		expires: 1000 * 60 * 60 * 24
+	}
+}));
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -43,9 +52,9 @@ app.use((req, res, next) =>  {
 });
 
 function auth(req, res, next) {
-	var token = req.query.token || req.body.token;
-	if(process.env.token && token === process.env.token) {
-		req.token = token;
+	var user = req.session.user;
+	if(user) {
+		req.user = user;
 		next();
 	} else {
 		return res.status(401).json({
@@ -54,6 +63,38 @@ function auth(req, res, next) {
 		});
 	}
 }
+
+app.post('/api/v2/login', (req, res) => {
+	setTimeout(() => {
+		queue.push(async () => {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var username = req.body.username;
+			var password = req.body.password;
+
+			if(username === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD" && password === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD") {
+				
+				req.session.user = username;
+
+				return res.status(200).json({});
+			} else {
+				return res.status(400).json({});
+			}
+		});
+	}, 1000);
+});
+
+app.get('/api/v2/logout', auth, (req, res) => {
+	queue.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
+
+		req.session.destroy();
+
+		return res.status(200).json({});
+	});
+});
 
 app.get('/api/v2/drive/version', auth, (req, res) => {
 	queue.push(async () => {
@@ -97,7 +138,7 @@ app.get('/api/v2/drive/list', auth, (req, res) => {
 		var filter = req.query.filter;
 		if(folderid) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(folderid) && (await cd.getType(folderid)) === ChipDrive.FOLDER) {
@@ -140,7 +181,7 @@ app.post('/api/v2/drive/file', auth, (req, res) => {
 		var name = req.body.name;
 		if(folderid && name) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(folderid)) {
@@ -176,7 +217,7 @@ app.post('/api/v2/drive/folder', auth, (req, res) => {
 		var folderid = req.body.folderid;
 		if(folderid && name) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(folderid)) {
@@ -212,7 +253,7 @@ app.patch('/api/v2/drive/object/:id', auth, (req, res) => {
 		var name = req.body.name;
 		if(id && name) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(id)) {
@@ -247,7 +288,7 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 		var id = req.params.id;
 		if(id) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(id)) {
@@ -282,7 +323,7 @@ app.put('/api/v2/drive/object/:id', auth, (req, res) => {
 		var id = req.params.id;
 		if(id) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(id)) {
@@ -325,7 +366,7 @@ app.get('/api/v2/drive/object/:id', auth, (req, res) => {
 		var id = req.params.id;
 		if(id) {
 			try {
-				var cd = new ChipDrive(req.token, null);
+				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
 				if(await cd.has(id)) {

@@ -7,9 +7,6 @@
 import $ from 'jquery';
 
 class ResponseCode {
-	static SUCCESS = 1 << 0;
-	static ERROR   = 1 << 1;
-	static LOGIN   = 1 << 2;
 	static code(httpCode) {
 		switch(httpCode) {
 			case 400:
@@ -35,8 +32,23 @@ class ChipDrive {
 	static TIMEOUT = 15000;
 
 	constructor() {
+		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
+		ChipDrive.log("Unless you are a developer, please do not type or insert anything here if someone asks you to do it. It might be malicious. Your data may be compromised if you do so. ");
+
 		this.setEndpoint("");
 		this.setFolder("");
+		this.callbacks = {
+			login: () => {}
+		}
+	}
+
+	static log(text) {
+		console.log(`%cChipDrive • Log:%c ${text}`, 'color: #FFFFFF; background: #43833a;', 'color: #4D4D4D;');
+	}
+
+	static error(text) {
+		console.log(`%cChipDrive • Error:%c ${text}`, 'color: #FFFFFF; background: red;', 'color: #4D4D4D;');
+		throw new Error(text);
 	}
 
 	setToken(token) {
@@ -63,6 +75,45 @@ class ChipDrive {
 		return this.folder;
 	}
 
+	on(type, callback) {
+		switch(type) {
+			case "login":
+				this.callbacks.login = callback;
+			break;
+			default:
+				ChipDrive.error("Unable to set unknown callback type when setting .on() listener");
+			break;
+		}
+	}
+
+	login(username, password) {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				url: this.getEndpoint() + "/api/v2/login",
+				type: "POST",
+				data: {
+					username: username,
+					password: password,
+					token: this.getToken()
+				},
+				success: (res) => {
+					resolve(res);
+				},
+				error: (e) => {
+					if(e.statusText === 'timeout') {
+						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
+					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
+						reject(ResponseCode.code(e.status));
+					}
+				},
+				timeout: ChipDrive.TIMEOUT
+			});
+		});
+	}
+
 	getDriveList() {
 		return new Promise((resolve, reject) => {
 			$.ajax({
@@ -78,6 +129,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},
@@ -103,6 +157,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},
@@ -128,6 +185,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},
@@ -153,6 +213,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},
@@ -176,6 +239,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},
@@ -200,6 +266,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},
@@ -232,6 +301,9 @@ class ChipDrive {
 					if(e.statusText === 'timeout') {
 						reject(ChipDrive.MSG_RESPONSE_TIMEOUT);
 					} else {
+						if(401 === e.status) {
+							this.callbacks.login();
+						}
 						reject(ResponseCode.code(e.status));
 					}
 				},

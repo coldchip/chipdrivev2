@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 
 import API from './API.js';
 
+import Login from './Login.jsx';
+
 import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';
 import Body from './Component/Body.jsx';
@@ -76,6 +78,18 @@ const reducer = (state, action) => {
 				tasks: {}
 			};
 		}
+		case 'login': {
+			return { 
+				...state, 
+				login: true
+			};
+		}
+		case 'closeLogin': {
+			return { 
+				...state, 
+				login: false
+			};
+		}
 		default: {
 			return state;
 		}
@@ -83,23 +97,13 @@ const reducer = (state, action) => {
 };
 
 function ChipDrive(props) {
-	var api = React.useMemo(() => {
-		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
-		console.log(`%cChipDrive • Warning:%c Unless you are a developer, please do not type or insert anything here if someone asks you to do it. It might be malicious. Your data may be compromised if you do so. `, 'color: #FFFFFF; background: red;', '');
-
-		var api = new API();
-		api.setEndpoint(props.endpoint);
-		api.setToken(props.token);
-
-		return api;
-	}, [props.endpoint, props.token]);
-
 	var [{
 		filter,
 		sidebar, 
 		drive, 
 		folder, 
-		tasks, 
+		tasks,
+		login,
 
 		alert,
 		alertTitle
@@ -109,46 +113,61 @@ function ChipDrive(props) {
 		drive: "Unknown",
 		folder: "root",
 		tasks: {},
+		login: false,
 
 		alert: false,
 		alertTitle: ""
 	});
 
+	var api = React.useMemo(() => {
+		var api = new API();
+
+		api.on("login", () => {
+			dispatch({type: "login"});
+		});
+
+		return api;
+	}, [dispatch]);
+
 	return (
 		<APIContext.Provider value={api}>
 			<ChipDriveContext.Provider value={dispatch}>
-				<div className={cssf(css, "!chipdrive-app chipdrive")}>
-					<Header />
+				{ 
+					!login && 
+					<div className={cssf(css, "!chipdrive-app chipdrive")}>
+						<Header />
 
-					<Sidebar 
-						open={sidebar} 
-					/>
+						<Sidebar 
+							open={sidebar} 
+						/>
 
-					<Body 
-						title={drive} 
-						folder={folder}
-						filter={filter} 
-					/>
+						<Body 
+							title={drive} 
+							folder={folder}
+							filter={filter} 
+						/>
 
-					<TaskModal 
-						tasks={tasks}
-						onClear={() => {
-							dispatch({type: "closeTask"})
-						}}
-					/>
+						<TaskModal 
+							tasks={tasks}
+							onClear={() => {
+								dispatch({type: "closeTask"})
+							}}
+						/>
 
-					<Alert
-						title={alertTitle}
-						open={alert} 
-						onAccept={() => {
-							dispatch({type: "unalert"});
-						}}
-					/>
-				</div>
+						<Alert
+							title={alertTitle}
+							open={alert} 
+							onAccept={() => {
+								dispatch({type: "unalert"});
+							}}
+						/>
+					</div>
+				}
+
+				{ login && <Login /> }
 			</ChipDriveContext.Provider>
 		</APIContext.Provider>
 	);
-
 }
 
 export default ChipDrive;
