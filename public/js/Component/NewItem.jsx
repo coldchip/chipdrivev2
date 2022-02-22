@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import API from './../API.js';
+import XHRRequest from './../XHRRequest.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -31,12 +31,12 @@ function NewItem(props) {
 					}
 				});
 
-				var {body} = await API.post("/api/v2/drive/file", {
+				var {body} = await XHRRequest.post("/api/v2/drive/file", {
 					name: files[i].name,
 					folderid: props.folder
 				});
 
-				await API.put(`/api/v2/drive/object/${body.id}`, files[i], (e) => { // state 2 - PUT the data
+				await XHRRequest.put(`/api/v2/drive/object/${body.id}`, files[i], (e) => { // state 2 - PUT the data
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 
@@ -60,7 +60,9 @@ function NewItem(props) {
 				});
 			}
 			
-			dispatch({type: "list"});
+			dispatch({
+				type: "list"
+			});
 		} catch(response) {
 			var {status, body} = response;
 
@@ -89,7 +91,7 @@ function NewItem(props) {
 			}
 		});
 
-		API.post("/api/v2/drive/folder", {
+		XHRRequest.post("/api/v2/drive/folder", {
 			name: name,
 			folderid: props.folder
 		}).then(() => {
@@ -102,7 +104,9 @@ function NewItem(props) {
 				}
 			});
 
-			dispatch({type: "list"});
+			dispatch({
+				type: "list"
+			});
 		}).catch((response) => {
 			var {status, body} = response;
 

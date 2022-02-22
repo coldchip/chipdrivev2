@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import API from './../API.js';
+import XHRRequest from './../XHRRequest.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -19,7 +19,7 @@ function List(props) {
 		setLoading(true);
 		setList([]);
 
-		API.get("/api/v2/drive/list", {
+		XHRRequest.get("/api/v2/drive/list", {
 			folderid: props.folder, 
 			filter: props.filter
 		}).then((response) => {

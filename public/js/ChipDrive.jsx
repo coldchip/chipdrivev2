@@ -1,7 +1,5 @@
 import React, { useEffect, useReducer } from 'react';
 
-import API from './API.js';
-
 import Login from './Login.jsx';
 
 import Header from './Component/Header.jsx';
@@ -143,7 +141,9 @@ function ChipDrive(props) {
 					<TaskModal 
 						tasks={tasks}
 						onClear={() => {
-							dispatch({type: "closeTask"})
+							dispatch({
+								type: "closeTask"
+							})
 						}}
 					/>
 
@@ -151,7 +151,9 @@ function ChipDrive(props) {
 						title={alertTitle}
 						open={alert} 
 						onAccept={() => {
-							dispatch({type: "unalert"});
+							dispatch({
+								type: "unalert"
+							});
 						}}
 					/>
 				</div>

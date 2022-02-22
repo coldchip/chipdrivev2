@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import API from './../API.js';
+import XHRRequest from './../XHRRequest.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -17,7 +17,8 @@ function DriveList(props) {
 	useEffect(() => {
 		setList([]);
 		setLoading(true);
-		API.get("/api/v2/drive/config", null).then((response) => {
+
+		XHRRequest.get("/api/v2/drive/config", null).then((response) => {
 			var {status, body} = response;
 
 			setLoading(false);
@@ -25,10 +26,14 @@ function DriveList(props) {
 
 			if(body.length > 0) {
 				var drive = body[0];
-				dispatch({type: "drive", name: drive.name});
-				dispatch({type: "list", id: drive.id});
+				dispatch({
+					type: "drive", name: drive.name
+				});
+				dispatch({
+					type: "list", id: drive.id
+				});
 			}
-		}).catch((e) => {
+		}).catch((response) => {
 			var {status, body} = response;
 
 			if(status === 401) {
@@ -54,8 +59,14 @@ function DriveList(props) {
 							<button 
 								className={cssf(css, "sidebar-item text")}
 								onClick={() => {
-									dispatch({type: "drive", name: drive.name});
-									dispatch({type: "list", id: drive.id});
+									dispatch({
+										type: "drive", 
+										name: drive.name
+									});
+									dispatch({
+										type: "list", 
+										id: drive.id
+									});
 								}} 
 								tabIndex="0"
 								key={drive.id}

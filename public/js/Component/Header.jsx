@@ -15,7 +15,9 @@ function Header(props) {
 		<React.Fragment>
 			<div className={cssf(css, "chipdrive-header")}>
 				<i className={cssf(css, "!fa !fa-bars header-bars")} onClick={() => {
-					dispatch({type:"sidebar"});
+					dispatch({
+						type:"sidebar"
+					});
 				}}></i>
 
 				<a href="#">
@@ -24,7 +26,12 @@ function Header(props) {
 
 				<form className={cssf(css, "header-search ms-5 me-5 ps-2")}>
 					<i class="fa fa-search"></i>
-					<input type="text" className={cssf(css, "ps-2 text")} placeholder="Search Drive" onChange={e => dispatch({type: "filter", filter: e.target.value})} />
+					<input type="text" onChange={(e) => {
+							dispatch({
+								type: "filter", 
+								filter: e.target.value
+							});
+					}} className={cssf(css, "ps-2 text")} placeholder="Search Drive" />
 				</form>
 
 				<div className={cssf(css, "flex-fill")}></div>

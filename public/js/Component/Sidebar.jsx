@@ -1,7 +1,10 @@
 import React, { useContext } from 'react';
 
+import XHRRequest from './../XHRRequest.js';
+
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
+import Confirm from './Confirm.jsx';
 import NewItem from './NewItem.jsx';
 import DriveList from './DriveList.jsx';
 import DriveQuota from './DriveQuota.jsx';
@@ -12,12 +15,35 @@ import cssf from "../CSSFormat";
 function Sidebar(props) {
 	var dispatch = useContext(ChipDriveContext);
 
+	function logout(name) {
+		XHRRequest.get("/api/v2/logout").then(() => {
+			dispatch({
+				type: "list"
+			});
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
+		});
+	}
+
 	return (
 		<React.Fragment>
 			<div className={cssf(css, `chipdrive-sidebar ${!props.open ? `chipdrive-sidebar-hidden` : ""} pt-3`)}>
 				<div className={cssf(css, "text sidebar-close")}>
 					<i className={cssf(css, "!fas !fa-times cross")} onClick={() => {
-						dispatch({type: "sidebar"});
+						dispatch({
+							type: "sidebar"
+						});
 					}}></i>
 				</div>
 
@@ -38,17 +64,26 @@ function Sidebar(props) {
 					<i className={cssf(css, "!fas !fa-cog me-2")}></i>
 					Settings
 				</button>
-				<button className={cssf(css, "sidebar-item text")} tabIndex="0">
-					<i className={cssf(css, "!fas !fa-sign-out-alt me-2")}></i>
-					Logout
-				</button>
+
+				<Confirm
+					title="Are you sure?"
+					trigger={
+						<button className={cssf(css, "sidebar-item text")} onClick={logout} tabIndex="0">
+							<i className={cssf(css, "!fas !fa-sign-out-alt me-2")}></i>
+							Logout
+						</button>
+					} 
+					onAccept={logout}
+				/>
 				
 				<DriveQuota />
 			</div>
 			{
 				props.open ? (
 					<div className={cssf(css, "chipdrive-sidebar-backdrop")} onClick={() => {
-						dispatch({type: "sidebar"});
+						dispatch({
+							type: "sidebar"
+						});
 					}}></div>
 				) : null
 			}

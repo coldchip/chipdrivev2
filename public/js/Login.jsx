@@ -1,6 +1,6 @@
 import React, { useState, useContext, useCallback } from 'react';
 
-import API from './API.js';
+import XHRRequest from './XHRRequest.js';
 import ChipDriveContext from './Context/ChipDriveContext.jsx';
 
 import css from "../css/index.scss";
@@ -18,24 +18,20 @@ function Login() {
 	var login = useCallback(() => {
 		setLoading(true);
 
-		API.post("/api/v2/login", {
+		XHRRequest.post("/api/v2/login", {
 			username: username, 
 			password:password
 		}).then(() => {
 			setLoading(false);
-			dispatch({type: "closeLogin"});
+			dispatch({
+				type: "closeLogin"
+			});
 		}).catch((response) => {
 			var {status, body} = response;
 
-			if(status === 400) {
-				setLoading(false);
-				setError("Invalid Credentials Provided");
-			} else {
-				dispatch({
-					type: "alert", 
-					title: body.message
-				});
-			}
+			setLoading(false);
+
+			setError(body.message);
 		});
 	}, [dispatch, username, password]);
 

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import API from './../API.js';
+import XHRRequest from './../XHRRequest.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -30,7 +30,7 @@ function ItemOption(props) {
 			}
 		});
 
-		API.patch(`/api/v2/drive/object/${props.item.id}`, {
+		XHRRequest.patch(`/api/v2/drive/object/${props.item.id}`, {
 			name: name
 		}).then(() => {
 			dispatch({
@@ -42,7 +42,9 @@ function ItemOption(props) {
 				}
 			});
 
-			dispatch({type: "list"});
+			dispatch({
+				type: "list"
+			});
 		}).catch((response) => {
 			var {status, body} = response;
 
@@ -73,7 +75,7 @@ function ItemOption(props) {
 			}
 		});
 
-		API.delete(API.getObjectURL(props.item.id)).then(() => {
+		XHRRequest.delete(`/api/v2/drive/object/${props.item.id}`).then(() => {
 			dispatch({
 				type: "task", 
 				id: taskid, 
@@ -83,7 +85,9 @@ function ItemOption(props) {
 				}
 			});
 
-			dispatch({type: "list"});
+			dispatch({
+				type: "list"
+			});
 		}).catch((e) => {
 			var {status, body} = response;
 
@@ -103,7 +107,7 @@ function ItemOption(props) {
 	function download() {
 		var {item} = props;
 
-		var link = API.getObjectURL(item.id);
+		var link = `/api/v2/drive/object/${item.id}`;
 			
 		var a = document.createElement("a");
 		a.style.display = "none";

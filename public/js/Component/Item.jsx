@@ -1,7 +1,5 @@
 import React, { useContext } from 'react';
 
-import API from './../API.js';
-
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import ItemOption from './ItemOption.jsx';
@@ -51,7 +49,10 @@ function Item(props) {
 
 				<div className={cssf(css, "list-item-inner")} onClick={() => {
 					var {item} = props;
-					dispatch({type: "list", id: item.id});
+					dispatch({
+						type: "list", 
+						id: item.id
+					});
 				}}>
 					<i className={cssf(css, "!fas !fa-folder item-icon")}></i>
 					<p className={cssf(css, "item-label text")}>{props.item.name}</p>

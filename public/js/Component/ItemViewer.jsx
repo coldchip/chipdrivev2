@@ -1,7 +1,5 @@
 import React from 'react';
 
-import API from './../API.js';
-
 import ButtonGreen from './ButtonGreen.jsx';
 
 import Types from '../Types';
@@ -13,7 +11,7 @@ function ItemViewer(props) {
 	function download() {
 		var {item} = props;
 
-		var link = API.getObjectURL(item.id);
+		var link = `/api/v2/drive/object/${item.id}`;
 			
 		var a = document.createElement("a");
 		a.style.display = "none";
@@ -33,18 +31,18 @@ function ItemViewer(props) {
 		var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
-				<img className={cssf(css, "cd-preview-modal-image")} src={ API.getObjectURL(item.id) } />
+				<img className={cssf(css, "cd-preview-modal-image")} src={ `/api/v2/drive/object/${item.id}` } />
 			)
 		} else if(Types.video.indexOf(ext) >= 0) {
 			return (
 				<video className={cssf(css, "cd-preview-modal-video")} controls>
-					<source type="video/mp4" src={ API.getObjectURL(item.id) } />
+					<source type="video/mp4" src={ `/api/v2/drive/object/${item.id}` } />
 				</video>
 			)
 		} else if(Types.audio.indexOf(ext) >= 0) {
 			return (
 				<audio className={cssf(css, "cd-preview-modal-audio")} controls="true" preload="auto">
-					<source type="audio/mp3" src={ API.getObjectURL(item.id) } />
+					<source type="audio/mp3" src={ `/api/v2/drive/object/${item.id}` } />
 				</audio>
 			)
 		} else {
