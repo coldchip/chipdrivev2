@@ -48,14 +48,14 @@ class XHRRequest {
 			xhr.onreadystatechange = function() {
 				if(xhr.readyState === 4) {
 					if(xhr.status >= 100 && xhr.status <= 599) {
-						var type = Math.floor(xhr.status / 100);
+						var basetype = Math.floor(xhr.status / 100);
 
 						var response = {
 							status: xhr.status,
 							body: JSON.parse(xhr.responseText)
 						};
 
-						if(type === 2) {
+						if(basetype === 2) {
 							resolve(response);
 						} else {
 							reject(response);
