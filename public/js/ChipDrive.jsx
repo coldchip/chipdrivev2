@@ -1,5 +1,4 @@
 import React, { useReducer } from 'react';
-import ReactDOM from 'react-dom';
 
 import API from './API.js';
 
@@ -9,7 +8,6 @@ import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';
 import Body from './Component/Body.jsx';
 import Alert from './Component/Alert.jsx';
-import Prompt from './Component/Prompt.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
 import APIContext from './Context/APIContext.jsx';
