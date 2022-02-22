@@ -1,6 +1,6 @@
 import React, { useState, useContext, useCallback } from 'react';
 
-import APIContext from './Context/APIContext.jsx';
+import API from './API.js';
 import ChipDriveContext from './Context/ChipDriveContext.jsx';
 
 import css from "../css/index.scss";
@@ -13,20 +13,31 @@ function Login() {
 
 	var [loading, setLoading] = useState(false);
 
-	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
 	var login = useCallback(() => {
 		setLoading(true);
 
-		api.login(username, password).then(() => {
+		API.post("/api/v2/login", {
+			username: username, 
+			password:password
+		}).then(() => {
 			setLoading(false);
 			dispatch({type: "closeLogin"});
-		}).catch((e) => {
-			setLoading(false);
-			setError("Invalid Credentials Provided");
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 400) {
+				setLoading(false);
+				setError("Invalid Credentials Provided");
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		});
-	}, [api, dispatch, username, password]);
+	}, [dispatch, username, password]);
 
 	return (
 		<div className={cssf(css, "login-page")}>

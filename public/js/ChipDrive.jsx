@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 
 import API from './API.js';
 
@@ -10,7 +10,6 @@ import Body from './Component/Body.jsx';
 import Alert from './Component/Alert.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
-import APIContext from './Context/APIContext.jsx';
 import ChipDriveContext from './Context/ChipDriveContext.jsx';
 
 import css from "../css/index.scss";
@@ -117,54 +116,49 @@ function ChipDrive(props) {
 		alertTitle: ""
 	});
 
-	var api = React.useMemo(() => {
-		var api = new API();
-
-		api.on("login", () => {
-			dispatch({type: "login"});
-		});
-
-		return api;
-	}, [dispatch]);
+	useEffect(() => {
+		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
+	}, []);
 
 	return (
-		<APIContext.Provider value={api}>
-			<ChipDriveContext.Provider value={dispatch}>
-				{ 
-					!login && 
-					<div className={cssf(css, "!chipdrive-app chipdrive")}>
-						<Header />
+		<ChipDriveContext.Provider value={dispatch}>
+			{ 
+				!login && 
+				<div className={cssf(css, "!chipdrive-app chipdrive")}>
+					<Header 
+						folder={folder}
+					/>
 
-						<Sidebar 
-							open={sidebar} 
-						/>
+					<Sidebar 
+						open={sidebar} 
+						folder={folder}
+					/>
 
-						<Body 
-							title={drive} 
-							folder={folder}
-							filter={filter} 
-						/>
+					<Body 
+						title={drive} 
+						folder={folder}
+						filter={filter} 
+					/>
 
-						<TaskModal 
-							tasks={tasks}
-							onClear={() => {
-								dispatch({type: "closeTask"})
-							}}
-						/>
+					<TaskModal 
+						tasks={tasks}
+						onClear={() => {
+							dispatch({type: "closeTask"})
+						}}
+					/>
 
-						<Alert
-							title={alertTitle}
-							open={alert} 
-							onAccept={() => {
-								dispatch({type: "unalert"});
-							}}
-						/>
-					</div>
-				}
+					<Alert
+						title={alertTitle}
+						open={alert} 
+						onAccept={() => {
+							dispatch({type: "unalert"});
+						}}
+					/>
+				</div>
+			}
 
-				{ login && <Login /> }
-			</ChipDriveContext.Provider>
-		</APIContext.Provider>
+			{ login && <Login /> }
+		</ChipDriveContext.Provider>
 	);
 }
 

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import APIContext from './../Context/APIContext.jsx';
+import API from './../API.js';
+
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Prompt from './Prompt.jsx';
@@ -9,7 +10,6 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function NewItem(props) {
-	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
 	var dropdown = useRef(null);
@@ -31,8 +31,12 @@ function NewItem(props) {
 					}
 				});
 
-				var res = await api.createFile(files[i].name); // stage 1 - create the file
-				await api.put(files[i], res.id, (e) => { // state 2 - PUT the data
+				var {body} = await API.post("/api/v2/drive/file", {
+					name: files[i].name,
+					folderid: props.folder
+				});
+
+				await API.put(`/api/v2/drive/object/${body.id}`, files[i], (e) => { // state 2 - PUT the data
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 
@@ -57,8 +61,19 @@ function NewItem(props) {
 			}
 			
 			dispatch({type: "list"});
-		} catch(e) {
-			dispatch({type: "alert", title: e});
+		} catch(response) {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		}
 	}
 
@@ -74,7 +89,10 @@ function NewItem(props) {
 			}
 		});
 
-		api.createFolder(name).then(() => {
+		API.post("/api/v2/drive/folder", {
+			name: name,
+			folderid: props.folder
+		}).then(() => {
 			dispatch({
 				type: "task", 
 				id: taskid, 
@@ -85,8 +103,19 @@ function NewItem(props) {
 			});
 
 			dispatch({type: "list"});
-		}).catch((e) => {
-			dispatch({type: "alert", title: e});
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		});
 	}
 

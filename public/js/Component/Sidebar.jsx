@@ -27,7 +27,8 @@ function Sidebar(props) {
 							<i className={cssf(css, "!fas !fa-plus cross me-2")} ></i>
 							New
 						</button>
-					} 
+					}
+					folder={props.folder}
 				/>
 
 				<DriveList />

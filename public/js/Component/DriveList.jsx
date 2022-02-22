@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import APIContext from './../Context/APIContext.jsx';
+import API from './../API.js';
+
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Loader from './Loader.jsx';
@@ -8,7 +9,6 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveList(props) {
-	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
 	var [list, setList] = useState([]);
@@ -17,20 +17,33 @@ function DriveList(props) {
 	useEffect(() => {
 		setList([]);
 		setLoading(true);
+		API.get("/api/v2/drive/config", null).then((response) => {
+			var {status, body} = response;
 
-		api.getDriveList().then((list) => {
-			setList(list);
 			setLoading(false);
+			setList(body);
 
-			if(list.length > 0) {
-				var drive = list[0];
+			if(body.length > 0) {
+				var drive = body[0];
 				dispatch({type: "drive", name: drive.name});
 				dispatch({type: "list", id: drive.id});
 			}
 		}).catch((e) => {
-			dispatch({type: "alert", title: e});
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		});
-	}, [api, dispatch]);
+
+	}, [dispatch]);
 
 	if(!loading) {
 		return (

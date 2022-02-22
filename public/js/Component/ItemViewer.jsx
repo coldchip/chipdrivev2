@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
-import APIContext from './../Context/APIContext.jsx';
+import API from './../API.js';
 
 import ButtonGreen from './ButtonGreen.jsx';
 
@@ -10,12 +10,10 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemViewer(props) {
-	var api = useContext(APIContext);
-
 	function download() {
 		var {item} = props;
 
-		var link = api.getStreamLink(item.id);
+		var link = API.getObjectURL(item.id);
 			
 		var a = document.createElement("a");
 		a.style.display = "none";
@@ -35,18 +33,18 @@ function ItemViewer(props) {
 		var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
-				<img className={cssf(css, "cd-preview-modal-image")} src={ api.getStreamLink(item.id) } />
+				<img className={cssf(css, "cd-preview-modal-image")} src={ API.getObjectURL(item.id) } />
 			)
 		} else if(Types.video.indexOf(ext) >= 0) {
 			return (
 				<video className={cssf(css, "cd-preview-modal-video")} controls>
-					<source type="video/mp4" src={ api.getStreamLink(item.id) } />
+					<source type="video/mp4" src={ API.getObjectURL(item.id) } />
 				</video>
 			)
 		} else if(Types.audio.indexOf(ext) >= 0) {
 			return (
 				<audio className={cssf(css, "cd-preview-modal-audio")} controls="true" preload="auto">
-					<source type="audio/mp3" src={ api.getStreamLink(item.id) } />
+					<source type="audio/mp3" src={ API.getObjectURL(item.id) } />
 				</audio>
 			)
 		} else {

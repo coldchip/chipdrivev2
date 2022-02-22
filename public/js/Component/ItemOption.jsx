@@ -1,6 +1,7 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import APIContext from './../Context/APIContext.jsx';
+import API from './../API.js';
+
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Prompt from './Prompt.jsx';
@@ -10,7 +11,6 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemOption(props) {
-	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
 	var dropdown = useRef(null);
@@ -30,7 +30,9 @@ function ItemOption(props) {
 			}
 		});
 
-		api.rename(props.item.id, name).then(() => {
+		API.patch(`/api/v2/drive/object/${props.item.id}`, {
+			name: name
+		}).then(() => {
 			dispatch({
 				type: "task", 
 				id: taskid, 
@@ -41,8 +43,19 @@ function ItemOption(props) {
 			});
 
 			dispatch({type: "list"});
-		}).catch((e) => {
-			dispatch({type: "alert", title: e});
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		});
 	}
 
@@ -60,7 +73,7 @@ function ItemOption(props) {
 			}
 		});
 
-		api.delete(props.item.id).then(() => {
+		API.delete(API.getObjectURL(props.item.id)).then(() => {
 			dispatch({
 				type: "task", 
 				id: taskid, 
@@ -72,14 +85,25 @@ function ItemOption(props) {
 
 			dispatch({type: "list"});
 		}).catch((e) => {
-			dispatch({type: "alert", title: e});
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		});
 	}
 
 	function download() {
 		var {item} = props;
 
-		var link = api.getStreamLink(item.id);
+		var link = API.getObjectURL(item.id);
 			
 		var a = document.createElement("a");
 		a.style.display = "none";

@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
 
+import API from './../API.js';
+
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import ItemOption from './ItemOption.jsx';
@@ -10,7 +12,10 @@ import cssf from "../CSSFormat";
 function Item(props) {
 	var dispatch = useContext(ChipDriveContext);
 
-	if(props.item.type === 1) {
+	const TYPE_FILE   = 1;
+	const TYPE_FOLDER = 2;
+
+	if(props.item.type === TYPE_FILE) {
 		return (
 			<div className={cssf(css, "list-item")}>
 				<ItemOption 
@@ -32,7 +37,9 @@ function Item(props) {
 			</div>
 			
 		)
-	} else {
+	} 
+
+	if(props.item.type === TYPE_FOLDER) {
 		return (
 			<div className={cssf(css, "list-item")}>
 				<ItemOption 

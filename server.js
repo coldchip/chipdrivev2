@@ -73,13 +73,16 @@ app.post('/api/v2/login', (req, res) => {
 			var username = req.body.username;
 			var password = req.body.password;
 
-			if(username === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD" && password === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD") {
+			if(username === "a" && password === "a") {
 				
 				req.session.user = username;
 
 				return res.status(200).json({});
 			} else {
-				return res.status(400).json({});
+				return res.status(400).json({
+					code: 400,
+					message: "Invalid Login"
+				});
 			}
 		});
 	}, 1000);

@@ -25,6 +25,7 @@ function Body(props) {
 						<i className={cssf(css, "!fas !fa-plus")}></i>
 					</button>
 				} 
+				folder={props.folder}
 			/>
 		</div>
 	);

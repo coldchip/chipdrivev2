@@ -1,6 +1,7 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
-import APIContext from './../Context/APIContext.jsx';
+import API from './../API.js';
+
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Loader from './Loader.jsx';
@@ -9,7 +10,6 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function List(props) {
-	var api = useContext(APIContext);
 	var dispatch = useContext(ChipDriveContext);
 
 	const [list, setList] = useState([]);
@@ -19,14 +19,30 @@ function List(props) {
 		setLoading(true);
 		setList([]);
 
-		api.setFolder(props.folder);
-		api.list(props.filter).then((_list) => {
+		API.get("/api/v2/drive/list", {
+			folderid: props.folder, 
+			filter: props.filter
+		}).then((response) => {
+			var {status, body} = response;
+
 			setLoading(false);
-			setList(_list);
-		}).catch((e) => {
-			dispatch({type: "alert", title: e});
+			setList(body);
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
 		});
-	}, [api, dispatch, props.folder, props.filter]);
+
+	}, [dispatch, props.folder, props.filter]);
 
 	if(!loading) {
 		if(list.length > 0) {

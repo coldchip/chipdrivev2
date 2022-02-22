@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
-import NewItem from './NewItem.jsx';
 import Account from './Account.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
