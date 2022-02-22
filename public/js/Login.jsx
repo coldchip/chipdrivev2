@@ -45,12 +45,14 @@ function Login() {
 					className={cssf(css, "input text mb-3")} 
 					id="username" 
 					placeholder="Username"
+					autocomplete="username" 
+					spellcheck="false"
 					onChange={e => setUsername(e.target.value)}
 				/>
 				
 				<label className={cssf(css, "label text")} for="password">Password: </label>
 				<input 
-					type="text" 
+					type="password" 
 					className={cssf(css, "input text mb-3")} 
 					id="password" 
 					placeholder="Password" 
