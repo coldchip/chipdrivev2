@@ -73,7 +73,7 @@ app.post('/api/v2/login', (req, res) => {
 			var username = req.body.username;
 			var password = req.body.password;
 
-			if(username === "a" && password === "a") {
+			if(username === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD" && password === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD") {
 				
 				req.session.user = username;
 

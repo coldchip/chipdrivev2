@@ -46,7 +46,8 @@ function Login() {
 					id="username" 
 					placeholder="Username"
 					autocomplete="username" 
-					spellcheck="false"
+					autocapitalize={false}
+					spellcheck={false}
 					onChange={e => setUsername(e.target.value)}
 				/>
 				
