@@ -1,10 +1,10 @@
 import React, { useState, useContext, useCallback } from 'react';
 
-import XHRRequest from './XHRRequest.js';
-import ChipDriveContext from './Context/ChipDriveContext.jsx';
+import IO from './../IO.js';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
-import css from "../css/index.scss";
-import cssf from "./CSSFormat";
+import css from "../../css/index.scss";
+import cssf from "../CSSFormat";
 
 function Login() {
 	var [username, setUsername] = useState("");
@@ -18,7 +18,7 @@ function Login() {
 	var login = useCallback(() => {
 		setLoading(true);
 
-		XHRRequest.post("/api/v2/login", {
+		IO.post("/api/v2/login", {
 			username: username, 
 			password:password
 		}).then(() => {
@@ -45,7 +45,7 @@ function Login() {
 					className={cssf(css, "input text mb-3")} 
 					id="username" 
 					placeholder="Username"
-					autocomplete="username" 
+					autocomplete="off" 
 					autocapitalize={false}
 					spellcheck={false}
 					onChange={e => setUsername(e.target.value)}

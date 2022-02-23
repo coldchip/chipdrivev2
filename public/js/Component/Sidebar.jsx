@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import XHRRequest from './../XHRRequest.js';
+import IO from './../IO.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -15,8 +15,8 @@ import cssf from "../CSSFormat";
 function Sidebar(props) {
 	var dispatch = useContext(ChipDriveContext);
 
-	function logout(name) {
-		XHRRequest.get("/api/v2/logout").then(() => {
+	var logout = (name) => {
+		IO.get("/api/v2/logout").then(() => {
 			dispatch({
 				type: "list"
 			});

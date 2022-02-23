@@ -32,26 +32,19 @@ class ChipDrive {
 	}
 
 	async init() {
-		return new Promise((resolve, reject) => {
-			sequelize.sync().then(() => {
-				return Node.findOrCreate({
-					where: {
-						id: "root",
-						user: this.user
-					},
-					defaults:{
-						type: 2, 
-						name: "root", 
-						id: "root", 
-						parent: this.user,
-						user: this.user
-					}
-				});
-			}).then(() => {
-				resolve();
-			}).catch((err) => {
-				reject(err);
-			});
+		await sequelize.sync();
+		await Node.findOrCreate({
+			where: {
+				id: "root",
+				user: this.user
+			},
+			defaults:{
+				type: 2, 
+				name: "root", 
+				id: "root", 
+				parent: this.user,
+				user: this.user
+			}
 		});
 	}
 
@@ -65,117 +58,106 @@ class ChipDrive {
 		return result.join('');
 	}
 
-	async has(id) {
-		return new Promise((resolve, reject) => {
-			Node.findAll({
-				where: {
-					id: id,
-					user: this.user
-				}
-			}).then((nodes) => {
-				resolve(nodes.length > 0)
-			}).catch((err) => {
-				reject(err);
-			});
+	async get(id) {
+		var nodes = await Node.findAll({
+			where: {
+				id: id,
+				user: this.user
+			}
 		});
+
+		if(nodes.length > 0) {
+			return nodes[0];
+		} else {
+			throw "Node not found";
+		}
+			
 	}
 
-	async getType(id) {
-		return new Promise((resolve, reject) => {
-			Node.findAll({
-				where: {
-					id: id,
-					user: this.user
-				}
-			}).then((nodes) => {
-				if(nodes.length > 0) {
-					resolve(nodes[0].type)
-				} else {
-					reject("Node not found");
-				}
-			}).catch((err) => {
-				reject(err);
-			});
-		});
+	async has(id) {
+		var nodes = await Node.findAll({
+			where: {
+				id: id,
+				user: this.user
+			}
+		})
+		
+		return nodes.length > 0;
+	}
+
+	async isFile(id) {
+		if(await this.has(id)) {
+			var node = await this.get(id);
+			if(node.type === ChipDrive.FILE) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	async isFolder(id) {
+		if(await this.has(id)) {
+			var node = await this.get(id);
+			if(node.type === ChipDrive.FOLDER) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	async list(id) {
-		return new Promise(async (resolve, reject) => {
-			if((await this.has(id)) && (await this.getType(id)) === ChipDrive.FOLDER) {
-				Node.findAll({
-					where: {
-						parent: id,
-						user: this.user
-					}
-				}).then((nodes) => {
-					resolve(nodes);
-				}).catch((err) => {
-					reject(err);
-				});
-			} else {
-				reject("Folder not found");
-			}
-		});
+		if(await this.isFolder(id)) {
+			return await Node.findAll({
+				where: {
+					parent: id,
+					user: this.user
+				}
+			});
+		} else {
+			throw "Folder not found";
+		}
 	}
 
 	async create(parent, name, type) {
-		return new Promise((resolve, reject) => {
-			if(this.has(parent)) {
-				Node.create({
-					type: type, 
-					name: name, 
-					id: ChipDrive.randID(32), 
-					parent: parent,
-					user: this.user
-				}).then((node) => {
-					resolve(node.dataValues);
-				}).catch((err) => {
-					reject(err);
-				});
-			} else {
-				reject("Folder not found");
-			}
-		});
+		if(await this.isFolder(parent)) {
+			return await Node.create({
+				type: type, 
+				name: name, 
+				id: ChipDrive.randID(32), 
+				parent: parent,
+				user: this.user
+			});
+		} else {
+			throw "Folder not found";
+		}
 	}
 
 	async rename(id, name) {
-		return new Promise(async (resolve, reject) => {
-			if(await this.has(id)) {
-				Node.update({
-					name: name, 
-				}, {
-					where: { 
-						id: id,
-						user: this.user
-					}
-				}).then((results) => {
-					resolve();
-				}).catch((err) => {
-					reject(err);
-				});
-			} else {
-				reject("Item not found");
-			}
-		});
+		if(await this.has(id)) {
+			return await Node.update({
+				name: name, 
+			}, {
+				where: { 
+					id: id,
+					user: this.user
+				}
+			});
+		} else {
+			throw "Node not found";
+		}
 	}
 
 	async delete(id) {
-		return new Promise(async (resolve, reject) => {
-			if(await this.has(id)) {
-				Node.destroy({
-					where: {
-						id: id,
-						user: this.user
-					}
-				}).then((results) => {
-					resolve();
-				}).catch((err) => {
-					reject(err);
-				});
-			} else {
-				reject("Item not found");
-			}
-		});
+		if(await this.has(id)) {
+			return await Node.destroy({
+				where: {
+					id: id,
+					user: this.user
+				}
+			});
+		} else {
+			throw "Node not found";
+		}
 	}
 
 }

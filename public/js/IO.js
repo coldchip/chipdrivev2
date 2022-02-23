@@ -1,10 +1,10 @@
 /*
-	@title: ChipDrive XHRRequest HTTP API
+	@title: ChipDrive IO HTTP API
 	@author: Ryan Loh
 	@description: A library to perform CRUD requests to ChipDrive server
 */
 
-class XHRRequest {
+class IO {
 	static TIMEOUT = 15000;
 
 	static _send(opts) {
@@ -106,9 +106,9 @@ class XHRRequest {
 			method: "GET",
 			url: url,
 			query: query,
-			timeout: XHRRequest.TIMEOUT
+			timeout: IO.TIMEOUT
 		};
-		return XHRRequest._send(opts);
+		return IO._send(opts);
 	}
 
 	static post(url, body) {
@@ -118,10 +118,10 @@ class XHRRequest {
 			header: {
 				"Content-Type": "application/x-www-form-urlencoded"
 			},
-			timeout: XHRRequest.TIMEOUT,
+			timeout: IO.TIMEOUT,
 			body: new URLSearchParams(body).toString()
 		};
-		return XHRRequest._send(opts);
+		return IO._send(opts);
 	}
 
 	static put(url, blob, progress) {
@@ -134,7 +134,7 @@ class XHRRequest {
 			progress: progress,
 			body: blob
 		};
-		return XHRRequest._send(opts);
+		return IO._send(opts);
 	}
 
 	static patch(url, body) {
@@ -144,20 +144,20 @@ class XHRRequest {
 			header: {
 				"Content-Type": "application/x-www-form-urlencoded"
 			},
-			timeout: XHRRequest.TIMEOUT,
+			timeout: IO.TIMEOUT,
 			body: new URLSearchParams(body).toString()
 		};
-		return XHRRequest._send(opts);
+		return IO._send(opts);
 	}
 
 	static delete(url) {
 		var opts = {
 			method: "DELETE",
 			url: url,
-			timeout: XHRRequest.TIMEOUT
+			timeout: IO.TIMEOUT
 		};
-		return XHRRequest._send(opts);
+		return IO._send(opts);
 	}
 }
 
-export default XHRRequest;
+export default IO;

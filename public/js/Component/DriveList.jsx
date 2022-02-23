@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import XHRRequest from './../XHRRequest.js';
+import IO from './../IO.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -18,7 +18,7 @@ function DriveList(props) {
 		setList([]);
 		setLoading(true);
 
-		XHRRequest.get("/api/v2/drive/config", null).then((response) => {
+		IO.get("/api/v2/drive/config", null).then((response) => {
 			var {status, body} = response;
 
 			setLoading(false);

@@ -6,7 +6,7 @@ import cssf from "../CSSFormat";
 function Alert(props) {
 	var modal = useRef(null);
 
-	function onAccept() {
+	var onAccept = () => {
 		modal.current.close();
 		if(typeof props.onAccept === 'function') {
 			props.onAccept();

@@ -8,7 +8,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemViewer(props) {
-	function download() {
+	var download = () => {
 		var {item} = props;
 
 		var link = `/api/v2/drive/object/${item.id}`;
@@ -24,7 +24,7 @@ function ItemViewer(props) {
 		document.body.removeChild(a);
 	}
 
-	function renderView() {
+	var renderView = () => {
 
 		var {item} = props;
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from 'react';
 
-import Login from './Login.jsx';
+import Login from './Component/Login.jsx';
 
 import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';

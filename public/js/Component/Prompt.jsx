@@ -7,14 +7,14 @@ function Prompt(props) {
 	var modal = useRef(null);
 	var [input, setInput] = useState("");
 
-	function onReject() {
+	var onReject = () => {
 		modal.current.close();
 		if(typeof props.onReject === 'function') {
 			props.onReject();
 		}
 	}
 
-	function onAccept() {
+	var onAccept = () => {
 		modal.current.close();
 		if(typeof props.onAccept === 'function') {
 			props.onAccept(input);

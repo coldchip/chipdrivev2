@@ -3,6 +3,7 @@ const async = require('async');
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
 const compression = require('compression');
 const path = require('path');
@@ -23,12 +24,6 @@ var queue = async.queue(async (task, executed) => {
 
 var app = express();
 
-const compiler = webpack(require("./webpack.config.js"));
-app.use(
-	middleware(compiler, {
-		writeToDisk: true
-	})
-);
 app.use(session({
 	name: "chipdrive-session",
 	secret: "thereisnospoon",
@@ -50,6 +45,8 @@ app.use((req, res, next) =>  {
 	console.log(`[${new Date().toUTCString()}] ${req.method.padEnd(6)} ${req.path}`);
 	next();
 });
+
+app.set('x-powered-by', false);
 
 function auth(req, res, next) {
 	var user = req.session.user;
@@ -74,14 +71,13 @@ app.post('/api/v2/login', (req, res) => {
 			var password = req.body.password;
 
 			if(username === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD" && password === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD") {
-				
 				req.session.user = username;
 
 				return res.status(200).json({});
 			} else {
 				return res.status(400).json({
 					code: 400,
-					message: "Invalid Login"
+					message: "Invalid credentials"
 				});
 			}
 		});
@@ -144,7 +140,7 @@ app.get('/api/v2/drive/list', auth, (req, res) => {
 				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
-				if(await cd.has(folderid) && (await cd.getType(folderid)) === ChipDrive.FOLDER) {
+				if(await cd.isFolder(folderid)) {
 					var list = await cd.list(folderid);
 
 					if(filter) {
@@ -187,7 +183,7 @@ app.post('/api/v2/drive/file', auth, (req, res) => {
 				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
-				if(await cd.has(folderid)) {
+				if(await cd.isFolder(folderid)) {
 					var node = await cd.create(folderid, name, ChipDrive.FILE);
 					return res.status(201).json(node);
 				} else {
@@ -223,7 +219,7 @@ app.post('/api/v2/drive/folder', auth, (req, res) => {
 				var cd = new ChipDrive(req.user, null);
 				await cd.init();
 
-				if(await cd.has(folderid)) {
+				if(await cd.isFolder(folderid)) {
 					var node = await cd.create(folderid, name, ChipDrive.FOLDER);
 					return res.status(201).json(node);
 				} else {
@@ -396,7 +392,11 @@ app.get('/api/v2/drive/object/:id', auth, (req, res) => {
 	});
 });
 
-app.set('x-powered-by', false);
+const compiler = webpack(require("./webpack.config.js"));
+app.use(history());
+app.use(middleware(compiler, {
+	writeToDisk: true
+}));
 
 const port = process.env.PORT || 5001;
 

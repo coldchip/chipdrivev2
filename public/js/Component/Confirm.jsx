@@ -6,14 +6,14 @@ import cssf from "../CSSFormat";
 function Confirm(props) {
 	var modal = useRef(null);
 
-	function onReject() {
+	var onReject = () => {
 		modal.current.close();
 		if(typeof props.onReject === 'function') {
 			props.onReject();
 		}
 	}
 
-	function onAccept() {
+	var onAccept = () => {
 		modal.current.close();
 		if(typeof props.onAccept === 'function') {
 			props.onAccept();

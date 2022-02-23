@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import XHRRequest from './../XHRRequest.js';
+import IO from './../IO.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -18,7 +18,7 @@ function ItemOption(props) {
 	var [deletePrompt, setDeletePrompt] = useState(false);
 	var [downloadPrompt, setDownloadPrompt] = useState(false);
 
-	function rename(name) {
+	var rename = (name) => {
 		var taskid = 'task_' + Math.random();
 
 		dispatch({
@@ -30,7 +30,7 @@ function ItemOption(props) {
 			}
 		});
 
-		XHRRequest.patch(`/api/v2/drive/object/${props.item.id}`, {
+		IO.patch(`/api/v2/drive/object/${props.item.id}`, {
 			name: name
 		}).then(() => {
 			dispatch({
@@ -61,7 +61,7 @@ function ItemOption(props) {
 		});
 	}
 
-	function remove() {
+	var remove = () => {
 		var {item} = props;
 
 		var taskid = 'task_' + Math.random();
@@ -75,7 +75,7 @@ function ItemOption(props) {
 			}
 		});
 
-		XHRRequest.delete(`/api/v2/drive/object/${props.item.id}`).then(() => {
+		IO.delete(`/api/v2/drive/object/${props.item.id}`).then(() => {
 			dispatch({
 				type: "task", 
 				id: taskid, 
@@ -104,7 +104,7 @@ function ItemOption(props) {
 		});
 	}
 
-	function download() {
+	var download = () => {
 		var {item} = props;
 
 		var link = `/api/v2/drive/object/${item.id}`;
@@ -120,41 +120,39 @@ function ItemOption(props) {
 		document.body.removeChild(a);
 	}
 
-	function renderDropdown() {
-		return (
-			<React.Fragment>
-				<button onClick={() => {
-					dropdown.current.close();
-					setRenamePrompt(true);
-				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-					<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
-				</button>
+	var dropdownInner = (
+		<React.Fragment>
+			<button onClick={() => {
+				dropdown.current.close();
+				setRenamePrompt(true);
+			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+				<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
+			</button>
 
-				<button onClick={() => {
-					dropdown.current.close();
-					setDeletePrompt(true);
-				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-					<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
-				</button>
-				
-				{
-					props.item.type === 1
-					?
-					(
-						<button onClick={() => {
-							dropdown.current.close();
-							setDownloadPrompt(true);
-						}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-							<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
-						</button>
-					)
-					:
-					null
-				}
-				
-			</React.Fragment>
-		)
-	}
+			<button onClick={() => {
+				dropdown.current.close();
+				setDeletePrompt(true);
+			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+				<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
+			</button>
+			
+			{
+				props.item.type === 1
+				?
+				(
+					<button onClick={() => {
+						dropdown.current.close();
+						setDownloadPrompt(true);
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
+					</button>
+				)
+				:
+				null
+			}
+			
+		</React.Fragment>
+	);
 
 	return (
 		<React.Fragment>
@@ -167,7 +165,7 @@ function ItemOption(props) {
 				nested
 			>
 				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-					{renderDropdown()}
+					{dropdownInner}
 				</div>
 			</Popup>
 

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import XHRRequest from './../XHRRequest.js';
+import IO from './../IO.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -16,7 +16,7 @@ function NewItem(props) {
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
-	async function upload(e) {
+	var upload = async(e) => {
 		try {
 			var files = e.target.files;
 			for(var i = 0; i < files.length; i++) {
@@ -31,12 +31,12 @@ function NewItem(props) {
 					}
 				});
 
-				var {body} = await XHRRequest.post("/api/v2/drive/file", {
+				var {body} = await IO.post("/api/v2/drive/file", {
 					name: files[i].name,
 					folderid: props.folder
 				});
 
-				await XHRRequest.put(`/api/v2/drive/object/${body.id}`, files[i], (e) => { // state 2 - PUT the data
+				await IO.put(`/api/v2/drive/object/${body.id}`, files[i], (e) => { // state 2 - PUT the data
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 
@@ -79,7 +79,7 @@ function NewItem(props) {
 		}
 	}
 
-	function create(name) {
+	var create = (name) => {
 		var taskid = 'task_' + Math.random();
 
 		dispatch({
@@ -91,7 +91,7 @@ function NewItem(props) {
 			}
 		});
 
-		XHRRequest.post("/api/v2/drive/folder", {
+		IO.post("/api/v2/drive/folder", {
 			name: name,
 			folderid: props.folder
 		}).then(() => {
@@ -123,27 +123,25 @@ function NewItem(props) {
 		});
 	}
 
-	function renderDropdown() {
-		return (
-			<React.Fragment>
-				<button onClick={() => {
-					dropdown.current.close();
-					uploadRef.current.click()
-				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-					<i className={cssf(css, "!fas !fa-upload me-2")}></i>
-					Upload
-				</button>
+	var dropdownInner = (
+		<React.Fragment>
+			<button onClick={() => {
+				dropdown.current.close();
+				uploadRef.current.click()
+			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+				<i className={cssf(css, "!fas !fa-upload me-2")}></i>
+				Upload
+			</button>
 
-				<button onClick={() => {
-					dropdown.current.close();
-					setCreatePrompt(true);
-				}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-					<i className={cssf(css, "!fas !fa-folder me-2")}></i>
-					Folder
-				</button>
-			</React.Fragment>
-		)
-	}
+			<button onClick={() => {
+				dropdown.current.close();
+				setCreatePrompt(true);
+			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+				<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+				Folder
+			</button>
+		</React.Fragment>
+	)
 
 	return (
 		<React.Fragment>
@@ -156,7 +154,7 @@ function NewItem(props) {
 				nested
 			>
 				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-					{renderDropdown()}
+					{dropdownInner}
 				</div>
 			</Popup>
 			<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
