@@ -71,6 +71,7 @@ app.post('/api/v2/login', (req, res) => {
 			var password = req.body.password;
 
 			if(username === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD" && password === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD") {
+				
 				req.session.user = username;
 
 				return res.status(200).json({});
@@ -93,6 +94,20 @@ app.get('/api/v2/logout', auth, (req, res) => {
 
 		return res.status(200).json({});
 	});
+});
+
+app.get('/api/v2/users/@me', auth, (req, res) => {
+	setTimeout(() => {
+		queue.push(async () => {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+				
+			return res.status(200).json({
+				name: req.session.user,
+				username: req.session.user
+			});
+		});
+	}, 1000);
 });
 
 app.get('/api/v2/drive/version', auth, (req, res) => {

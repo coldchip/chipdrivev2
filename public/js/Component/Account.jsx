@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+import IO from './../IO.js';
+
+import profile from '../../img/profile.png';
+
 import Popup from 'reactjs-popup';
 import ButtonGreen from './ButtonGreen.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Account(props) {
+	var [name, setName] = useState("...");
+	var [username, setUsername] = useState("...");
+
+	useEffect(() => {
+		IO.get("/api/v2/users/@me", null).then((response) => {
+			var {status, body} = response;
+
+			setName(body.name);
+			setUsername(body.username);
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
+			}
+		});
+	}, []);
+
 	return (
 		<Popup 
 			trigger={props.trigger}
@@ -12,9 +42,13 @@ function Account(props) {
 			modal
 		>
 			<div className={cssf(css, "cd-account-modal")}>
-				<img className={cssf(css, "account-profile")} src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" />
-				<p className={cssf(css, "account-name text mt-3")}>Ryan Loh</p>
-				<p className={cssf(css, "account-email text mt-2")}>ryan@coldchip.ru</p>
+				<img className={cssf(css, "account-profile")} src={profile} />
+				<p className={cssf(css, "account-name text mt-3")}>
+					{name}
+				</p>
+				<p className={cssf(css, "account-email text mt-2")}>
+					{username}
+				</p>
 				
 				<ButtonGreen className={cssf(css, "mt-4")}>
 					<i className={cssf(css, "!fas !fa-pen me-2")}></i>
