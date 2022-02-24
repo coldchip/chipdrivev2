@@ -97,17 +97,15 @@ app.get('/api/v2/logout', auth, (req, res) => {
 });
 
 app.get('/api/v2/users/@me', auth, (req, res) => {
-	setTimeout(() => {
-		queue.push(async () => {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-				
-			return res.status(200).json({
-				name: req.session.user,
-				username: req.session.user
-			});
+	queue.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
+			
+		return res.status(200).json({
+			name: "John Doe",
+			username: req.session.user
 		});
-	}, 1000);
+	});
 });
 
 app.get('/api/v2/drive/version', auth, (req, res) => {
