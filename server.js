@@ -61,7 +61,15 @@ function auth(req, res, next) {
 	}
 }
 
-app.post('/api/v2/login', (req, res) => {
+function validate(username, password) {
+	if(process.env.username && process.env.password) {
+		return (username === process.env.username && password === process.env.password);
+	} else {
+		return (username === "a" && password === "a");
+	}
+}
+
+app.post('/api/v2/auth/login', (req, res) => {
 	setTimeout(() => {
 		queue.push(async () => {
 			res.contentType("application/json");
@@ -70,7 +78,7 @@ app.post('/api/v2/login', (req, res) => {
 			var username = req.body.username;
 			var password = req.body.password;
 
-			if(username === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD" && password === "a45nUXq8QGnSyHZ8GrRryQZqvMStBWPD") {
+			if(validate(username, password)) {
 				
 				req.session.user = username;
 
@@ -85,7 +93,7 @@ app.post('/api/v2/login', (req, res) => {
 	}, 1000);
 });
 
-app.get('/api/v2/logout', auth, (req, res) => {
+app.get('/api/v2/auth/logout', auth, (req, res) => {
 	queue.push(async () => {
 		res.contentType("application/json");
 		res.set('Cache-Control', 'no-store');

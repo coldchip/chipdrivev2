@@ -3,8 +3,6 @@ import React from 'react';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-import spinner from "../../img/loader.svg";
-
 function TaskModal(props) {
 	var {tasks} = props;
 	if(Object.keys(tasks).length > 0) {
@@ -25,7 +23,7 @@ function TaskModal(props) {
 						task.progress < 100.0
 						?
 						(
-							<img src={spinner} className={cssf(css, "task-spinner")}/>
+							<div className={cssf(css, "task-spinner")}></div>
 						)
 						:
 						(

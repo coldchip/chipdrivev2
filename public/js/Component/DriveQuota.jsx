@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveQuota() {
+	var [percentage, setPercentage] = useState(0);
+
 	return (
 		<React.Fragment>
 			<div className={cssf(css, "sidebar-seperator")}></div>
@@ -13,7 +15,9 @@ function DriveQuota() {
 					My Storage
 				</div>
 				<div className={cssf(css, "quota-bar mt-3")}>
-					<div className={cssf(css, "quota-bar-used")}></div>
+					<div style={{
+						width: percentage + "%"
+					}} className={cssf(css, "quota-bar-used")}></div>
 				</div>
 				<div className={cssf(css, "quota-usage text mt-2")}>
 					0.0 B of 0 B used

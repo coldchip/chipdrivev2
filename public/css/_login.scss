@@ -63,22 +63,28 @@
 				right: 0;
 				bottom: 0;
 				margin: auto;
-				border: 4px solid transparent;
-				border-top-color: #ffffff;
+				border-top: 3px solid white;
+				border-right: 3px solid transparent;
+				border-bottom: 3px solid white;
+				border-left: 3px solid transparent;
 				border-radius: 50%;
 				animation: submit-spinner 1s ease infinite;
 			}
+		}
+
+		.register-button {
+			display: block;
 		}
 	}
 }
 
 @keyframes submit-spinner {
 	from {
-		transform: rotate(0turn);
+		transform: rotate(0deg);
 	}
 
 	to {
-		transform: rotate(1turn);
+		transform: rotate(360deg);
 	}
 }
 

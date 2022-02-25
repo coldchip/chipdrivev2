@@ -27,7 +27,7 @@ function Login() {
 	var login = useCallback(() => {
 		setLoading(true);
 
-		IO.post("/api/v2/login", {
+		IO.post("/api/v2/auth/login", {
 			username: username, 
 			password:password
 		}).then(() => {
@@ -91,6 +91,8 @@ function Login() {
 						>
 							{ !loading && <span>Login</span> }
 						</button>
+
+						<a href="#" onClick="" className={cssf(css, "register-button text mt-2")}>Register</a>
 					</React.Fragment>
 				}
 			</form>

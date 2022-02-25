@@ -16,7 +16,7 @@ function Sidebar(props) {
 	var dispatch = useContext(ChipDriveContext);
 
 	var logout = (name) => {
-		IO.get("/api/v2/logout").then(() => {
+		IO.get("/api/v2/auth/logout").then(() => {
 			dispatch({
 				type: "list"
 			});
