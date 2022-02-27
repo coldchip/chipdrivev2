@@ -6,7 +6,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 var cssLookup = [];
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   devtool: false,
   performance: {
     hints: false

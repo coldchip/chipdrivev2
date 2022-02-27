@@ -48,7 +48,6 @@ function Login() {
 
 	var { signIn } = useGoogleLogin({
 		clientId: "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com",
-		accessType: "offline",
 		onSuccess: (user) => {
 			console.log(user)
 			setLoading(true);
