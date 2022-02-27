@@ -3,6 +3,8 @@ import React, { useEffect, useState, useContext, useCallback } from 'react';
 import IO from './../IO.js';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
+import GoogleLogin from 'react-google-login';
+
 import Loader from './Loader.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
@@ -29,7 +31,7 @@ function Login() {
 
 		IO.post("/api/v2/auth/login", {
 			username: username, 
-			password:password
+			password: password
 		}).then(() => {
 			setLoading(false);
 			dispatch({
@@ -43,6 +45,25 @@ function Login() {
 			setError(body.message);
 		});
 	}, [dispatch, username, password]);
+
+	var loginGoogle = useCallback((token) => {
+		setLoading(true);
+
+		IO.post("/api/v2/oauth/login", {
+			token: token, 
+		}).then(() => {
+			setLoading(false);
+			dispatch({
+				type: "closeLogin"
+			});
+		}).catch((response) => {
+			var {status, body} = response;
+
+			setLoading(false);
+
+			setError(body.message);
+		});
+	}, [dispatch]);
 
 	return (
 		<div className={cssf(css, "login-page")}>
@@ -92,7 +113,19 @@ function Login() {
 							{ !loading && <span>Login</span> }
 						</button>
 
-						<a href="#" onClick="" className={cssf(css, "register-button text mt-2")}>Register</a>
+						<GoogleLogin
+							clientId="580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com"
+							buttonText="Login with Google"
+							onSuccess={(user) => {
+								console.log(user);
+								loginGoogle(user.accessToken);
+							}}
+							onFailure={() => {
+								
+							}}
+							className={cssf(css, "submit text mt-3")}
+							cookiePolicy={'single_host_origin'}
+						/>
 					</React.Fragment>
 				}
 			</form>

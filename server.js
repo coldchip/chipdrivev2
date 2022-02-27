@@ -61,11 +61,25 @@ function auth(req, res, next) {
 	}
 }
 
+var accounts = [{
+	username: "coldchip", 
+	password: "c"
+}, {
+	username: "a", 
+	password: "ab"
+}];
+
 function validate(username, password) {
 	if(process.env.username && process.env.password) {
 		return (username === process.env.username && password === process.env.password);
 	} else {
-		return (username === "a" && password === "a");
+		for(const account of accounts) {
+			if(account.username === username && account.password === password) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
 
@@ -81,6 +95,29 @@ app.post('/api/v2/auth/login', (req, res) => {
 			if(validate(username, password)) {
 				
 				req.session.user = username;
+
+				return res.status(200).json({});
+			} else {
+				return res.status(400).json({
+					code: 400,
+					message: "Invalid credentials"
+				});
+			}
+		});
+	}, 1000);
+});
+
+app.post('/api/v2/oauth/login', (req, res) => {
+	setTimeout(() => {
+		queue.push(async () => {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var token = req.body.token;
+
+			if(false) {
+				
+				//req.session.user = "babayaga";
 
 				return res.status(200).json({});
 			} else {
