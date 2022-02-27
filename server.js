@@ -8,8 +8,12 @@ const bodyParser = require("body-parser");
 const compression = require('compression');
 const path = require('path');
 const { pipeline } = require('stream');
+const { OAuth2Client } = require('google-auth-library');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
+
+const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
+const client = new OAuth2Client(CLIENT_ID);
 
 const ChipDrive = require("./ChipDrive");
 
@@ -50,8 +54,10 @@ app.set('x-powered-by', false);
 
 function auth(req, res, next) {
 	var user = req.session.user;
+	var name = req.session.name;
 	if(user) {
 		req.user = user;
+		req.name = name;
 		next();
 	} else {
 		return res.status(401).json({
@@ -108,26 +114,37 @@ app.post('/api/v2/auth/login', (req, res) => {
 });
 
 app.post('/api/v2/oauth/login', (req, res) => {
-	setTimeout(() => {
-		queue.push(async () => {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
+	queue.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
 
-			var token = req.body.token;
+		var token = req.body.token;
 
-			if(false) {
-				
-				//req.session.user = "babayaga";
+		try {
+			const ticket = await client.verifyIdToken({
+				idToken: token,
+				audience: CLIENT_ID,
+			});
+			const {email, name} = ticket.getPayload();
 
+			if(email && name) {
+				req.session.user = email;
+				req.session.name = name;
 				return res.status(200).json({});
 			} else {
 				return res.status(400).json({
 					code: 400,
-					message: "Invalid credentials"
+					message: "Invalid OAuth Token"
 				});
 			}
-		});
-	}, 1000);
+		} catch(e) {
+			console.log(e);
+			return res.status(500).json({
+				code: 500,
+				message: "Server Internal Error"
+			});
+		}
+	});
 });
 
 app.get('/api/v2/auth/logout', auth, (req, res) => {
@@ -147,8 +164,8 @@ app.get('/api/v2/users/@me', auth, (req, res) => {
 		res.set('Cache-Control', 'no-store');
 			
 		return res.status(200).json({
-			name: "John Doe",
-			username: req.session.user
+			name: req.name,
+			username: req.user
 		});
 	});
 });

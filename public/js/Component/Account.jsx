@@ -64,7 +64,7 @@ function Account(props) {
 						{name}
 					</p>
 					<p className={cssf(css, "account-email text mt-2")}>
-						@{username}
+						{username}
 					</p>
 					
 					<ButtonGreen className={cssf(css, "mt-4")}>
