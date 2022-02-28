@@ -127,6 +127,8 @@ app.post('/api/v2/oauth/login', (req, res) => {
 			});
 			const {email, name} = ticket.getPayload();
 
+			console.log(ticket.getPayload());
+
 			if(email && name) {
 				req.session.user = email;
 				req.session.name = name;

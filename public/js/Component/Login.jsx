@@ -46,8 +46,9 @@ function Login() {
 		});
 	}, [dispatch, username, password]);
 
-	var { signIn } = useGoogleLogin({
+	var { signIn: loginGoogle } = useGoogleLogin({
 		clientId: "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com",
+		hostedDomain: "coldchip.ru",
 		onSuccess: (user) => {
 			console.log(user)
 			setLoading(true);
@@ -120,7 +121,7 @@ function Login() {
 						<button 
 							type="button" 
 							className={cssf(css, `submit ${loading ? "submit-loading" : null} text`)} 
-							onClick={signIn} 
+							onClick={loginGoogle} 
 							disabled={loading}
 						>
 							{ !loading && <span>Login with Google</span> }
