@@ -44,10 +44,94 @@ function List(props) {
 
 	}, [dispatch, props.folder, props.filter]);
 
+	var onDrop = async (e) => {
+		e.stopPropagation();
+		e.preventDefault();
+
+		if(e.dataTransfer.items) {
+			var files = [];
+
+			for(const item of e.dataTransfer.items) {
+				if(item.kind === "file") {
+					files.push(item.getAsFile());
+				}
+			}
+
+			try {
+				for(const file of files) {
+					var taskid = 'task_' + Math.random();
+			
+					dispatch({
+						type: "task", 
+						id: taskid, 
+						task: {
+							name: `Uploading ${file.name}`,
+							progress: 0.0
+						}
+					});
+
+					var {body} = await IO.post("/api/v2/drive/file", {
+						name: file.name,
+						folderid: props.folder
+					});
+
+					await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => {
+						var progress = e.toFixed(2);
+						console.log(`Uploading ${progress}%`);
+
+						dispatch({
+							type: "task", 
+							id: taskid, 
+							task: {
+								name: `Uploading ${file.name}`,
+								progress: progress
+							}
+						});
+					});
+
+					dispatch({
+						type: "task", 
+						id: taskid, 
+						task: {
+							name: `Uploaded ${file.name}`,
+							progress: 100.0
+						}
+					});
+				}
+
+				dispatch({
+					type: "list"
+				});
+			} catch(response) {
+				var {status, body} = response;
+
+				if(status === 401) {
+					dispatch({
+						type: "login"
+					});
+				} else {
+					dispatch({
+						type: "alert", 
+						title: body.message
+					});
+				}
+			}
+		}
+
+		console.log(e);
+	}
+
+	var onDragover = (e) => {
+		e.stopPropagation();
+		e.preventDefault();
+
+		console.log(e);
+	}
+
 	if(!loading) {
 		if(list.length > 0) {
 			return (
-				<div className={cssf(css, "list-container")}>
+				<div onDrop={onDrop} onDragOver={onDragover} className={cssf(css, "list-container")}>
 					{
 						list.map((item) => {
 							return (

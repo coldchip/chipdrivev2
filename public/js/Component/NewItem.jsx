@@ -16,27 +16,27 @@ function NewItem(props) {
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
-	var upload = async(e) => {
+	var upload = async (e) => {
 		try {
 			var files = e.target.files;
-			for(var i = 0; i < files.length; i++) {
+			for(const file of files) {
 				var taskid = 'task_' + Math.random();
 				
 				dispatch({
 					type: "task", 
 					id: taskid, 
 					task: {
-						name: `Uploading ${files[i].name}`,
+						name: `Uploading ${file.name}`,
 						progress: 0.0
 					}
 				});
 
 				var {body} = await IO.post("/api/v2/drive/file", {
-					name: files[i].name,
+					name: file.name,
 					folderid: props.folder
 				});
 
-				await IO.put(`/api/v2/drive/object/${body.id}`, files[i], (e) => { // state 2 - PUT the data
+				await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => { // state 2 - PUT the data
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 
@@ -44,7 +44,7 @@ function NewItem(props) {
 						type: "task", 
 						id: taskid, 
 						task: {
-							name: `Uploading ${files[i].name}`,
+							name: `Uploading ${file.name}`,
 							progress: progress
 						}
 					});
@@ -54,7 +54,7 @@ function NewItem(props) {
 					type: "task", 
 					id: taskid, 
 					task: {
-						name: `Uploaded ${files[i].name}`,
+						name: `Uploaded ${file.name}`,
 						progress: 100.0
 					}
 				});

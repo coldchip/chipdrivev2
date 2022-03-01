@@ -172,12 +172,17 @@ app.get('/api/v2/users/@me', auth, (req, res) => {
 	});
 });
 
-app.get('/api/v2/drive/version', auth, (req, res) => {
+app.get('/api/v2/drive/quota', auth, (req, res) => {
 	queue.push(async () => {
 		res.contentType("application/json");
 		res.set('Cache-Control', 'no-store');
 
-		return res.status(200).json({version: "v1.0.0"});
+		var quota = {
+			used: 41124311859,
+			available: 107374182400
+		};
+
+		return res.status(200).json(quota);
 	});
 });
 
