@@ -15,6 +15,8 @@ const middleware = require("webpack-dev-middleware");
 const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 
+const MAX_STORAGE = 1024 * 1024 * 500;
+
 const ChipDrive = require("./ChipDrive");
 
 if(!fs.existsSync("database")){
@@ -177,12 +179,24 @@ app.get('/api/v2/drive/quota', auth, (req, res) => {
 		res.contentType("application/json");
 		res.set('Cache-Control', 'no-store');
 
-		var quota = {
-			used: 41124311859,
-			available: 107374182400
-		};
+		try {
+			var cd = new ChipDrive(req.user, null);
+			await cd.init();
 
-		return res.status(200).json(quota);
+			var used = await cd.usage();
+
+			var quota = {
+				used: used,
+				available: MAX_STORAGE
+			};
+
+			return res.status(200).json(quota);
+		} catch(err) {
+			return res.status(500).json({
+				code: 500,
+				message: "Server Internal Error"
+			});
+		}
 	});
 });
 
@@ -338,7 +352,8 @@ app.patch('/api/v2/drive/object/:id', auth, (req, res) => {
 				await cd.init();
 
 				if(await cd.has(id)) {
-					await cd.rename(id, name);
+					await cd.set(id, { name: name });
+
 					return res.status(200).json({});
 				} else {
 					return res.status(404).json({
@@ -396,47 +411,57 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 	});
 });
 
-app.put('/api/v2/drive/object/:id', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
+app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
 
-		var id = req.params.id;
-		if(id) {
-			try {
-				var cd = new ChipDrive(req.user, null);
-				await cd.init();
+	var id = req.params.id;
+	if(id) {
+		try {
+			var cd = new ChipDrive(req.user, null);
+			await cd.init();
 
-				if(await cd.has(id)) {
-					pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
-						if(!err) {
-							return res.status(200).json({});
-						} else {
-							return res.status(500).json({
-								code: 500, 
-								message: "Piping to backend failed"
-							});
-						}
+			if(await cd.has(id)) {
+				if((await cd.usage()) <= MAX_STORAGE) {
+					await new Promise((resolve, reject) => {
+						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
+							if(!err) {
+								resolve();
+							} else {
+								reject();
+							}
+						});
 					});
+
+					var size = fs.statSync(path.join(__dirname, `/database/${id}`)).size;
+
+					await cd.set(id, { size: size });
+
+					return res.status(200).json({});
 				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
+					return res.status(413).json({
+						code: 413, 
+						message: "No storage space left"
 					});
 				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
+			} else {
+				return res.status(404).json({
+					code: 404, 
+					message: "Node Not Found"
 				});
 			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
+		} catch(err) {
+			return res.status(500).json({
+				code: 500, 
+				message: "Server Internal Error"
 			});
 		}
-	});
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
 });
 
 app.get('/api/v2/drive/object/:id', auth, (req, res) => {

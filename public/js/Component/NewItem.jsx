@@ -36,7 +36,7 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
-				await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => { // state 2 - PUT the data
+				await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => {
 					var progress = e.toFixed(2);
 					console.log(`Uploading ${progress}%`);
 

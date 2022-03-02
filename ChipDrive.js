@@ -17,6 +17,7 @@ Node.init({
 	name: DataTypes.STRING,
 	id: DataTypes.STRING,
 	parent: DataTypes.STRING,
+	size: DataTypes.INTEGER,
 	user: DataTypes.STRING
 }, { sequelize, modelName: 'node' });
 
@@ -74,6 +75,21 @@ class ChipDrive {
 			
 	}
 
+	async set(id, data) {
+		if(await this.has(id)) {
+			await Node.update(data, {
+				where: { 
+					id: id,
+					user: this.user
+				}
+			});
+
+			return true;
+		} else {
+			throw "Node not found";
+		}
+	}
+
 	async has(id) {
 		var nodes = await Node.findAll({
 			where: {
@@ -107,12 +123,14 @@ class ChipDrive {
 
 	async list(id) {
 		if(await this.isFolder(id)) {
-			return await Node.findAll({
+			var list = await Node.findAll({
 				where: {
 					parent: id,
 					user: this.user
 				}
 			});
+
+			return list.map((node) => node.dataValues);
 		} else {
 			throw "Folder not found";
 		}
@@ -120,44 +138,49 @@ class ChipDrive {
 
 	async create(parent, name, type) {
 		if(await this.isFolder(parent)) {
-			return await Node.create({
+			var node = await Node.create({
 				type: type, 
 				name: name, 
 				id: ChipDrive.randID(32), 
 				parent: parent,
 				user: this.user
 			});
+
+			return node.dataValues;
 		} else {
 			throw "Folder not found";
 		}
 	}
 
-	async rename(id, name) {
-		if(await this.has(id)) {
-			return await Node.update({
-				name: name, 
-			}, {
-				where: { 
-					id: id,
-					user: this.user
-				}
-			});
-		} else {
-			throw "Node not found";
-		}
-	}
-
 	async delete(id) {
 		if(await this.has(id)) {
-			return await Node.destroy({
+			await Node.destroy({
 				where: {
 					id: id,
 					user: this.user
 				}
 			});
+
+			return true;
 		} else {
 			throw "Node not found";
 		}
+	}
+
+	async usage() {
+		var nodes = await Node.findAll({
+			where: {
+				user: this.user
+			}
+		});
+
+		var size = 0;
+
+		for(const node of nodes) {
+			size += node.dataValues.size;
+		}
+
+		return size;
 	}
 
 }
