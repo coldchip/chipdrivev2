@@ -11,6 +11,13 @@ const { pipeline } = require('stream');
 const { OAuth2Client } = require('google-auth-library');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
+const axios = require("axios");
+const AWS = require('aws-sdk');
+
+const s3 = new AWS.S3({
+	accessKeyId: process.env.BUCKETKEY,
+	secretAccessKey: process.env.BUCKETTOKEN
+});
 
 const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
@@ -423,19 +430,15 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 
 			if(await cd.has(id)) {
 				if((await cd.usage()) <= MAX_STORAGE) {
-					await new Promise((resolve, reject) => {
-						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
-							if(!err) {
-								resolve();
-							} else {
-								reject();
-							}
-						});
-					});
+					const params = {
+						Bucket: 'chipdrive',
+						Key: id,
+						Body: req
+					};
 
-					var size = fs.statSync(path.join(__dirname, `/database/${id}`)).size;
+					var j = await s3.upload(params).promise();
 
-					await cd.set(id, { size: size });
+					//await cd.set(id, { size: size });
 
 					return res.status(200).json({});
 				} else {
@@ -451,6 +454,7 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 				});
 			}
 		} catch(err) {
+			console.log(err);
 			return res.status(500).json({
 				code: 500, 
 				message: "Server Internal Error"
@@ -477,7 +481,32 @@ app.get('/api/v2/drive/object/:id', auth, (req, res) => {
 
 				if(await cd.has(id)) {
 					res.contentType("application/octet-stream");
-					res.sendFile(path.join(__dirname, `./database/${id}`));
+
+					var params = {
+						Bucket: 'chipdrive',
+						Key: id,
+						Range: req.headers.range
+					};
+
+					var obj = s3.getObject(params);
+
+					obj.on('httpHeaders', (statusCode, headers, response, statusMessage) => {
+						res.status(statusCode);
+
+						if(headers["accept-ranges"]) {
+							res.set("accept-ranges", headers["accept-ranges"]);
+						}
+						if(headers["content-range"]) {
+							res.set("content-range", headers["content-range"]);
+						}
+						if(headers["content-length"]) {
+							res.set("content-length", headers["content-length"]);
+						}
+					});
+
+					pipeline(obj.createReadStream(), res, () => {
+
+					});
 				} else {
 					return res.status(404).json({
 						code: 404, 
