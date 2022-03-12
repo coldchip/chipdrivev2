@@ -76,7 +76,9 @@ function Sidebar(props) {
 					onAccept={logout}
 				/>
 				
-				<DriveQuota />
+				<DriveQuota 
+					folder={props.folder}
+				/>
 			</div>
 			{
 				props.open ? (

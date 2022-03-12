@@ -7,35 +7,33 @@ import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function DriveQuota() {
+function DriveQuota(props) {
 	var dispatch = useContext(ChipDriveContext);
 
 	var [used, setUsed] = useState(0);
 	var [available, setAvailable] = useState(0);
 
 	useEffect(() => {
-		setInterval(async () => {
-			try {
-				var {body} = await IO.get("/api/v2/drive/quota");
+		IO.get("/api/v2/drive/quota").then((response) => {
+			var {status, body} = response;
 
-				setUsed(body.used);
-				setAvailable(body.available);
-			} catch(response) {
-				var {status, body} = response;
+			setUsed(body.used);
+			setAvailable(body.available);
 
-				if(status === 401) {
-					dispatch({
-						type: "login"
-					});
-				} else {
-					dispatch({
-						type: "alert", 
-						title: body.message
-					});
-				}
+		}).catch((response) => {
+			var {status, body} = response;
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				dispatch({
+					type: "alert", 
+					title: body.message
+				});
 			}
-		}, 2000);
-	}, [dispatch]);
+		});
+	}, [dispatch, props.folder]);
 
 	var formatBytes = (bytes, decimals) => {
 		if(bytes == 0) return '0 B';
