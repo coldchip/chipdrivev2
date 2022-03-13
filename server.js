@@ -11,20 +11,19 @@ const { pipeline } = require('stream');
 const { OAuth2Client } = require('google-auth-library');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
-const axios = require("axios");
+const ChipDrive = require("./ChipDrive");
 const AWS = require('aws-sdk');
 
 const s3 = new AWS.S3({
 	accessKeyId: process.env.BUCKETKEY,
-	secretAccessKey: process.env.BUCKETTOKEN
+	secretAccessKey: process.env.BUCKETTOKEN,
+	region: "ap-southeast-1"
 });
 
 const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 
 const MAX_STORAGE = 1024 * 1024 * 500;
-
-const ChipDrive = require("./ChipDrive");
 
 if(!fs.existsSync("database")){
 	fs.mkdirSync("database");
@@ -396,6 +395,14 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 
 				if(await cd.has(id)) {
 					await cd.delete(id);
+
+					const params = {
+						Bucket: 'chipdrive',
+						Key: id
+					};
+
+					await s3.deleteObject(params).promise();
+
 					return res.status(200).json({});
 				} else {
 					return res.status(404).json({
@@ -436,7 +443,7 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 						Body: req
 					};
 
-					var j = await s3.upload(params).promise();
+					await s3.upload(params).promise();
 
 					//await cd.set(id, { size: size });
 
@@ -502,11 +509,12 @@ app.get('/api/v2/drive/object/:id', auth, (req, res) => {
 						if(headers["content-length"]) {
 							res.set("content-length", headers["content-length"]);
 						}
+						pipeline(response.httpResponse.createUnbufferedStream(), res, (err) => {
+							
+						});
 					});
 
-					pipeline(obj.createReadStream(), res, () => {
-
-					});
+					obj.send();
 				} else {
 					return res.status(404).json({
 						code: 404, 
