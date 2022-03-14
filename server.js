@@ -1,5 +1,6 @@
 const fs = require('fs');
 const async = require('async');
+const stream = require('stream');
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -437,17 +438,32 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 
 			if(await cd.has(id)) {
 				if((await cd.usage()) <= MAX_STORAGE) {
+
+					var passthrough = new stream.PassThrough();
+
 					const params = {
 						Bucket: 'chipdrive',
 						Key: id,
-						Body: req
+						Body: passthrough
 					};
 
-					await s3.upload(params).promise();
+					var s3upload = await s3.upload(params).promise();
+
+					pipeline(req, passthrough, (err) => {
+						console.log(err);
+						if(!err) {
+							return res.status(200).json({});
+						} else {
+							s3upload.abort();
+							return res.status(500).json({
+								code: 500, 
+								message: "Pipe error"
+							});
+						}
+					});
 
 					//await cd.set(id, { size: size });
 
-					return res.status(200).json({});
 				} else {
 					return res.status(413).json({
 						code: 413, 
@@ -475,65 +491,70 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 	}
 });
 
-app.get('/api/v2/drive/object/:id', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
+app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
 
-		var id = req.params.id;
-		if(id) {
-			try {
-				var cd = new ChipDrive(req.user, null);
-				await cd.init();
+	var id = req.params.id;
+	if(id) {
+		try {
+			var cd = new ChipDrive(req.user, null);
+			await cd.init();
 
-				if(await cd.has(id)) {
-					res.contentType("application/octet-stream");
+			if(await cd.has(id)) {
+				res.contentType("application/octet-stream");
 
-					var params = {
-						Bucket: 'chipdrive',
-						Key: id,
-						Range: req.headers.range
-					};
+				var params = {
+					Bucket: 'chipdrive',
+					Key: id,
+					Range: req.headers.range
+				};
 
-					var obj = s3.getObject(params);
+				var s3object = s3.getObject(params);
 
-					obj.on('httpHeaders', (statusCode, headers, response, statusMessage) => {
-						res.status(statusCode);
+				req
+				.on("close", () => s3object.abort());
 
-						if(headers["accept-ranges"]) {
-							res.set("accept-ranges", headers["accept-ranges"]);
-						}
-						if(headers["content-range"]) {
-							res.set("content-range", headers["content-range"]);
-						}
-						if(headers["content-length"]) {
-							res.set("content-length", headers["content-length"]);
-						}
-						pipeline(response.httpResponse.createUnbufferedStream(), res, (err) => {
-							
-						});
+				s3object
+				.on('httpHeaders', (status, headers, response) => {
+					res.status(status);
+
+					if(headers["accept-ranges"]) {
+						res.set("accept-ranges", headers["accept-ranges"]);
+					}
+					if(headers["content-range"]) {
+						res.set("content-range", headers["content-range"]);
+					}
+					if(headers["content-length"]) {
+						res.set("content-length", headers["content-length"]);
+					}
+					response.httpResponse.createUnbufferedStream().pipe(res);
+				})
+				.on('error', () => {
+					return res.status(500).json({
+						code: 500, 
+						message: "Backend data fetch failed"
 					});
-
-					obj.send();
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
+				})
+				.send();
+			} else {
+				return res.status(404).json({
+					code: 404, 
+					message: "Node Not Found"
 				});
 			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
+		} catch(err) {
+			return res.status(500).json({
+				code: 500, 
+				message: "Server Internal Error"
 			});
 		}
-	});
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
 });
 
 const compiler = webpack(require("./webpack.config.js"));
