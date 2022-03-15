@@ -10,6 +10,8 @@ import TaskModal from './Component/TaskModal.jsx';
 
 import ChipDriveContext from './Context/ChipDriveContext.jsx';
 
+import io from 'socket.io-client';
+
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
 
@@ -116,6 +118,23 @@ function ChipDrive(props) {
 
 	useEffect(() => {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
+		
+		const ws = io(`http://${window.location.hostname}:5001`);
+
+		ws.on("connect", () => {
+			console.log("Connected WS");
+		});
+
+		navigator.serviceWorker.register("serviceworker.js", {
+			scope: "/"
+		}).then((reg) => {
+			reg.update();
+		});
+
+		navigator.serviceWorker.addEventListener('message', (event) => {
+			ws.emit("stream", event.data);
+		});
+
 	}, []);
 
 	return (

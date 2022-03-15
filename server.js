@@ -13,18 +13,12 @@ const { OAuth2Client } = require('google-auth-library');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
 const ChipDrive = require("./ChipDrive");
-const AWS = require('aws-sdk');
-
-const s3 = new AWS.S3({
-	accessKeyId: process.env.BUCKETKEY,
-	secretAccessKey: process.env.BUCKETTOKEN,
-	region: "ap-southeast-1"
-});
+const http = require('http');
 
 const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 
-const MAX_STORAGE = 1024 * 1024 * 500;
+const MAX_STORAGE = 1024 * 1024 * 1024 * 5;
 
 if(!fs.existsSync("database")){
 	fs.mkdirSync("database");
@@ -37,9 +31,13 @@ var queue = async.queue(async (task, executed) => {
 
 var app = express();
 
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
 app.use(session({
 	name: "chipdrive-session",
-	secret: "thereisnospoon",
+	secret: "hteh4tgrgt4ttgrdfesfnyjthrawefds",
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
@@ -50,11 +48,12 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) =>  {
-	res.header("strict-transport-security", "max-age=31536000; includeSubDomains");
-	res.header("x-content-type-options", "nosniff");
-	res.header("x-frame-options", "DENY");
-	res.header("x-xss-protection", "1; mode=block");
+	// res.header("strict-transport-security", "max-age=31536000; includeSubDomains");
+	// res.header("x-content-type-options", "nosniff");
+	// res.header("x-frame-options", "DENY");
+	// res.header("x-xss-protection", "1; mode=block");
 	res.header("Server", "ColdChip");
+	res.header("Service-Worker-Allowed", "/");
 	console.log(`[${new Date().toUTCString()}] ${req.method.padEnd(6)} ${req.path}`);
 	next();
 });
@@ -285,10 +284,17 @@ app.post('/api/v2/drive/file', auth, (req, res) => {
 			try {
 				var cd = new ChipDrive(req.user, null);
 				await cd.init();
-
+				
 				if(await cd.isFolder(folderid)) {
-					var node = await cd.create(folderid, name, ChipDrive.FILE);
-					return res.status(201).json(node);
+					if((await cd.usage()) <= MAX_STORAGE) {
+						var node = await cd.create(folderid, name, ChipDrive.FILE);
+						return res.status(201).json(node);
+					} else {
+						return res.status(413).json({
+							code: 413, 
+							message: "No storage space left"
+						});
+					}
 				} else {
 					return res.status(404).json({
 						code: 404, 
@@ -323,8 +329,15 @@ app.post('/api/v2/drive/folder', auth, (req, res) => {
 				await cd.init();
 
 				if(await cd.isFolder(folderid)) {
-					var node = await cd.create(folderid, name, ChipDrive.FOLDER);
-					return res.status(201).json(node);
+					if((await cd.usage()) <= MAX_STORAGE) {
+						var node = await cd.create(folderid, name, ChipDrive.FOLDER);
+						return res.status(201).json(node);
+					} else {
+						return res.status(413).json({
+							code: 413, 
+							message: "No storage space left"
+						});
+					}
 				} else {
 					return res.status(404).json({
 						code: 404, 
@@ -402,8 +415,6 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 						Key: id
 					};
 
-					await s3.deleteObject(params).promise();
-
 					return res.status(200).json({});
 				} else {
 					return res.status(404).json({
@@ -439,30 +450,21 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 			if(await cd.has(id)) {
 				if((await cd.usage()) <= MAX_STORAGE) {
 
-					var passthrough = new stream.PassThrough();
-
-					const params = {
-						Bucket: 'chipdrive',
-						Key: id,
-						Body: passthrough
-					};
-
-					var s3upload = await s3.upload(params).promise();
-
-					pipeline(req, passthrough, (err) => {
-						console.log(err);
-						if(!err) {
-							return res.status(200).json({});
-						} else {
-							s3upload.abort();
-							return res.status(500).json({
-								code: 500, 
-								message: "Pipe error"
-							});
-						}
+					await new Promise((resolve, reject) => {
+						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
+							if(!err) {
+								resolve();
+							} else {
+								reject();
+							}
+						});
 					});
 
-					//await cd.set(id, { size: size });
+					var size = fs.statSync(path.join(__dirname, `/database/${id}`)).size;
+
+					await cd.set(id, { size: size });
+
+					return res.status(200).json({});
 
 				} else {
 					return res.status(413).json({
@@ -492,7 +494,6 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 });
 
 app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
-	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
 	var id = req.params.id;
@@ -504,39 +505,9 @@ app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
 			if(await cd.has(id)) {
 				res.contentType("application/octet-stream");
 
-				var params = {
-					Bucket: 'chipdrive',
-					Key: id,
-					Range: req.headers.range
-				};
+				var filename = path.join(__dirname, `./database/${id}`);
 
-				var s3object = s3.getObject(params);
-
-				req
-				.on("close", () => s3object.abort());
-
-				s3object
-				.on('httpHeaders', (status, headers, response) => {
-					res.status(status);
-
-					if(headers["accept-ranges"]) {
-						res.set("accept-ranges", headers["accept-ranges"]);
-					}
-					if(headers["content-range"]) {
-						res.set("content-range", headers["content-range"]);
-					}
-					if(headers["content-length"]) {
-						res.set("content-length", headers["content-length"]);
-					}
-					response.httpResponse.createUnbufferedStream().pipe(res);
-				})
-				.on('error', () => {
-					return res.status(500).json({
-						code: 500, 
-						message: "Backend data fetch failed"
-					});
-				})
-				.send();
+				res.sendFile(filename);
 			} else {
 				return res.status(404).json({
 					code: 404, 
@@ -557,6 +528,109 @@ app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
 	}
 });
 
+app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
+	res.set('Cache-Control', 'no-store');
+
+	var id = req.params.id;
+	var start = req.params.start;
+	var end = req.params.end;
+	if(id && start && end) {
+		try {
+			var cd = new ChipDrive(req.user, null);
+			await cd.init();
+
+			if(await cd.has(id)) {
+				res.contentType("application/octet-stream");
+
+				var filename = path.join(__dirname, `./database/${id}`);
+
+				var stats = fs.statSync(filename);
+				var size = stats.size;
+
+				start = parseInt(start, 10);
+				end = parseInt(end, 10);
+
+				end = Math.min(size, end);
+
+				res.set({
+					"Content-Length": end - start,
+					"Total-Size": size,
+					"Start": start,
+					"End": end
+				});
+
+				pipeline(fs.createReadStream(filename, {
+					start: start, 
+					end: end
+				}), res, (err) => {
+
+				});
+			} else {
+				return res.status(404).json({
+					code: 404, 
+					message: "Node Not Found"
+				});
+			}
+		} catch(err) {
+			return res.status(500).json({
+				code: 500, 
+				message: "Server Internal Error"
+			});
+		}
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
+});
+
+
+
+io.on("connection", function (socket) {
+	console.log("Made socket connection");
+
+	socket.on("stream", async (data) => {
+		console.log(data);
+
+		var {id, start, end} = data;
+
+		var cd = new ChipDrive("ryan@coldchip.ru", null);
+		await cd.init();
+
+		if(await cd.has(id)) {
+			var filename = path.join(__dirname, `./database/${id}`);
+
+			if(!end) {
+				end = start + 128;
+			}
+
+			var stream = fs.createReadStream(filename, {
+				start: start, 
+				end: end
+			})
+
+			const _buf = [];
+
+			await new Promise((resolve, reject) => {
+
+				stream.on("data", (chunk) => _buf.push(chunk));
+				stream.on("end", () => resolve(Buffer.concat(_buf)));
+				stream.on("error", (err) => reject(err));
+
+			});
+
+			console.log(_buf);
+
+			socket.emit("chunk", new Uint8Array(new ArrayBuffer(_buf)));
+		}
+	});
+
+	socket.on("disconnect", () => {
+
+	});
+});
+
 const compiler = webpack(require("./webpack.config.js"));
 app.use(history());
 app.use(middleware(compiler, {
@@ -565,7 +639,7 @@ app.use(middleware(compiler, {
 
 const port = process.env.PORT || 5001;
 
-app.listen(port, () =>  {
+server.listen(port, () =>  {
 	if(process.env.NODE_ENV) {
 		console.log("Production Mode is Activated");
 	}

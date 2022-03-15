@@ -31,18 +31,18 @@ function ItemViewer(props) {
 		var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
-				<img className={cssf(css, "cd-preview-modal-image")} src={ `/api/v2/drive/object/${item.id}` } />
+				<img className={cssf(css, "cd-preview-modal-image")} src={ `/cryptoworker/${item.id}` } />
 			)
 		} else if(Types.video.indexOf(ext) >= 0) {
 			return (
 				<video className={cssf(css, "cd-preview-modal-video")} controls>
-					<source type="video/mp4" src={ `/api/v2/drive/object/${item.id}` } />
+					<source type="video/mp4" src={ `/cryptoworker/${item.id}` } />
 				</video>
 			)
 		} else if(Types.audio.indexOf(ext) >= 0) {
 			return (
 				<audio className={cssf(css, "cd-preview-modal-audio")} controls="true" preload="auto">
-					<source type="audio/mp3" src={ `/api/v2/drive/object/${item.id}` } />
+					<source type="audio/mp3" src={ `/cryptoworker/${item.id}` } />
 				</audio>
 			)
 		} else {

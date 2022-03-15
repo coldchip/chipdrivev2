@@ -11,7 +11,13 @@ module.exports = {
   performance: {
     hints: false
   },
-  entry: ['./public/js/index.jsx'],
+  entry: {
+    'main': './public/js/index.jsx',
+    'serviceworker': {
+      import: './public/js/ServiceWorker.js', 
+      filename: 'serviceworker.js' 
+    }
+  },
   module: {
     rules: [
       {

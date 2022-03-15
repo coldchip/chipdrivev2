@@ -56,7 +56,7 @@ function DriveQuota(props) {
 				</div>
 				<div className={cssf(css, "quota-bar mt-3")}>
 					<div style={{
-						width: `${((used / available) * 100).toFixed(5)}%`
+						width: `${Math.min(((used / available) * 100).toFixed(5), 100)}%`
 					}} className={cssf(css, "quota-bar-used")}></div>
 				</div>
 				<div className={cssf(css, "quota-usage text mt-2")}>
