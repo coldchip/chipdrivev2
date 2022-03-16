@@ -16,6 +16,20 @@ function NewItem(props) {
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
+	var readFileAsync = (file) => {
+		return new Promise((resolve, reject) => {
+			let reader = new FileReader();
+
+			reader.onload = () => {
+				resolve(reader.result);
+			};
+
+			reader.onerror = reject;
+
+			reader.readAsArrayBuffer(file);
+		});
+	}
+
 	var upload = async (e) => {
 		try {
 			var files = e.target.files;
@@ -36,19 +50,38 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
-				await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => {
-					var progress = e.toFixed(2);
-					console.log(`Uploading ${progress}%`);
+				const CHUNK_SIZE = (1024 * 1024);
 
-					dispatch({
-						type: "task", 
-						id: taskid, 
-						task: {
-							name: `Uploading ${file.name}`,
-							progress: progress
-						}
+				for(var start = 0; start < file.size; start += CHUNK_SIZE) {
+					var end = Math.min(start + CHUNK_SIZE, file.size);
+
+					var chunk = file.slice(start, end);
+
+					var buffer = new Uint8Array(await readFileAsync(chunk));
+
+					for(var i = 0; i < buffer.length; i++) {
+						buffer[i] ^= 0x50;
+					}
+
+					await IO.put(`/api/v2/drive/object/${body.id}/${start}`, buffer, (e) => {
+						var progress = e.toFixed(2);
+						console.log(`Uploading ${progress}%`);
 					});
-				});
+				}
+
+				// await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => {
+				// 	var progress = e.toFixed(2);
+				// 	console.log(`Uploading ${progress}%`);
+
+				// 	dispatch({
+				// 		type: "task", 
+				// 		id: taskid, 
+				// 		task: {
+				// 			name: `Uploading ${file.name}`,
+				// 			progress: progress
+				// 		}
+				// 	});
+				// });
 
 				dispatch({
 					type: "task", 
@@ -64,6 +97,7 @@ function NewItem(props) {
 				type: "list"
 			});
 		} catch(response) {
+			// response can be any error
 			var {status, body} = response;
 
 			if(status === 401) {

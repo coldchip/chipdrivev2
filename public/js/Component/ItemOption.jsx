@@ -107,14 +107,13 @@ function ItemOption(props) {
 	var download = () => {
 		var {item} = props;
 
-		var link = `/api/v2/drive/object/${item.id}`;
+		var link = `/cryptoworker/${item.id}`;
 			
 		var a = document.createElement("a");
 		a.style.display = "none";
 		a.style.width = "0px";
 		a.style.height = "0px";
 		a.href = link;
-		a.download = item.name;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);

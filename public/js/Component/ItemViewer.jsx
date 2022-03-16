@@ -11,7 +11,7 @@ function ItemViewer(props) {
 	var download = () => {
 		var {item} = props;
 
-		var link = `/api/v2/drive/object/${item.id}`;
+		var link = `/cryptoworker/${item.id}`;
 			
 		var a = document.createElement("a");
 		a.style.display = "none";
