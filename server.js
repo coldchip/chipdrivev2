@@ -612,10 +612,10 @@ app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
 				start = parseInt(start, 10);
 				end = parseInt(end, 10);
 
-				end = Math.min(size, end);
+				end = Math.min(size - 1, end);
 
 				res.set({
-					"Content-Length": end - start,
+					"Content-Length": (end - start) + 1,
 					"Total-Size": size,
 					"Start": start,
 					"End": end
