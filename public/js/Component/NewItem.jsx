@@ -52,10 +52,10 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
-				var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
+				var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 ];
 				var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(0));
 
-				const CHUNK_SIZE = (1024 * 1024);
+				const CHUNK_SIZE = 1048575;
 
 				for(var start = 0; start < file.size; start += CHUNK_SIZE) {
 					var end = Math.min(start + CHUNK_SIZE, file.size);
@@ -63,10 +63,6 @@ function NewItem(props) {
 					var chunk = file.slice(start, end);
 
 					var buffer = new Uint8Array(await readFileAsync(chunk));
-
-					// for(var i = 0; i < buffer.length; i++) {
-					// 	buffer[i] ^= 0x50;
-					// }
 
 					var encrypted = aesCtr.encrypt(buffer);
 

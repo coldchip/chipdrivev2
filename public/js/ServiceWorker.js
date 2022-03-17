@@ -11,7 +11,7 @@ self.addEventListener('activate', function(event) {
 	event.waitUntil(self.clients.claim());
 });
 
-function nearestMultiple(value, roundTo) {
+function nearestBlock(value, roundTo) {
 	if(value % roundTo == 0) {
 		return value;
 	}
@@ -19,13 +19,7 @@ function nearestMultiple(value, roundTo) {
 }
 
 async function requestChunk(start, end, id) {
-	var startBlock = nearestMultiple(start, 16);
-
-	if(isNaN(end) || (end - start) > 1024 * 1024) {
-		end = start + 1024 * 1024;
-	}
-
-	console.log("STARTBLOCK", startBlock, end);
+	var startBlock = nearestBlock(start, 16);
 
 	var response = await fetch(`/api/v2/drive/object/${id}/${startBlock}/${end}`, {
 		headers: {
@@ -35,26 +29,21 @@ async function requestChunk(start, end, id) {
 
 	var data = new Uint8Array(await response.arrayBuffer());
 
-	var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
+	var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 ];
 	var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(startBlock / 16));
 
-	var decrypted = aesCtr.decrypt(data);
-
-	decrypted = decrypted.slice(start - startBlock);
+	var decrypted = aesCtr.decrypt(data).slice(start - startBlock);
 
 	return {
 		total: response.headers.get("total-size"),
 		size: response.headers.get("content-length"),
-		start: response.headers.get("start"),
-		end: response.headers.get("end"),
 		buffer: decrypted
 	};
-
 }
 
-function streamDecrypt(event) {
-	console.log(event);
+var CHUNK_SIZE = 1048576;
 
+function streamDecrypt(event) {
 	var request = event.request;
 
 	var id = request.url.split("/")[4];
@@ -63,10 +52,8 @@ function streamDecrypt(event) {
 		var range = request.headers.get("range");
 		var [start, end] = range.replace(/bytes=/, "").split("-");
 
-		start = parseInt(start, 10);
-		end = parseInt(end, 10);
-
-		console.log("Range", start, end);
+		start = start ? parseInt(start, 10) : 0;
+		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE);
 
 		return requestChunk(start, end, id).then((chunk) => {
 			return new Response(chunk.buffer, {
@@ -75,7 +62,7 @@ function streamDecrypt(event) {
 				headers: {
 					'Content-Type': 'application/octet-stream',
 					'Accept-Ranges': 'bytes',
-					'Content-Range': `bytes ${chunk.start}-${chunk.end}/${chunk.total}`,
+					'Content-Range': `bytes ${start}-${Math.min(end, chunk.total - 1)}/${chunk.total}`,
 					'Content-Length': `${chunk.size}`,
 					'Date': new Date().toUTCString(),
 					'Cache-Control': 'no-store',
@@ -84,18 +71,16 @@ function streamDecrypt(event) {
 			});
 		});
 	} else {
-		var CHUNK_SIZE = 1024 * 1024;
-
 		return requestChunk(0, 1, id).then((firstChunk) => {
 			var stream = new ReadableStream({
 				start(controller) {
 					(async () => {
 						var start = 0;
 						while(start < firstChunk.total) {
-							console.log("CS", start, start + CHUNK_SIZE);
-							var chunk = await requestChunk(start, start + CHUNK_SIZE, id);
+							var end = (start + CHUNK_SIZE) - 1;
+							var chunk = await requestChunk(start, end, id);
 							controller.enqueue(chunk.buffer);
-							start += chunk.buffer.length; // additional 1
+							start += chunk.buffer.length;
 						}
 						return controller.close();
 					})()
