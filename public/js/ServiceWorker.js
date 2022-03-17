@@ -1,3 +1,5 @@
+import aesjs from 'aes-js';
+
 self.addEventListener('install', function(event) {
 	// Skip the 'waiting' lifecycle phase, to go directly from 'installed' to 'activated', even if
 	// there are still previous incarnations of this service worker registration active.
@@ -19,7 +21,7 @@ function nearestMultiple(value, roundTo) {
 async function requestChunk(start, end, id) {
 	var startBlock = nearestMultiple(start, 16);
 
-	if(isNaN(end) || end > 1024 * 1024) {
+	if(isNaN(end) || (end - start) > 1024 * 1024) {
 		end = start + 1024 * 1024;
 	}
 
@@ -32,18 +34,25 @@ async function requestChunk(start, end, id) {
 
 	var data = new Uint8Array(await response.arrayBuffer());
 
-	for(var i = 0; i < data.length; i++) {
-		data[i] ^= 0x50;
-	}
+	// for(var i = 0; i < data.length; i++) {
+	// 	data[i] ^= 0x50;
+	// }
 
-	data = data.slice((start - startBlock), (end - startBlock) + 1);
+	var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
+	var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(startBlock / 16));
+
+	var decrypted = aesCtr.decrypt(data);
+
+	console.log("starttttttttttt", start)
+
+	decrypted = decrypted.slice((start - startBlock), (end - startBlock) + 1);
 
 	return {
 		total: response.headers.get("total-size"),
 		size: response.headers.get("content-length"),
 		start: response.headers.get("start"),
 		end: response.headers.get("end"),
-		data: data
+		data: decrypted
 	};
 
 }
@@ -88,10 +97,10 @@ function streamDecrypt(event) {
 					var start = 0;
 					return pump();
 					function pump() {
+						if(start >= firstChunk.total) {
+							return controller.close();
+						}
 						return requestChunk(start, start + CHUNK_SIZE, id).then((chunk) => {
-							if(start >= firstChunk.total) {
-								return controller.close();
-							}
 							controller.enqueue(chunk.data);
 
 							start += chunk.data.byteLength;

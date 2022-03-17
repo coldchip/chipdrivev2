@@ -4,6 +4,8 @@ import IO from './../IO.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
+import aesjs from 'aes-js';
+
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
@@ -50,6 +52,9 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
+				var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
+				var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(0));
+
 				const CHUNK_SIZE = (1024 * 1024);
 
 				for(var start = 0; start < file.size; start += CHUNK_SIZE) {
@@ -59,11 +64,13 @@ function NewItem(props) {
 
 					var buffer = new Uint8Array(await readFileAsync(chunk));
 
-					for(var i = 0; i < buffer.length; i++) {
-						buffer[i] ^= 0x50;
-					}
+					// for(var i = 0; i < buffer.length; i++) {
+					// 	buffer[i] ^= 0x50;
+					// }
 
-					await IO.put(`/api/v2/drive/object/${body.id}/${start}`, buffer, (e) => {
+					var encrypted = aesCtr.encrypt(buffer);
+
+					await IO.put(`/api/v2/drive/object/${body.id}/${start}`, encrypted, (e) => {
 						var progress = e.toFixed(2);
 						console.log(`Uploading ${progress}%`);
 					});
