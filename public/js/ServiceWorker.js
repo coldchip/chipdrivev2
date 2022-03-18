@@ -22,6 +22,7 @@ var CHUNK_SIZE = 1048576;
 
 async function requestChunk(start, end, id) {
 	// clamp it to the chunk size 
+	console.log("RS", (end - start) + 1, CHUNK_SIZE);
 	if((end - start) + 1 > CHUNK_SIZE) {
 		end = (start + CHUNK_SIZE) - 1;
 	}
@@ -62,7 +63,7 @@ function streamDecrypt(event) {
 		var [start, end] = range.replace(/bytes=/, "").split("-");
 
 		start = start ? parseInt(start, 10) : 0;
-		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE);
+		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE) - 1;
 
 		return requestChunk(start, end, id).then((chunk) => {
 			var actualEnd = Math.min((start + chunk.size) - 1, chunk.total - 1);
