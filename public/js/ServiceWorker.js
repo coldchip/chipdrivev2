@@ -1,15 +1,21 @@
 import aesjs from 'aes-js';
+import sha256 from 'js-sha256';
 
 self.addEventListener('install', function(event) {
-	// Skip the 'waiting' lifecycle phase, to go directly from 'installed' to 'activated', even if
-	// there are still previous incarnations of this service worker registration active.
 	event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', function(event) {
-	// Claim any clients immediately, so that the page will be under SW control without reloading.
 	event.waitUntil(self.clients.claim());
 });
+
+function incrementCounter(iv, inc) {
+	for(var i = iv.length - 1; i >= 0; i--) {
+		inc += iv[i]; // add the previous value to the incrementer
+		iv[i] = inc % 256; // get the first 8 bits
+		inc = Math.floor(inc / 256); // carry the remainder to the next array
+	}
+}
 
 function nearestBlock(value, roundTo) {
 	if(value % roundTo == 0) {
@@ -22,7 +28,6 @@ var CHUNK_SIZE = 1048576;
 
 async function requestChunk(start, end, id) {
 	// clamp it to the chunk size 
-	console.log("RS", (end - start) + 1, CHUNK_SIZE);
 	if((end - start) + 1 > CHUNK_SIZE) {
 		end = (start + CHUNK_SIZE) - 1;
 	}
@@ -36,10 +41,17 @@ async function requestChunk(start, end, id) {
 
 	var data = new Uint8Array(await response.arrayBuffer());
 
-	var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 ];
-	var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(startBlock / 16));
+	var key = [239, 99, 2, 115, 50, 138, 94, 207, 107, 118, 55, 213, 13, 101, 176, 242, 177, 243, 50, 225, 245, 90, 163, 131, 205, 218, 89, 138, 140, 223, 246, 150];
+	var iv = sha256.create()
+		.update(id)
+		.array()
+		.slice(0, 128 / 8);
 
-	var decrypted = aesCtr.decrypt(data).slice(start - startBlock);
+	incrementCounter(iv, startBlock / 16);
+
+	var aes = new aesjs.ModeOfOperation.ctr(key, iv);
+
+	var decrypted = aes.decrypt(data);
 
 	var total = response.headers.get("total-size");
 	var size = response.headers.get("content-length");
@@ -49,7 +61,7 @@ async function requestChunk(start, end, id) {
 		size: size,
 		start: start,
 		end: Math.min((start + size) - 1, total - 1),
-		buffer: decrypted
+		buffer: decrypted.slice(start - startBlock) // removes unused bytes that are used for decryption
 	};
 }
 

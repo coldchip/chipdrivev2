@@ -437,62 +437,6 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 	});
 });
 
-app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
-	res.contentType("application/json");
-	res.set('Cache-Control', 'no-store');
-
-	var id = req.params.id;
-	if(id) {
-		try {
-			var cd = new ChipDrive(req.user, null);
-			await cd.init();
-
-			if(await cd.has(id)) {
-				if((await cd.usage()) <= MAX_STORAGE) {
-
-					await new Promise((resolve, reject) => {
-						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
-							if(!err) {
-								resolve();
-							} else {
-								reject();
-							}
-						});
-					});
-
-					var size = fs.statSync(path.join(__dirname, `/database/${id}`)).size;
-
-					await cd.set(id, { size: size });
-
-					return res.status(200).json({});
-
-				} else {
-					return res.status(413).json({
-						code: 413, 
-						message: "No storage space left"
-					});
-				}
-			} else {
-				return res.status(404).json({
-					code: 404, 
-					message: "Node Not Found"
-				});
-			}
-		} catch(err) {
-			console.log(err);
-			return res.status(500).json({
-				code: 500, 
-				message: "Server Internal Error"
-			});
-		}
-	} else {
-		return res.status(400).json({
-			code: 400, 
-			message: "The server can't process the request"
-		});
-	}
-});
-
 app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
@@ -555,41 +499,6 @@ app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
 	}
 });
 
-app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
-	res.set('Cache-Control', 'no-store');
-
-	var id = req.params.id;
-	if(id) {
-		try {
-			var cd = new ChipDrive(req.user, null);
-			await cd.init();
-
-			if(await cd.has(id)) {
-				res.contentType("application/octet-stream");
-
-				var filename = path.join(__dirname, `./database/${id}`);
-
-				res.sendFile(filename);
-			} else {
-				return res.status(404).json({
-					code: 404, 
-					message: "Node Not Found"
-				});
-			}
-		} catch(err) {
-			return res.status(500).json({
-				code: 500, 
-				message: "Server Internal Error"
-			});
-		}
-	} else {
-		return res.status(400).json({
-			code: 400, 
-			message: "The server can't process the request"
-		});
-	}
-});
-
 app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
 	res.set('Cache-Control', 'no-store');
 
@@ -609,14 +518,10 @@ app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
 				var stats = fs.statSync(filename);
 				var size = stats.size;
 
-				console.log("---------\n", start, end);
-
 				start = start ? parseInt(start, 10) : 0;
 				end = end ? parseInt(end, 10) : start + CHUNK_SIZE;
 
 				end = Math.min(end, size - 1);
-
-				console.log((end - start) + 1);
 
 				res.set({
 					"Content-Length": (end - start) + 1,

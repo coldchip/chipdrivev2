@@ -5,6 +5,7 @@ import IO from './../IO.js';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import aesjs from 'aes-js';
+import sha256 from 'js-sha256';
 
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
@@ -52,10 +53,15 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
-				var key = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 ];
-				var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(0));
-
 				const CHUNK_SIZE = 1048575;
+
+				var key = [239, 99, 2, 115, 50, 138, 94, 207, 107, 118, 55, 213, 13, 101, 176, 242, 177, 243, 50, 225, 245, 90, 163, 131, 205, 218, 89, 138, 140, 223, 246, 150];
+				var iv = sha256.create()
+					.update(body.id)
+					.array()
+					.slice(0, 128 / 8);
+
+				var aes = new aesjs.ModeOfOperation.ctr(key, iv);
 
 				for(var start = 0; start < file.size; start += CHUNK_SIZE) {
 					var end = Math.min(start + CHUNK_SIZE, file.size);
@@ -64,7 +70,7 @@ function NewItem(props) {
 
 					var buffer = new Uint8Array(await readFileAsync(chunk));
 
-					var encrypted = aesCtr.encrypt(buffer);
+					var encrypted = aes.encrypt(buffer);
 
 					await IO.put(`/api/v2/drive/object/${body.id}/${start}`, encrypted, (e) => {
 						var progress = e.toFixed(2);
