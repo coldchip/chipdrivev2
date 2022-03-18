@@ -609,10 +609,14 @@ app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
 				var stats = fs.statSync(filename);
 				var size = stats.size;
 
+				console.log("---------\n", start, end);
+
 				start = start ? parseInt(start, 10) : 0;
 				end = end ? parseInt(end, 10) : start + CHUNK_SIZE;
 
 				end = Math.min(end, size - 1);
+
+				console.log((end - start) + 1);
 
 				res.set({
 					"Content-Length": (end - start) + 1,

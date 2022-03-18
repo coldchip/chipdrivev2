@@ -18,9 +18,15 @@ function nearestBlock(value, roundTo) {
 	return Math.floor(value / roundTo) * roundTo;
 }
 
-async function requestChunk(start, end, id) {
-	var startBlock = nearestBlock(start, 16);
+var CHUNK_SIZE = 1048576;
 
+async function requestChunk(start, end, id) {
+	// clamp it to the chunk size 
+	if((end - start) + 1 > CHUNK_SIZE) {
+		end = (start + CHUNK_SIZE) - 1;
+	}
+
+	var startBlock = nearestBlock(start, 16);
 	var response = await fetch(`/api/v2/drive/object/${id}/${startBlock}/${end}`, {
 		headers: {
 
@@ -34,14 +40,17 @@ async function requestChunk(start, end, id) {
 
 	var decrypted = aesCtr.decrypt(data).slice(start - startBlock);
 
+	var total = response.headers.get("total-size");
+	var size = response.headers.get("content-length");
+
 	return {
-		total: response.headers.get("total-size"),
-		size: response.headers.get("content-length"),
+		total: total,
+		size: size,
+		start: start,
+		end: Math.min((start + size) - 1, total - 1),
 		buffer: decrypted
 	};
 }
-
-var CHUNK_SIZE = 1048576;
 
 function streamDecrypt(event) {
 	var request = event.request;
@@ -56,13 +65,15 @@ function streamDecrypt(event) {
 		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE);
 
 		return requestChunk(start, end, id).then((chunk) => {
+			var actualEnd = Math.min((start + chunk.size) - 1, chunk.total - 1);
+
 			return new Response(chunk.buffer, {
 				status: 206, 
 				statusText: "Partial Content",
 				headers: {
 					'Content-Type': 'application/octet-stream',
 					'Accept-Ranges': 'bytes',
-					'Content-Range': `bytes ${start}-${Math.min(end, chunk.total - 1)}/${chunk.total}`,
+					'Content-Range': `bytes ${chunk.start}-${chunk.end}/${chunk.total}`,
 					'Content-Length': `${chunk.size}`,
 					'Date': new Date().toUTCString(),
 					'Cache-Control': 'no-store',
