@@ -66,8 +66,6 @@ function streamDecrypt(event) {
 		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE) - 1;
 
 		return requestChunk(start, end, id).then((chunk) => {
-			var actualEnd = Math.min((start + chunk.size) - 1, chunk.total - 1);
-
 			return new Response(chunk.buffer, {
 				status: 206, 
 				statusText: "Partial Content",
