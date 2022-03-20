@@ -1,5 +1,7 @@
 import React, { useEffect, useReducer } from 'react';
 
+import CryptoIO from './CryptoIO.js';
+
 import Login from './Component/Login.jsx';
 
 import Header from './Component/Header.jsx';
@@ -9,8 +11,6 @@ import Alert from './Component/Alert.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
 import ChipDriveContext from './Context/ChipDriveContext.jsx';
-
-import io from 'socket.io-client';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
@@ -118,12 +118,6 @@ function ChipDrive(props) {
 
 	useEffect(() => {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
-		
-		const ws = io(`http://${window.location.hostname}:5001`);
-
-		ws.on("connect", () => {
-			console.log("Connected WS");
-		});
 
 		navigator.serviceWorker.register("serviceworker.js", {
 			scope: "/"
@@ -131,8 +125,17 @@ function ChipDrive(props) {
 			reg.update();
 		});
 
+		var cio = new CryptoIO("piskapiskapiskapiskapiska");
+
 		navigator.serviceWorker.addEventListener('message', (event) => {
-			ws.emit("stream", event.data);
+			var {taskid, id, start, end} = event.data;
+
+			cio.getChunk(id, start, end).then((chunk) => {
+				navigator.serviceWorker.controller.postMessage({
+					taskid: taskid,
+					...chunk
+				});
+			});
 		});
 
 	}, []);

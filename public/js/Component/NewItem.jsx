@@ -1,6 +1,7 @@
 import React, { useRef, useState, useContext } from 'react';
 
 import IO from './../IO.js';
+import CryptoIO from './../CryptoIO.js';
 
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
@@ -18,20 +19,6 @@ function NewItem(props) {
 	var dropdown = useRef(null);
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
-
-	var readFileAsync = (file) => {
-		return new Promise((resolve, reject) => {
-			let reader = new FileReader();
-
-			reader.onload = () => {
-				resolve(reader.result);
-			};
-
-			reader.onerror = reject;
-
-			reader.readAsArrayBuffer(file);
-		});
-	}
 
 	var upload = async (e) => {
 		try {
@@ -53,49 +40,8 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
-				const CHUNK_SIZE = 1048575;
-
-				var key  = sha256.create()
-					.update("piskapiskapiskapiskapiska")
-					.update("chipdrive")
-					.array()
-					.slice(0, 32);
-				var iv = sha256.create()
-					.update(body.id)
-					.update("chipdrive")
-					.array()
-					.slice(0, 16);
-
-				var aes = new aesjs.ModeOfOperation.ctr(key, iv);
-
-				for(var start = 0; start < file.size; start += CHUNK_SIZE) {
-					var end = Math.min(start + CHUNK_SIZE, file.size);
-
-					var chunk = file.slice(start, end);
-
-					var buffer = new Uint8Array(await readFileAsync(chunk));
-
-					var encrypted = aes.encrypt(buffer);
-
-					await IO.put(`/api/v2/drive/object/${body.id}/${start}`, encrypted, (e) => {
-						var progress = e.toFixed(2);
-						console.log(`Uploading ${progress}%`);
-					});
-				}
-
-				// await IO.put(`/api/v2/drive/object/${body.id}`, file, (e) => {
-				// 	var progress = e.toFixed(2);
-				// 	console.log(`Uploading ${progress}%`);
-
-				// 	dispatch({
-				// 		type: "task", 
-				// 		id: taskid, 
-				// 		task: {
-				// 			name: `Uploading ${file.name}`,
-				// 			progress: progress
-				// 		}
-				// 	});
-				// });
+				var cio = new CryptoIO("piskapiskapiskapiskapiska");
+				await cio.putFile(body.id, file);
 
 				dispatch({
 					type: "task", 

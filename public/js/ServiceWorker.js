@@ -1,5 +1,6 @@
-import aesjs from 'aes-js';
-import sha256 from 'js-sha256';
+import DeferredPromise from './DeferredPromise';
+
+const tasks = {};
 
 self.addEventListener('install', function(event) {
 	event.waitUntil(self.skipWaiting());
@@ -9,66 +10,25 @@ self.addEventListener('activate', function(event) {
 	event.waitUntil(self.clients.claim());
 });
 
-function counterOffset(iv, inc) {
-	for(var i = iv.length - 1; i >= 0; i--) {
-		inc += iv[i]; // add the previous value to the incrementer
-		iv[i] = inc % 256; // get the first 8 bits
-		inc = Math.floor(inc / 256); // carry the remainder to the next array
-	}
-}
-
-function nearestBlock(value, roundTo) {
-	if(value % roundTo == 0) {
-		return value;
-	}
-	return Math.floor(value / roundTo) * roundTo;
-}
-
 var CHUNK_SIZE = 1048576;
 
-async function requestChunk(start, end, id) {
-	// clamp it to the chunk size 
-	if((end - start) + 1 > CHUNK_SIZE) {
-		end = (start + CHUNK_SIZE) - 1;
+async function requestChunk(event, start, end, id) {
+	var taskid = Math.random().toString();
+
+	var task = new DeferredPromise();
+	tasks[taskid] = task;
+
+    const client = await clients.get(event.clientId);
+    if(client) {
+		client.postMessage({
+			taskid: taskid,
+			id: id,
+			start: start,
+			end: end
+		});
 	}
 
-	var startBlock = nearestBlock(start, 16);
-	var response = await fetch(`/api/v2/drive/object/${id}`, {
-		headers: {
-			start: startBlock,
-			end: end
-		}
-	});
-
-	var data = new Uint8Array(await response.arrayBuffer());
-
-	var key = sha256.create()
-		.update("piskapiskapiskapiskapiska")
-		.update("chipdrive")
-		.array()
-		.slice(0, 32);
-	var iv = sha256.create()
-		.update(id)
-		.update("chipdrive")
-		.array()
-		.slice(0, 16);
-
-	counterOffset(iv, startBlock / 16);
-
-	var aes = new aesjs.ModeOfOperation.ctr(key, iv);
-
-	var decrypted = aes.decrypt(data);
-
-	var total = response.headers.get("total");
-	var size = response.headers.get("content-length");
-
-	return {
-		total: total,
-		size: size,
-		start: start,
-		end: Math.min((start + size) - 1, total - 1),
-		buffer: decrypted.slice(start - startBlock) // removes unused bytes that are used for decryption
-	};
+	return task.promise;
 }
 
 function streamDecrypt(event) {
@@ -83,7 +43,7 @@ function streamDecrypt(event) {
 		start = start ? parseInt(start, 10) : 0;
 		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE) - 1;
 
-		return requestChunk(start, end, id).then((chunk) => {
+		return requestChunk(event, start, end, id).then((chunk) => {
 			return new Response(chunk.buffer, {
 				status: 206, 
 				statusText: "Partial Content",
@@ -99,14 +59,14 @@ function streamDecrypt(event) {
 			});
 		});
 	} else {
-		return requestChunk(0, 1, id).then((firstChunk) => {
+		return requestChunk(event, 0, 1, id).then((firstChunk) => {
 			var stream = new ReadableStream({
 				start(controller) {
 					(async () => {
 						var start = 0;
 						while(start < firstChunk.total) {
 							var end = (start + CHUNK_SIZE) - 1;
-							var chunk = await requestChunk(start, end, id);
+							var chunk = await requestChunk(event, start, end, id);
 							controller.enqueue(chunk.buffer);
 							start += chunk.buffer.length;
 						}
@@ -132,7 +92,13 @@ function streamDecrypt(event) {
 }
 
 self.addEventListener('message', (event) => {
-	console.log(event.data);
+	var response = event.data;
+	for(const [taskid, task] of Object.entries(tasks)) {
+		if(response.taskid === taskid) {
+			task.resolve(response);
+			delete tasks[taskid];
+		}
+	}
 });
 
 self.addEventListener('fetch', (event) => {
