@@ -499,12 +499,12 @@ app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
 	}
 });
 
-app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
+app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
 	res.set('Cache-Control', 'no-store');
 
 	var id = req.params.id;
-	var start = req.params.start;
-	var end = req.params.end;
+	var start = req.headers.start;
+	var end = req.headers.end;
 	if(id && start && end) {
 		try {
 			var cd = new ChipDrive(req.user, null);
@@ -525,7 +525,7 @@ app.get('/api/v2/drive/object/:id/:start/:end', auth, async (req, res) => {
 
 				res.set({
 					"Content-Length": (end - start) + 1,
-					"Total-Size": size
+					"Total": size
 				});
 
 				pipeline(fs.createReadStream(filename, {

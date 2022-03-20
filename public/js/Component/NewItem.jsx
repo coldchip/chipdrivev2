@@ -55,11 +55,16 @@ function NewItem(props) {
 
 				const CHUNK_SIZE = 1048575;
 
-				var key = [239, 99, 2, 115, 50, 138, 94, 207, 107, 118, 55, 213, 13, 101, 176, 242, 177, 243, 50, 225, 245, 90, 163, 131, 205, 218, 89, 138, 140, 223, 246, 150];
+				var key  = sha256.create()
+					.update("piskapiskapiskapiskapiska")
+					.update("chipdrive")
+					.array()
+					.slice(0, 32);
 				var iv = sha256.create()
 					.update(body.id)
+					.update("chipdrive")
 					.array()
-					.slice(0, 128 / 8);
+					.slice(0, 16);
 
 				var aes = new aesjs.ModeOfOperation.ctr(key, iv);
 

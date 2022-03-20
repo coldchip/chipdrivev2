@@ -9,7 +9,7 @@ self.addEventListener('activate', function(event) {
 	event.waitUntil(self.clients.claim());
 });
 
-function incrementCounter(iv, inc) {
+function counterOffset(iv, inc) {
 	for(var i = iv.length - 1; i >= 0; i--) {
 		inc += iv[i]; // add the previous value to the incrementer
 		iv[i] = inc % 256; // get the first 8 bits
@@ -33,27 +33,33 @@ async function requestChunk(start, end, id) {
 	}
 
 	var startBlock = nearestBlock(start, 16);
-	var response = await fetch(`/api/v2/drive/object/${id}/${startBlock}/${end}`, {
+	var response = await fetch(`/api/v2/drive/object/${id}`, {
 		headers: {
-
+			start: startBlock,
+			end: end
 		}
 	});
 
 	var data = new Uint8Array(await response.arrayBuffer());
 
-	var key = [239, 99, 2, 115, 50, 138, 94, 207, 107, 118, 55, 213, 13, 101, 176, 242, 177, 243, 50, 225, 245, 90, 163, 131, 205, 218, 89, 138, 140, 223, 246, 150];
+	var key = sha256.create()
+		.update("piskapiskapiskapiskapiska")
+		.update("chipdrive")
+		.array()
+		.slice(0, 32);
 	var iv = sha256.create()
 		.update(id)
+		.update("chipdrive")
 		.array()
-		.slice(0, 128 / 8);
+		.slice(0, 16);
 
-	incrementCounter(iv, startBlock / 16);
+	counterOffset(iv, startBlock / 16);
 
 	var aes = new aesjs.ModeOfOperation.ctr(key, iv);
 
 	var decrypted = aes.decrypt(data);
 
-	var total = response.headers.get("total-size");
+	var total = response.headers.get("total");
 	var size = response.headers.get("content-length");
 
 	return {
