@@ -1,32 +1,15 @@
-import aesjs from 'aes-js';
-import sha256 from 'js-sha256';
-
 import IO from './IO.js';
+import AES from './AES.js';
 
 class CryptoIO {
 	static CHUNK_SIZE = 1048576;
 
-	constructor(token) {
-		if(!token) throw new Error("Undefined token passed in");
-		this.token = token;
+	constructor(key) {
+		if(!key) throw new Error("Undefined key passed in");
+		this.key = key;
 	}
 
-	static counterOffset(iv, inc) {
-		for(var i = iv.length - 1; i >= 0; i--) {
-			inc += iv[i]; // add the previous value to the incrementer
-			iv[i] = inc % 256; // get the first 8 bits
-			inc = Math.floor(inc / 256); // carry the remainder to the next array
-		}
-	}
-
-	static nearestBlock(value, roundTo) {
-		if(value % roundTo == 0) {
-			return value;
-		}
-		return Math.floor(value / roundTo) * roundTo;
-	}
-
-	static readFileAsync = (file) => {
+	static readFile(file) {
 		return new Promise((resolve, reject) => {
 			let reader = new FileReader();
 
@@ -41,25 +24,14 @@ class CryptoIO {
 	}
 
 	async putFile(id, file) {
-		var key  = sha256.create()
-			.update(this.token)
-			.update("chipdrive")
-			.array()
-			.slice(0, 32);
-		var iv = sha256.create()
-			.update(id)
-			.update("chipdrive")
-			.array()
-			.slice(0, 16);
-
-		var aes = new aesjs.ModeOfOperation.ctr(key, iv);
+		var aes = new AES(this.key, id, 0);
 
 		for(var start = 0; start < file.size; start += CryptoIO.CHUNK_SIZE) {
 			var end = Math.min(start + CryptoIO.CHUNK_SIZE, file.size);
 
 			var chunk = file.slice(start, end);
 
-			var buffer = new Uint8Array(await CryptoIO.readFileAsync(chunk));
+			var buffer = new Uint8Array(await CryptoIO.readFile(chunk));
 
 			var encrypted = aes.encrypt(buffer);
 
@@ -76,7 +48,7 @@ class CryptoIO {
 			end = (start + CryptoIO.CHUNK_SIZE) - 1;
 		}
 
-		var startBlock = CryptoIO.nearestBlock(start, 16);
+		var startBlock = AES.closestBlock(start);
 
 		return fetch(`/api/v2/drive/object/${id}`, {
 			headers: {
@@ -86,21 +58,7 @@ class CryptoIO {
 		}).then(async (response) => {
 			var data = new Uint8Array(await response.arrayBuffer());
 
-			var key = sha256.create()
-				.update(this.token)
-				.update("chipdrive")
-				.array()
-				.slice(0, 32);
-			var iv = sha256.create()
-				.update(id)
-				.update("chipdrive")
-				.array()
-				.slice(0, 16);
-
-			CryptoIO.counterOffset(iv, startBlock / 16);
-
-			var aes = new aesjs.ModeOfOperation.ctr(key, iv);
-
+			var aes = new AES(this.key, id, startBlock)
 			var decrypted = aes.decrypt(data);
 
 			var total = response.headers.get("total");
@@ -111,7 +69,7 @@ class CryptoIO {
 				size: size,
 				start: start,
 				end: Math.min((start + size) - 1, total - 1),
-				buffer: decrypted.slice(start - startBlock) // removes unused bytes that are used for decryption
+				buffer: decrypted.slice(start - startBlock)
 			}
 		});
 	}
