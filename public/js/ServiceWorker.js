@@ -12,23 +12,22 @@ self.addEventListener('activate', function(event) {
 
 var CHUNK_SIZE = 1048576;
 
-async function requestChunk(event, start, end, id) {
-	var taskid = Math.random().toString();
+function getChunk(event, start, end, id) {
+	return clients.get(event.clientId).then((client) => {
+		if(client) {
+			var taskid = Math.random().toString();
 
-	var task = new DeferredPromise();
-	tasks[taskid] = task;
-
-    const client = await clients.get(event.clientId);
-    if(client) {
-		client.postMessage({
-			taskid: taskid,
-			id: id,
-			start: start,
-			end: end
-		});
-	}
-
-	return task.promise;
+			var task = new DeferredPromise();
+			tasks[taskid] = task;
+			client.postMessage({
+				taskid: taskid,
+				id: id,
+				start: start,
+				end: end
+			});
+			return task.promise;
+		}
+	});
 }
 
 function streamDecrypt(event) {
@@ -43,7 +42,7 @@ function streamDecrypt(event) {
 		start = start ? parseInt(start, 10) : 0;
 		end = end ? parseInt(end, 10) : (start + CHUNK_SIZE) - 1;
 
-		return requestChunk(event, start, end, id).then((chunk) => {
+		return getChunk(event, start, end, id).then((chunk) => {
 			return new Response(chunk.buffer, {
 				status: 206, 
 				statusText: "Partial Content",
@@ -59,14 +58,14 @@ function streamDecrypt(event) {
 			});
 		});
 	} else {
-		return requestChunk(event, 0, 1, id).then((firstChunk) => {
+		return getChunk(event, 0, 1, id).then((firstChunk) => {
 			var stream = new ReadableStream({
 				start(controller) {
 					(async () => {
 						var start = 0;
 						while(start < firstChunk.total) {
 							var end = (start + CHUNK_SIZE) - 1;
-							var chunk = await requestChunk(event, start, end, id);
+							var chunk = await getChunk(event, start, end, id);
 							controller.enqueue(chunk.buffer);
 							start += chunk.buffer.length;
 						}
