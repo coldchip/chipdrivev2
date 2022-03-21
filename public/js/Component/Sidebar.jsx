@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 
 import IO from './../IO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import Confirm from './Confirm.jsx';
 import NewItem from './NewItem.jsx';
@@ -13,7 +13,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Sidebar(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	var logout = (name) => {
 		IO.get("/api/v2/auth/logout").then(() => {

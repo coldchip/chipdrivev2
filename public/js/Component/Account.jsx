@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 
 import IO from './../IO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import profile from '../../img/profile.png';
 
@@ -13,7 +13,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Account(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	var [name, setName] = useState("...");
 	var [username, setUsername] = useState("...");

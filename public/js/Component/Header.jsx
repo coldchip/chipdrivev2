@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import Account from './Account.jsx';
 import css from "../../css/index.scss";
@@ -9,7 +9,7 @@ import cssf from "../CSSFormat";
 import logo from "../../img/logo.png";
 
 function Header(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	return (
 		<React.Fragment>

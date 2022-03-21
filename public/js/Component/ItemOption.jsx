@@ -2,7 +2,7 @@ import React, { useRef, useState, useContext } from 'react';
 
 import IO from './../IO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
@@ -11,7 +11,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemOption(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	var dropdown = useRef(null);
 	var [renamePrompt, setRenamePrompt] = useState(false);

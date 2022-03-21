@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useContext } from 'react';
 
 import CryptoIO from './CryptoIO.js';
 
@@ -10,7 +10,8 @@ import Body from './Component/Body.jsx';
 import Alert from './Component/Alert.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
-import ChipDriveContext from './Context/ChipDriveContext.jsx';
+import DispatchContext from './Context/DispatchContext.jsx';
+import CredentialContext from './Context/CredentialContext.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
@@ -94,6 +95,8 @@ const reducer = (state, action) => {
 };
 
 function ChipDrive(props) {
+	var key = useContext(CredentialContext);
+
 	var [{
 		filter,
 		sidebar, 
@@ -125,7 +128,7 @@ function ChipDrive(props) {
 			reg.update();
 		});
 
-		var cio = new CryptoIO("piskapiskapiskapiskapiska");
+		var cio = new CryptoIO(key);
 
 		navigator.serviceWorker.addEventListener('message', (event) => {
 			var {taskid, id, start, end} = event.data;
@@ -138,10 +141,10 @@ function ChipDrive(props) {
 			});
 		});
 
-	}, []);
+	}, [key]);
 
 	return (
-		<ChipDriveContext.Provider value={dispatch}>
+		<DispatchContext.Provider value={dispatch}>
 			{ 
 				!login && 
 				<div className={cssf(css, "!chipdrive-app chipdrive")}>
@@ -182,8 +185,16 @@ function ChipDrive(props) {
 			}
 
 			{ login && <Login /> }
-		</ChipDriveContext.Provider>
+		</DispatchContext.Provider>
 	);
 }
 
-export default ChipDrive;
+function ChipDriveApp() {
+	return (
+		<CredentialContext.Provider value="piskapiskapiskapiskapiska">
+			<ChipDrive />
+		</CredentialContext.Provider>
+	);
+}
+
+export default ChipDriveApp;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 
 import IO from './../IO.js';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import { useGoogleLogin } from 'react-google-login';
 
@@ -17,7 +17,7 @@ function Login() {
 	var [loading, setLoading] = useState(false);
 	var [preloading, setPreloading] = useState(false);
 
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	useEffect(() => {
 		setPreloading(true);

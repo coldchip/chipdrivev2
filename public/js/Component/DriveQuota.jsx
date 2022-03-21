@@ -2,13 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 
 import IO from './../IO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveQuota(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	var [used, setUsed] = useState(0);
 	var [available, setAvailable] = useState(0);

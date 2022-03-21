@@ -2,14 +2,14 @@ import React, { useContext, useState, useEffect } from 'react';
 
 import IO from './../IO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import Loader from './Loader.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveList(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	var [list, setList] = useState([]);
 	var [loading, setLoading] = useState(false);

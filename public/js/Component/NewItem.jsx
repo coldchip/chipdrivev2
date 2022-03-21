@@ -1,9 +1,10 @@
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useState, useContext, useCallback } from 'react';
 
 import IO from './../IO.js';
 import CryptoIO from './../CryptoIO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
+import CredentialContext from './../Context/CredentialContext.jsx';
 
 import aesjs from 'aes-js';
 import sha256 from 'js-sha256';
@@ -14,13 +15,14 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function NewItem(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
+	var key = useContext(CredentialContext);
 
 	var dropdown = useRef(null);
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
-	var upload = async (e) => {
+	var upload = useCallback(async (e) => {
 		try {
 			var files = e.target.files;
 			for(const file of files) {
@@ -40,7 +42,7 @@ function NewItem(props) {
 					folderid: props.folder
 				});
 
-				var cio = new CryptoIO("piskapiskapiskapiskapiska");
+				var cio = new CryptoIO(key);
 				await cio.putFile(body.id, file);
 
 				dispatch({
@@ -71,7 +73,7 @@ function NewItem(props) {
 				});
 			}
 		}
-	}
+	}, [dispatch, props.folder, key]);
 
 	var create = (name) => {
 		var taskid = 'task_' + Math.random();

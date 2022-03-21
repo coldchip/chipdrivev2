@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 
 import IO from './../IO.js';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import DispatchContext from './../Context/DispatchContext.jsx';
 
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';
@@ -10,7 +10,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function List(props) {
-	var dispatch = useContext(ChipDriveContext);
+	var dispatch = useContext(DispatchContext);
 
 	const [list, setList] = useState([]);
 	const [loading, setLoading] = useState(false);
