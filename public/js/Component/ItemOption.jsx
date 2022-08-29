@@ -1,8 +1,9 @@
 import React, { useRef, useState, useContext } from 'react';
 
-import IO from './../IO.js';
+import fetch from './../IO.js';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
@@ -11,7 +12,8 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function ItemOption(props) {
-	var dispatch = useContext(DispatchContext);
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var dropdown = useRef(null);
 	var [renamePrompt, setRenamePrompt] = useState(false);
@@ -30,8 +32,15 @@ function ItemOption(props) {
 			}
 		});
 
-		IO.patch(`/api/v2/drive/object/${props.item.id}`, {
-			name: name
+		fetch(`/api/v2/drive/object/${props.item.id}`, {
+			method: "PATCH",
+			body: new URLSearchParams({
+				name: name
+			}).toString(),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				token: token
+			}
 		}).then(() => {
 			dispatch({
 				type: "task", 
@@ -75,7 +84,12 @@ function ItemOption(props) {
 			}
 		});
 
-		IO.delete(`/api/v2/drive/object/${props.item.id}`).then(() => {
+		fetch(`/api/v2/drive/object/${props.item.id}`, {
+			method: "DELETE",
+			headers: {
+				token: token
+			}
+		}).then(() => {
 			dispatch({
 				type: "task", 
 				id: taskid, 
@@ -107,13 +121,14 @@ function ItemOption(props) {
 	var download = () => {
 		var {item} = props;
 
-		var link = `/cryptoworker/${item.id}`;
+		var link = `/api/v2/drive/object/${item.id}`;
 			
 		var a = document.createElement("a");
 		a.style.display = "none";
 		a.style.width = "0px";
 		a.style.height = "0px";
 		a.href = link;
+		a.download = item.name;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);

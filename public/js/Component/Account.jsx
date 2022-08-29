@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 
-import IO from './../IO.js';
+import fetch from './../IO.js';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import profile from '../../img/profile.png';
 
@@ -13,7 +14,8 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Account(props) {
-	var dispatch = useContext(DispatchContext);
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var [name, setName] = useState("...");
 	var [username, setUsername] = useState("...");
@@ -23,7 +25,12 @@ function Account(props) {
 	var loadAccount = () => {
 		setLoading(true);
 
-		IO.get("/api/v2/users/@me", null).then((response) => {
+		fetch("/api/v2/users/@me", {
+			method: "GET",
+			headers: {
+				token: token
+			}
+		}).then((response) => {
 			var {status, body} = response;
 
 			setLoading(false);

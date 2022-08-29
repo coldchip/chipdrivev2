@@ -13,7 +13,6 @@ const { OAuth2Client } = require('google-auth-library');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
 const ChipDrive = require("./ChipDrive");
-const http = require('http');
 
 const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
@@ -30,10 +29,6 @@ var queue = async.queue(async (task, executed) => {
 }, 1);
 
 var app = express();
-
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
 
 app.use(session({
 	name: "chipdrive-session",
@@ -110,7 +105,9 @@ app.post('/api/v2/auth/login', (req, res) => {
 				
 				req.session.user = username;
 
-				return res.status(200).json({});
+				return res.status(200).json({
+					token: Math.random()
+				});
 			} else {
 				return res.status(400).json({
 					code: 400,
@@ -134,6 +131,8 @@ app.post('/api/v2/oauth/login', (req, res) => {
 				audience: CLIENT_ID,
 			});
 			const {email, name} = ticket.getPayload();
+
+			console.log(email, name);
 
 			console.log(ticket.getPayload());
 
@@ -437,27 +436,20 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 	});
 });
 
-app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
+app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
 	var id = req.params.id;
-	var start = req.params.start;
-	if(id && start) {
+	if(id) {
 		try {
 			var cd = new ChipDrive(req.user, null);
 			await cd.init();
 
 			if(await cd.has(id)) {
 				if((await cd.usage()) <= MAX_STORAGE) {
-
-					start = parseInt(start, 10);
-
 					await new Promise((resolve, reject) => {
-						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`), {
-							flags: "a",
-							start: start
-						}), (err) => {
+						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
 							if(!err) {
 								resolve();
 							} else {
@@ -471,7 +463,6 @@ app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
 					await cd.set(id, { size: size });
 
 					return res.status(200).json({});
-
 				} else {
 					return res.status(413).json({
 						code: 413, 
@@ -485,7 +476,6 @@ app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
 				});
 			}
 		} catch(err) {
-			console.log(err);
 			return res.status(500).json({
 				code: 500, 
 				message: "Server Internal Error"
@@ -499,104 +489,38 @@ app.put('/api/v2/drive/object/:id/:start', auth, async (req, res) => {
 	}
 });
 
-app.get('/api/v2/drive/object/:id', auth, async (req, res) => {
-	res.set('Cache-Control', 'no-store');
+app.get('/api/v2/drive/object/:id', auth, (req, res) => {
+	queue.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
 
-	var id = req.params.id;
-	var start = req.headers.start;
-	var end = req.headers.end;
-	if(id && start && end) {
-		try {
-			var cd = new ChipDrive(req.user, null);
-			await cd.init();
+		var id = req.params.id;
+		if(id) {
+			try {
+				var cd = new ChipDrive(req.user, null);
+				await cd.init();
 
-			if(await cd.has(id)) {
-				res.contentType("application/octet-stream");
-
-				var filename = path.join(__dirname, `./database/${id}`);
-
-				var stats = fs.statSync(filename);
-				var size = stats.size;
-
-				start = start ? parseInt(start, 10) : 0;
-				end = end ? parseInt(end, 10) : start + CHUNK_SIZE;
-
-				end = Math.min(end, size - 1);
-
-				res.set({
-					"Content-Length": (end - start) + 1,
-					"Total": size
-				});
-
-				pipeline(fs.createReadStream(filename, {
-					start: start, 
-					end: end
-				}), res, (err) => {
-
-				});
-			} else {
-				return res.status(404).json({
-					code: 404, 
-					message: "Node Not Found"
+				if(await cd.has(id)) {
+					res.contentType("application/octet-stream");
+					res.sendFile(path.join(__dirname, `./database/${id}`));
+				} else {
+					return res.status(404).json({
+						code: 404, 
+						message: "Node Not Found"
+					});
+				}
+			} catch(err) {
+				return res.status(500).json({
+					code: 500, 
+					message: "Server Internal Error"
 				});
 			}
-		} catch(err) {
-			return res.status(500).json({
-				code: 500, 
-				message: "Server Internal Error"
+		} else {
+			return res.status(400).json({
+				code: 400, 
+				message: "The server can't process the request"
 			});
 		}
-	} else {
-		return res.status(400).json({
-			code: 400, 
-			message: "The server can't process the request"
-		});
-	}
-});
-
-
-
-io.on("connection", function (socket) {
-	console.log("Made socket connection");
-
-	socket.on("stream", async (data) => {
-		console.log(data);
-
-		var {id, start, end} = data;
-
-		var cd = new ChipDrive("ryan@coldchip.ru", null);
-		await cd.init();
-
-		if(await cd.has(id)) {
-			var filename = path.join(__dirname, `./database/${id}`);
-
-			if(!end) {
-				end = start + 128;
-			}
-
-			var stream = fs.createReadStream(filename, {
-				start: start, 
-				end: end
-			})
-
-			const _buf = [];
-
-			await new Promise((resolve, reject) => {
-
-				stream.on("data", (chunk) => _buf.push(chunk));
-				stream.on("end", () => resolve(Buffer.concat(_buf)));
-				stream.on("error", (err) => reject(err));
-
-			});
-
-			console.log(_buf);
-
-			socket.emit("chunk", new Uint8Array(new ArrayBuffer(_buf)));
-		}
-	});
-
-	socket.on("disconnect", () => {
-
 	});
 });
 
@@ -608,7 +532,7 @@ app.use(middleware(compiler, {
 
 const port = process.env.PORT || 5001;
 
-server.listen(port, () =>  {
+app.listen(port, () =>  {
 	if(process.env.NODE_ENV) {
 		console.log("Production Mode is Activated");
 	}

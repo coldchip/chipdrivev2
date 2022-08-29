@@ -1,15 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import IO from './../IO.js';
+import fetch from './../IO.js';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Loader from './Loader.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveList(props) {
-	var dispatch = useContext(DispatchContext);
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var [list, setList] = useState([]);
 	var [loading, setLoading] = useState(false);
@@ -18,7 +20,12 @@ function DriveList(props) {
 		setList([]);
 		setLoading(true);
 
-		IO.get("/api/v2/drive/config", null).then((response) => {
+		fetch("/api/v2/drive/config", {
+			method: "GET",
+			headers: {
+				token: token
+			}
+		}).then((response) => {
 			var {status, body} = response;
 
 			setLoading(false);

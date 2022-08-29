@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 
-import IO from './../IO.js';
+import fetch from './../IO.js';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Confirm from './Confirm.jsx';
 import NewItem from './NewItem.jsx';
@@ -13,10 +14,16 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Sidebar(props) {
-	var dispatch = useContext(DispatchContext);
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var logout = (name) => {
-		IO.get("/api/v2/auth/logout").then(() => {
+		fetch("/api/v2/auth/logout", {
+			method: "GET",
+			headers: {
+				token: token
+			}
+		}).then(() => {
 			dispatch({
 				type: "list"
 			});

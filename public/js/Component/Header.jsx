@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Account from './Account.jsx';
 import css from "../../css/index.scss";
@@ -9,7 +9,7 @@ import cssf from "../CSSFormat";
 import logo from "../../img/logo.png";
 
 function Header(props) {
-	var dispatch = useContext(DispatchContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	return (
 		<React.Fragment>
@@ -20,7 +20,7 @@ function Header(props) {
 					});
 				}}></i>
 
-				<a href="#">
+				<a href="/">
 					<img className={cssf(css, "header-logo ms-3")} src={logo} alt="ChipDrive Logo" />	
 				</a>
 

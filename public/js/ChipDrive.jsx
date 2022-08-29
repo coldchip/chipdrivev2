@@ -1,6 +1,4 @@
-import React, { useEffect, useReducer, useContext } from 'react';
-
-import CryptoIO from './CryptoIO.js';
+import React, { useEffect, useReducer } from 'react';
 
 import Login from './Component/Login.jsx';
 
@@ -10,8 +8,8 @@ import Body from './Component/Body.jsx';
 import Alert from './Component/Alert.jsx';
 import TaskModal from './Component/TaskModal.jsx';
 
-import DispatchContext from './Context/DispatchContext.jsx';
-import CredentialContext from './Context/CredentialContext.jsx';
+import TokenContext from './Context/TokenContext.jsx';
+import ChipDriveContext from './Context/ChipDriveContext.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
@@ -95,8 +93,6 @@ const reducer = (state, action) => {
 };
 
 function ChipDrive(props) {
-	var key = useContext(CredentialContext);
-
 	var [{
 		filter,
 		sidebar, 
@@ -121,80 +117,54 @@ function ChipDrive(props) {
 
 	useEffect(() => {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
-
-		navigator.serviceWorker.register("serviceworker.js", {
-			scope: "/"
-		}).then((reg) => {
-			reg.update();
-		});
-
-		var cio = new CryptoIO(key);
-
-		navigator.serviceWorker.addEventListener('message', (event) => {
-			var {taskid, id, start, end} = event.data;
-
-			cio.getChunk(id, start, end).then((chunk) => {
-				navigator.serviceWorker.controller.postMessage({
-					taskid: taskid,
-					...chunk
-				});
-			});
-		});
-
-	}, [key]);
+	}, []);
 
 	return (
-		<DispatchContext.Provider value={dispatch}>
-			{ 
-				!login && 
-				<div className={cssf(css, "!chipdrive-app chipdrive")}>
-					<Header 
-						folder={folder}
-					/>
+		<TokenContext.Provider value={localStorage.getItem('token')}>
+			<ChipDriveContext.Provider value={dispatch}>
+				{ 
+					!login && 
+					<div className={cssf(css, "!chipdrive-app chipdrive")}>
+						<Header 
+							folder={folder}
+						/>
 
-					<Sidebar 
-						open={sidebar} 
-						folder={folder}
-					/>
+						<Sidebar 
+							open={sidebar} 
+							folder={folder}
+						/>
 
-					<Body 
-						title={drive} 
-						folder={folder}
-						filter={filter} 
-					/>
+						<Body 
+							title={drive} 
+							folder={folder}
+							filter={filter} 
+						/>
 
-					<TaskModal 
-						tasks={tasks}
-						onClear={() => {
-							dispatch({
-								type: "closeTask"
-							})
-						}}
-					/>
+						<TaskModal 
+							tasks={tasks}
+							onClear={() => {
+								dispatch({
+									type: "closeTask"
+								})
+							}}
+						/>
 
-					<Alert
-						title={alertTitle}
-						open={alert} 
-						onAccept={() => {
-							dispatch({
-								type: "unalert"
-							});
-						}}
-					/>
-				</div>
-			}
+						<Alert
+							title={alertTitle}
+							open={alert} 
+							onAccept={() => {
+								dispatch({
+									type: "unalert"
+								});
+							}}
+						/>
+					</div>
+				}
 
-			{ login && <Login /> }
-		</DispatchContext.Provider>
+				{ login && <Login /> }
+			</ChipDriveContext.Provider>
+		</TokenContext.Provider>
 	);
 }
 
-function ChipDriveApp() {
-	return (
-		<CredentialContext.Provider value="piskapiskapiskapiskapiska">
-			<ChipDrive />
-		</CredentialContext.Provider>
-	);
-}
-
-export default ChipDriveApp;
+export default ChipDrive;

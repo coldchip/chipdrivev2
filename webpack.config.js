@@ -12,11 +12,7 @@ module.exports = {
     hints: false
   },
   entry: {
-    'main': './public/js/index.jsx',
-    'serviceworker': {
-      import: './public/js/ServiceWorker.js', 
-      filename: 'serviceworker.js' 
-    }
+    'main': './public/js/index.jsx'
   },
   module: {
     rules: [

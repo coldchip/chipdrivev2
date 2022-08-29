@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
 
-import IO from './../IO.js';
-import DispatchContext from './../Context/DispatchContext.jsx';
+import fetch from './../IO.js';
+
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import { useGoogleLogin } from 'react-google-login';
 
@@ -10,14 +12,15 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Login() {
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
+
 	var [username, setUsername] = useState("");
 	var [password, setPassword] = useState("");
 	var [error, setError] = useState("");
 
 	var [loading, setLoading] = useState(false);
 	var [preloading, setPreloading] = useState(false);
-
-	var dispatch = useContext(DispatchContext);
 
 	useEffect(() => {
 		setPreloading(true);
@@ -29,10 +32,20 @@ function Login() {
 	var login = useCallback(() => {
 		setLoading(true);
 
-		IO.post("/api/v2/auth/login", {
-			username: username, 
-			password: password
-		}).then(() => {
+		fetch("/api/v2/auth/login", {
+			method: "POST",
+			body: new URLSearchParams({
+				username: username, 
+				password: password
+			}).toString(),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				token: token
+			}
+		}).then((response) => {
+			var {body} = response;
+			localStorage.setItem('token', body.token);
+
 			setLoading(false);
 			dispatch({
 				type: "closeLogin"

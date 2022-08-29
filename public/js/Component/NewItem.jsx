@@ -1,13 +1,9 @@
-import React, { useRef, useState, useContext, useCallback } from 'react';
+import React, { useRef, useState, useContext } from 'react';
 
-import IO from './../IO.js';
-import CryptoIO from './../CryptoIO.js';
+import fetch from './../IO.js';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
-import CredentialContext from './../Context/CredentialContext.jsx';
-
-import aesjs from 'aes-js';
-import sha256 from 'js-sha256';
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import Prompt from './Prompt.jsx';
 import Popup from 'reactjs-popup';
@@ -15,14 +11,14 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function NewItem(props) {
-	var dispatch = useContext(DispatchContext);
-	var key = useContext(CredentialContext);
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var dropdown = useRef(null);
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
-	var upload = useCallback(async (e) => {
+	var upload = async (e) => {
 		try {
 			var files = e.target.files;
 			for(const file of files) {
@@ -37,13 +33,38 @@ function NewItem(props) {
 					}
 				});
 
-				var {body} = await IO.post("/api/v2/drive/file", {
-					name: file.name,
-					folderid: props.folder
-				});
+				var {body} = await fetch("/api/v2/drive/file", {
+					method: "POST",
+					body: new URLSearchParams({
+						name: file.name,
+						folderid: props.folder
+					}).toString(),
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						token: token
+					}
+				})
 
-				var cio = new CryptoIO(key);
-				await cio.putFile(body.id, file);
+				await fetch(`/api/v2/drive/object/${body.id}`, {
+					method: "PUT",
+					body: file,
+					headers: {
+						token: token
+					},
+					progress: (e) => {
+						var progress = e.toFixed(2);
+						console.log(`Uploading ${progress}%`);
+
+						dispatch({
+							type: "task", 
+							id: taskid, 
+							task: {
+								name: `Uploading ${file.name}`,
+								progress: progress
+							}
+						});
+					}
+				});
 
 				dispatch({
 					type: "task", 
@@ -59,7 +80,6 @@ function NewItem(props) {
 				type: "list"
 			});
 		} catch(response) {
-			// response can be any error
 			var {status, body} = response;
 
 			if(status === 401) {
@@ -73,7 +93,7 @@ function NewItem(props) {
 				});
 			}
 		}
-	}, [dispatch, props.folder, key]);
+	}
 
 	var create = (name) => {
 		var taskid = 'task_' + Math.random();
@@ -87,9 +107,16 @@ function NewItem(props) {
 			}
 		});
 
-		IO.post("/api/v2/drive/folder", {
-			name: name,
-			folderid: props.folder
+		fetch("/api/v2/drive/folder", {
+			method: "POST",
+			body: new URLSearchParams({
+				name: name,
+				folderid: props.folder
+			}).toString(),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				token: token
+			}
 		}).then(() => {
 			dispatch({
 				type: "task", 

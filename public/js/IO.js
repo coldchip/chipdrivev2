@@ -4,160 +4,100 @@
 	@description: A library to perform CRUD requests to ChipDrive server
 */
 
-class IO {
-	static TIMEOUT = 15000;
 
-	static _send(opts) {
-		var {
-			method, 
-			url, 
-			query, 
-			header, 
-			timeout, 
-			progress, 
-			body
-		} = opts;
+function fetch(url, opts) {
+	var {
+		method, 
+		query, 
+		headers, 
+		timeout, 
+		progress, 
+		body
+	} = opts;
 
-		return new Promise((resolve, reject) => {
-			var xhr = new XMLHttpRequest();
+	return new Promise((resolve, reject) => {
+		var xhr = new XMLHttpRequest();
 
-			if(query) {
-				url = url.concat("?", new URLSearchParams(query).toString());
+		if(query) {
+			url = url.concat("?", new URLSearchParams(query).toString());
+		}
+
+		xhr.open(method ? method : "GET", url, true);
+
+		if(headers) {
+			for(const [key, value] of Object.entries(headers)) {
+				xhr.setRequestHeader(key, value);
 			}
+		}
 
-			xhr.open(method, url, true);
-
-			if(header) {
-				for(const [key, value] of Object.entries(header)) {
-					xhr.setRequestHeader(key, value);
+		if(progress) {
+			xhr.upload.onprogress = (event) => {
+			if (event.lengthComputable) {
+					progress((event.loaded / event.total) * 100);
 				}
 			}
+		}
 
-			if(progress) {
-				xhr.upload.onprogress = (event) => {
-				if (event.lengthComputable) {
-						progress((event.loaded / event.total) * 100);
+		if(timeout) {
+			xhr.timeout = timeout;
+		} else {
+			xhr.timeout = 30000;
+		}
+
+		xhr.onreadystatechange = function() {
+			if(xhr.readyState === 4) {
+				if(xhr.status >= 100 && xhr.status <= 599) {
+					var basetype = Math.floor(xhr.status / 100);
+
+					var response = {
+						status: xhr.status,
+						body: JSON.parse(xhr.responseText)
+					};
+
+					if(basetype === 2) {
+						resolve(response);
+					} else {
+						reject(response);
 					}
 				}
 			}
+		}
 
-			if(timeout) {
-				xhr.timeout = timeout;
-			}
-
-			xhr.onreadystatechange = function() {
-				if(xhr.readyState === 4) {
-					if(xhr.status >= 100 && xhr.status <= 599) {
-						var basetype = Math.floor(xhr.status / 100);
-
-						var response = {
-							status: xhr.status,
-							body: JSON.parse(xhr.responseText)
-						};
-
-						if(basetype === 2) {
-							resolve(response);
-						} else {
-							reject(response);
-						}
-					}
+		xhr.onerror = (e) => {
+			var response = {
+				status: 0,
+				body: {
+					code: 0,
+					message: "Request error, is the network down?"
 				}
-			}
-
-			xhr.onerror = (e) => {
-				var response = {
-					status: 0,
-					body: {
-						code: 0,
-						message: "Request error, is the network down?"
-					}
-				};
-				reject(response);
-			}
-
-			xhr.onabort = (e) => {
-				var response = {
-					status: 0,
-					body: {
-						code: 0,
-						message: "Request aborted"
-					}
-				};
-				reject(response);
-			}
-
-			xhr.ontimeout = (e) => {
-				var response = {
-					status: 0,
-					body: {
-						code: 0,
-						message: "Request timeout, please try again"
-					}
-				};
-				reject(response);
 			};
+			reject(response);
+		}
 
-			xhr.send(body ? body : null);
-		});
-	}
+		xhr.onabort = (e) => {
+			var response = {
+				status: 0,
+				body: {
+					code: 0,
+					message: "Request aborted"
+				}
+			};
+			reject(response);
+		}
 
-	static get(url, query) {
-		var opts = {
-			method: "GET",
-			url: url,
-			query: query,
-			timeout: IO.TIMEOUT
+		xhr.ontimeout = (e) => {
+			var response = {
+				status: 0,
+				body: {
+					code: 0,
+					message: "Request timeout, please try again"
+				}
+			};
+			reject(response);
 		};
-		return IO._send(opts);
-	}
 
-	static post(url, body) {
-		var opts = {
-			method: "POST",
-			url: url,
-			header: {
-				"Content-Type": "application/x-www-form-urlencoded"
-			},
-			timeout: IO.TIMEOUT,
-			body: new URLSearchParams(body).toString()
-		};
-		return IO._send(opts);
-	}
-
-	static put(url, blob, progress) {
-		var opts = {
-			method: "PUT",
-			url: url,
-			header: {
-				"Content-Type": "application/octet-stream"
-			},
-			progress: progress,
-			body: blob
-		};
-		return IO._send(opts);
-	}
-
-	static patch(url, body) {
-		var opts = {
-			method: "PATCH",
-			url: url,
-			header: {
-				"Content-Type": "application/x-www-form-urlencoded"
-			},
-			timeout: IO.TIMEOUT,
-			body: new URLSearchParams(body).toString()
-		};
-		return IO._send(opts);
-	}
-
-	static delete(url) {
-		var opts = {
-			method: "DELETE",
-			url: url,
-			timeout: IO.TIMEOUT
-		};
-		return IO._send(opts);
-	}
+		xhr.send(body ? body : null);
+	});
 }
 
-export default IO;
+export default fetch;

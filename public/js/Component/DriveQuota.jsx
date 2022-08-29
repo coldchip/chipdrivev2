@@ -1,20 +1,27 @@
 import React, { useState, useEffect, useContext } from 'react';
 
-import IO from './../IO.js';
+import fetch from './../IO.js';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveQuota(props) {
-	var dispatch = useContext(DispatchContext);
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	var [used, setUsed] = useState(0);
 	var [available, setAvailable] = useState(0);
 
 	useEffect(() => {
-		IO.get("/api/v2/drive/quota").then((response) => {
+		fetch("/api/v2/drive/quota", {
+			method: "GET",
+			headers: {
+				token: token
+			}
+		}).then((response) => {
 			var {status, body} = response;
 
 			setUsed(body.used);
@@ -56,7 +63,7 @@ function DriveQuota(props) {
 				</div>
 				<div className={cssf(css, "quota-bar mt-3")}>
 					<div style={{
-						width: `${Math.min(((used / available) * 100).toFixed(5), 100)}%`
+						width: `${((used / available) * 100).toFixed(5)}%`
 					}} className={cssf(css, "quota-bar-used")}></div>
 				</div>
 				<div className={cssf(css, "quota-usage text mt-2")}>

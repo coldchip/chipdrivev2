@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import DispatchContext from './../Context/DispatchContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
 import ItemOption from './ItemOption.jsx';
 import ItemViewer from './ItemViewer.jsx';
@@ -8,7 +8,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Item(props) {
-	var dispatch = useContext(DispatchContext);
+	var dispatch = useContext(ChipDriveContext);
 
 	const TYPE_FILE   = 1;
 	const TYPE_FOLDER = 2;
