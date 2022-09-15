@@ -34,19 +34,21 @@ class ChipDrive {
 
 	async init() {
 		await sequelize.sync();
-		await Node.findOrCreate({
-			where: {
-				id: "root",
-				user: this.user
-			},
-			defaults:{
-				type: 2, 
-				name: "root", 
-				id: "root", 
-				parent: this.user,
-				user: this.user
-			}
-		});
+		if(this.user) {
+			await Node.findOrCreate({
+				where: {
+					id: "root",
+					user: this.user
+				},
+				defaults:{
+					type: 2, 
+					name: "root", 
+					id: "root", 
+					parent: this.user,
+					user: this.user
+				}
+			});
+		}
 	}
 
 	static randID(length) {
@@ -91,12 +93,21 @@ class ChipDrive {
 	}
 
 	async has(id) {
-		var nodes = await Node.findAll({
-			where: {
-				id: id,
-				user: this.user
-			}
-		})
+		var nodes;
+		if(this.user) {
+			nodes = await Node.findAll({
+				where: {
+					id: id,
+					user: this.user
+				}
+			});
+		} else {
+			nodes = await Node.findAll({
+				where: {
+					id: id
+				}
+			});
+		}
 		
 		return nodes.length > 0;
 	}

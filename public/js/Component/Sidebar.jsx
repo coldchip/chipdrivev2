@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 
 import fetch from './../IO.js';
 
@@ -17,7 +17,7 @@ function Sidebar(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	var logout = (name) => {
+	var logout = useCallback((name) => {
 		fetch("/api/v2/auth/logout", {
 			method: "GET",
 			headers: {
@@ -41,7 +41,7 @@ function Sidebar(props) {
 				});
 			}
 		});
-	}
+	}, [dispatch, token]);
 
 	return (
 		<React.Fragment>
@@ -67,6 +67,7 @@ function Sidebar(props) {
 				<DriveList />
 
 				<div className={cssf(css, "sidebar-seperator")}></div>
+				
 				<button className={cssf(css, "sidebar-item text")} tabIndex="0">
 					<i className={cssf(css, "!fas !fa-cog me-2")}></i>
 					Settings
@@ -83,6 +84,8 @@ function Sidebar(props) {
 					onAccept={logout}
 				/>
 				
+				<div className={cssf(css, "sidebar-seperator")}></div>
+
 				<DriveQuota 
 					folder={props.folder}
 				/>

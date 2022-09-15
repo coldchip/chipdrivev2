@@ -47,6 +47,7 @@ app.use((req, res, next) =>  {
 	// res.header("x-content-type-options", "nosniff");
 	// res.header("x-frame-options", "DENY");
 	// res.header("x-xss-protection", "1; mode=block");
+	console.log(req.headers);
 	res.header("Server", "ColdChip");
 	res.header("Service-Worker-Allowed", "/");
 	console.log(`[${new Date().toUTCString()}] ${req.method.padEnd(6)} ${req.path}`);
@@ -55,19 +56,15 @@ app.use((req, res, next) =>  {
 
 app.set('x-powered-by', false);
 
-function auth(req, res, next) {
-	var user = req.session.user;
-	var name = req.session.name;
-	if(user) {
-		req.user = user;
-		req.name = name;
-		next();
-	} else {
-		return res.status(401).json({
-			code: 401, 
-			message: "Unauthorized"
-		});
-	}
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
 }
 
 var accounts = [{
@@ -78,94 +75,20 @@ var accounts = [{
 	password: "ab"
 }];
 
-function validate(username, password) {
-	if(process.env.username && process.env.password) {
-		return (username === process.env.username && password === process.env.password);
-	} else {
-		for(const account of accounts) {
-			if(account.username === username && account.password === password) {
-				return true;
-			}
-		}
+var tokens = ["abcdef"];
 
-		return false;
+function auth(req, res, next) {
+	if(req.headers.token && tokens.includes(req.headers.token)) {
+		req.user = "internal@chip.sg";
+		req.name = "test";
+		next();
+	} else {
+		return res.status(401).json({
+			code: 401, 
+			message: "Unauthorized"
+		});
 	}
 }
-
-app.post('/api/v2/auth/login', (req, res) => {
-	setTimeout(() => {
-		queue.push(async () => {
-			res.contentType("application/json");
-			res.set('Cache-Control', 'no-store');
-
-			var username = req.body.username;
-			var password = req.body.password;
-
-			if(validate(username, password)) {
-				
-				req.session.user = username;
-
-				return res.status(200).json({
-					token: Math.random()
-				});
-			} else {
-				return res.status(400).json({
-					code: 400,
-					message: "Invalid credentials"
-				});
-			}
-		});
-	}, 1000);
-});
-
-app.post('/api/v2/oauth/login', (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		var token = req.body.token;
-
-		try {
-			const ticket = await client.verifyIdToken({
-				idToken: token,
-				audience: CLIENT_ID,
-			});
-			const {email, name} = ticket.getPayload();
-
-			console.log(email, name);
-
-			console.log(ticket.getPayload());
-
-			if(email && name) {
-				req.session.user = email;
-				req.session.name = name;
-				return res.status(200).json({});
-			} else {
-				return res.status(400).json({
-					code: 400,
-					message: "Invalid OAuth Token"
-				});
-			}
-		} catch(e) {
-			console.log(e);
-			return res.status(500).json({
-				code: 500,
-				message: "Server Internal Error"
-			});
-		}
-	});
-});
-
-app.get('/api/v2/auth/logout', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		req.session.destroy();
-
-		return res.status(200).json({});
-	});
-});
 
 app.get('/api/v2/users/@me', auth, (req, res) => {
 	queue.push(async () => {
@@ -220,10 +143,6 @@ app.get('/api/v2/drive/config', auth, (req, res) => {
 			name: "Recently Deleted",
 			id: "c37a134e4be06e94840b6082135cb0d2"
 		}];
-
-		// await new Promise((resolve, reject) => {
-		// 	setTimeout(() => {resolve()}, 10000);
-		// });
 
 		return res.status(200).json(list);
 	});
@@ -489,7 +408,7 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 	}
 });
 
-app.get('/api/v2/drive/object/:id', auth, (req, res) => {
+app.get('/api/v2/drive/object/:id', (req, res) => {
 	queue.push(async () => {
 		res.contentType("application/json");
 		res.set('Cache-Control', 'no-store');
@@ -497,7 +416,7 @@ app.get('/api/v2/drive/object/:id', auth, (req, res) => {
 		var id = req.params.id;
 		if(id) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(null, null);
 				await cd.init();
 
 				if(await cd.has(id)) {

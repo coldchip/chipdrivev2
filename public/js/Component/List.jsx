@@ -16,10 +16,12 @@ function List(props) {
 
 	const [list, setList] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(undefined);
 
 	useEffect(() => {
-		setLoading(true);
 		setList([]);
+		setLoading(true);
+		setError(undefined);
 
 		fetch("/api/v2/drive/list", {
 			method: "GET",
@@ -33,7 +35,6 @@ function List(props) {
 		}).then((response) => {
 			var {status, body} = response;
 
-			setLoading(false);
 			setList(body);
 		}).catch((response) => {
 			var {status, body} = response;
@@ -43,42 +44,49 @@ function List(props) {
 					type: "login"
 				});
 			} else {
-				dispatch({
-					type: "alert", 
-					title: body.message
-				});
+				setError(body.message);
 			}
+		}).finally(() => {
+			setLoading(false);
 		});
 
-	}, [dispatch, props.folder, props.filter]);
+	}, [dispatch, props.folder, props.filter, token]);
 
-	if(!loading) {
-		if(list.length > 0) {
-			return (
-				<div className={cssf(css, "list-container")}>
-					{
-						list.map((item) => {
-							return (
-								<Item 
-									item={item} 
-									key={item.id}
-								/>
-							);
-						})
-					}
-				</div>
-			);
+
+	if(!error) {
+		if(!loading) {
+			if(list.length > 0) {
+				return (
+					<div className={cssf(css, "list-container")}>
+						{
+							list.map((item) => {
+								return (
+									<Item 
+										item={item} 
+										key={item.id}
+									/>
+								);
+							})
+						}
+					</div>
+				);
+			} else {
+				return (
+					<div className={cssf(css, "notice-container mt-2")}>
+						<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
+						<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
+					</div>
+				);
+			}
+
 		} else {
 			return (
-				<div className={cssf(css, "notice-container mt-2")}>
-					<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
-					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
-				</div>
+				<Loader />
 			);
 		}
 	} else {
 		return (
-			<Loader />
+			<h1 className={cssf(css, "text mt-5")}>Error: {error}</h1>
 		);
 	}
 }

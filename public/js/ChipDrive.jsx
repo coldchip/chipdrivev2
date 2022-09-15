@@ -1,7 +1,5 @@
 import React, { useEffect, useReducer } from 'react';
 
-import Login from './Component/Login.jsx';
-
 import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';
 import Body from './Component/Body.jsx';
@@ -13,6 +11,15 @@ import ChipDriveContext from './Context/ChipDriveContext.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
+
+function getQuery(name, url = window.location.href) {
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
 
 const reducer = (state, action) => {
 	console.log(state, action);
@@ -80,12 +87,6 @@ const reducer = (state, action) => {
 				login: true
 			};
 		}
-		case 'closeLogin': {
-			return { 
-				...state, 
-				login: false
-			};
-		}
 		default: {
 			return state;
 		}
@@ -119,52 +120,66 @@ function ChipDrive(props) {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
 	}, []);
 
-	return (
-		<TokenContext.Provider value={localStorage.getItem('token')}>
+	let body = (
+		<TokenContext.Provider value={getQuery("token")}>
 			<ChipDriveContext.Provider value={dispatch}>
-				{ 
-					!login && 
-					<div className={cssf(css, "!chipdrive-app chipdrive")}>
-						<Header 
-							folder={folder}
-						/>
+				<div className={cssf(css, "!chipdrive-app chipdrive")}>
+					<Header 
+						folder={folder}
+					/>
 
-						<Sidebar 
-							open={sidebar} 
-							folder={folder}
-						/>
+					<Sidebar 
+						open={sidebar} 
+						folder={folder}
+					/>
 
-						<Body 
-							title={drive} 
-							folder={folder}
-							filter={filter} 
-						/>
+					<Body 
+						title={drive} 
+						folder={folder}
+						filter={filter} 
+					/>
 
-						<TaskModal 
-							tasks={tasks}
-							onClear={() => {
-								dispatch({
-									type: "closeTask"
-								})
-							}}
-						/>
+					<TaskModal 
+						tasks={tasks}
+						onClear={() => {
+							dispatch({
+								type: "closeTask"
+							})
+						}}
+					/>
 
-						<Alert
-							title={alertTitle}
-							open={alert} 
-							onAccept={() => {
-								dispatch({
-									type: "unalert"
-								});
-							}}
-						/>
-					</div>
-				}
+					<Alert
+						title={alertTitle}
+						open={alert} 
+						onAccept={() => {
+							dispatch({
+								type: "unalert"
+							});
+						}}
+					/>
 
-				{ login && <Login /> }
+					<Alert
+						title="Invalid login token"
+						open={login} 
+						onAccept={() => {
+							dispatch({
+								type: "closeLogin"
+							});
+						}}
+					/>
+				</div>
 			</ChipDriveContext.Provider>
 		</TokenContext.Provider>
 	);
+
+
+	if(!login) {
+		return body;
+	} else {
+		return (
+			<h1 className={cssf(css, "text")}>Invalid Token</h1>
+		);
+	}
 }
 
 export default ChipDrive;

@@ -68,7 +68,7 @@ function fetch(url, opts) {
 				status: 0,
 				body: {
 					code: 0,
-					message: "Request error, is the network down?"
+					message: "Network Error"
 				}
 			};
 			reject(response);

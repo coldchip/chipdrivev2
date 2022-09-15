@@ -25,7 +25,7 @@ function Header(props) {
 				</a>
 
 				<form className={cssf(css, "header-search ms-5 me-5 ps-2")}>
-					<i class="fa fa-search"></i>
+					<i className="fa fa-search"></i>
 					<input type="text" onChange={(e) => {
 							dispatch({
 								type: "filter", 

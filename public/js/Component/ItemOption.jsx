@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useState, useContext, useCallback } from 'react';
 
 import fetch from './../IO.js';
 
@@ -20,7 +20,7 @@ function ItemOption(props) {
 	var [deletePrompt, setDeletePrompt] = useState(false);
 	var [downloadPrompt, setDownloadPrompt] = useState(false);
 
-	var rename = (name) => {
+	var rename = useCallback((name) => {
 		var taskid = 'task_' + Math.random();
 
 		dispatch({
@@ -68,18 +68,16 @@ function ItemOption(props) {
 				});
 			}
 		});
-	}
+	}, [dispatch, props.item.id, token]);
 
-	var remove = () => {
-		var {item} = props;
-
+	var remove = useCallback(() => {
 		var taskid = 'task_' + Math.random();
 
 		dispatch({
 			type: "task", 
 			id: taskid, 
 			task: {
-				name: `Deleting '${item.name}'`,
+				name: `Deleting '${props.item.name}'`,
 				progress: 0.0
 			}
 		});
@@ -94,7 +92,7 @@ function ItemOption(props) {
 				type: "task", 
 				id: taskid, 
 				task: {
-					name: `Deleted '${item.name}'`,
+					name: `Deleted '${props.item.name}'`,
 					progress: 100.0
 				}
 			});
@@ -116,7 +114,7 @@ function ItemOption(props) {
 				});
 			}
 		});
-	}
+	}, [dispatch, props.item.name, props.item.id, token]);
 
 	var download = () => {
 		var {item} = props;

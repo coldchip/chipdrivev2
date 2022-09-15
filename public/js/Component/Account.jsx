@@ -17,13 +17,15 @@ function Account(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	var [name, setName] = useState("...");
-	var [username, setUsername] = useState("...");
+	const [name, setName] = useState("...");
+	const [username, setUsername] = useState("...");
 
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(undefined);
 
 	var loadAccount = () => {
 		setLoading(true);
+		setError(undefined);
 
 		fetch("/api/v2/users/@me", {
 			method: "GET",
@@ -32,8 +34,6 @@ function Account(props) {
 			}
 		}).then((response) => {
 			var {status, body} = response;
-
-			setLoading(false);
 
 			setName(body.name);
 			setUsername(body.username);
@@ -45,26 +45,18 @@ function Account(props) {
 					type: "login"
 				});
 			} else {
-				dispatch({
-					type: "alert", 
-					title: body.message
-				});
+				setError(body.message);
 			}
+		}).finally(() => {
+			setLoading(false);
 		});
 	}
 
-	return (
-		<Popup 
-			trigger={props.trigger}
-			keepTooltipInside="body"
-			onOpen={loadAccount}
-			modal
-		>
-			{
-				loading 
-				? 
-				<Loader />
-				:
+	var body;
+
+	if(!error) {
+		if(!loading) {
+			body = (
 				<div className={cssf(css, "cd-account-modal")}>
 					<img className={cssf(css, "account-profile")} src={profile} />
 					<p className={cssf(css, "account-name text mt-3")}>
@@ -79,7 +71,26 @@ function Account(props) {
 						Manage Account
 					</ButtonGreen>
 				</div>
-			}
+			);
+		} else {
+			body = (
+				<Loader />
+			);
+		}
+	} else {
+		body = (
+			<p className={cssf(css, "text")}>Error: {error}</p>
+		);
+	}
+
+	return (
+		<Popup 
+			trigger={props.trigger}
+			keepTooltipInside="body"
+			onOpen={loadAccount}
+			modal
+		>
+			{body}
 		</Popup>
 	);
 }

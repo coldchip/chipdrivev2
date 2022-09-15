@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useState, useContext, useCallback } from 'react';
 
 import fetch from './../IO.js';
 
@@ -18,7 +18,7 @@ function NewItem(props) {
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
-	var upload = async (e) => {
+	var upload = useCallback(async (e) => {
 		try {
 			var files = e.target.files;
 			for(const file of files) {
@@ -93,9 +93,9 @@ function NewItem(props) {
 				});
 			}
 		}
-	}
+	}, [dispatch, props.folder, token]);
 
-	var create = (name) => {
+	var create = useCallback((name) => {
 		var taskid = 'task_' + Math.random();
 
 		dispatch({
@@ -144,7 +144,7 @@ function NewItem(props) {
 				});
 			}
 		});
-	}
+	}, [dispatch, props.folder, token])
 
 	var dropdownInner = (
 		<React.Fragment>
