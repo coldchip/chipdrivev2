@@ -22,6 +22,29 @@
 		}
 	}
 
+	.breadcrumbs {
+		display: flex;
+		flex-direction: row;
+		margin: 15px 20px;
+    	padding: 5px 10px;
+		overflow: scroll;
+
+		.breadcrumb {
+			padding: 5px;
+			margin-right: 10px;
+			border-radius: 5px;
+			background: #CCCCCC;
+			cursor: pointer;
+			flex-shrink: 0;
+		}
+
+		.breadcrumb-seperator {
+			padding: 5px;
+			margin-right: 10px;
+			border-radius: 5px;
+		}
+	}
+
 	.list-container {
 		width: 100%;
 		display: grid;

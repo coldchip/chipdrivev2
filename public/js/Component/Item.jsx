@@ -49,6 +49,7 @@ function Item(props) {
 
 				<div className={cssf(css, "list-item-inner")} onClick={() => {
 					var {item} = props;
+
 					dispatch({
 						type: "list", 
 						id: item.id

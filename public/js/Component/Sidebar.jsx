@@ -36,8 +36,12 @@ function Sidebar(props) {
 				});
 			} else {
 				dispatch({
-					type: "alert", 
-					title: body.message
+					type: "task", 
+					id: "0", 
+					task: {
+						name: `Error logging out`,
+						progress: 100
+					}
 				});
 			}
 		});

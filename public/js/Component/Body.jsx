@@ -1,5 +1,6 @@
 import React from 'react';
 
+import BreadCrumbs from './BreadCrumbs.jsx';
 import List from './List.jsx';
 import NewItem from './NewItem.jsx';
 
@@ -15,10 +16,14 @@ function Body(props) {
 					{props.title}
 				</p>
 			</div>
+
+			<BreadCrumbs folder={props.folder}/>
+
 			<List 
 				folder={props.folder}
 				filter={props.filter}
 			/>
+
 			<NewItem 
 				trigger={
 					<button className={cssf(css, "upload-round p-0")}>

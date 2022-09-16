@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 
 import Header from './Component/Header.jsx';
 import Sidebar from './Component/Sidebar.jsx';
@@ -30,20 +30,6 @@ const reducer = (state, action) => {
 				filter: action.filter,
 			};
 		}
-		case 'alert': {
-			return {
-				...state, 
-				alert: true,
-				alertTitle: action.title
-			};
-		}
-		case 'unalert': {
-			return {
-				...state, 
-				alert: false,
-				alertTitle: ""
-			};
-		}
 		case 'sidebar': {
 			return {
 				...state, 
@@ -57,13 +43,11 @@ const reducer = (state, action) => {
 			};
 		}
 		case 'list': {
-			/* 
-				React listen for state changes based on their refrence
-				using new String will create a mutable string
-			*/
+			let id = action.id ? action.id : state.folder
+
 			return { 
 				...state, 
-				folder: action.id ? new String(action.id) : new String(state.folder)
+				folder: new String(id),
 			};
 		}
 		case 'task': {
@@ -94,27 +78,24 @@ const reducer = (state, action) => {
 };
 
 function ChipDrive(props) {
-	var [{
+	const [{
 		filter,
 		sidebar, 
 		drive, 
 		folder, 
 		tasks,
-		login,
-
-		alert,
-		alertTitle
+		login
 	}, dispatch] = useReducer(reducer, {
 		filter: "",
 		sidebar: false,
 		drive: "Unknown",
 		folder: "root",
 		tasks: {},
-		login: false,
-
-		alert: false,
-		alertTitle: ""
+		login: false
 	});
+
+
+	const [dir, setDir] = useState(["ss", "ss"]);
 
 	useEffect(() => {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
@@ -136,7 +117,7 @@ function ChipDrive(props) {
 					<Body 
 						title={drive} 
 						folder={folder}
-						filter={filter} 
+						filter={filter}
 					/>
 
 					<TaskModal 
@@ -145,26 +126,6 @@ function ChipDrive(props) {
 							dispatch({
 								type: "closeTask"
 							})
-						}}
-					/>
-
-					<Alert
-						title={alertTitle}
-						open={alert} 
-						onAccept={() => {
-							dispatch({
-								type: "unalert"
-							});
-						}}
-					/>
-
-					<Alert
-						title="Invalid login token"
-						open={login} 
-						onAccept={() => {
-							dispatch({
-								type: "closeLogin"
-							});
 						}}
 					/>
 				</div>

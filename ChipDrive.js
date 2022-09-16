@@ -42,7 +42,7 @@ class ChipDrive {
 				},
 				defaults:{
 					type: 2, 
-					name: "root", 
+					name: "My Drive", 
 					id: "root", 
 					parent: this.user,
 					user: this.user

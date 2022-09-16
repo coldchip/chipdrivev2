@@ -63,8 +63,12 @@ function ItemOption(props) {
 				});
 			} else {
 				dispatch({
-					type: "alert", 
-					title: body.message
+					type: "task", 
+					id: taskid, 
+					task: {
+						name: `Error renaming '${name}'`,
+						progress: 100
+					}
 				});
 			}
 		});
@@ -109,8 +113,12 @@ function ItemOption(props) {
 				});
 			} else {
 				dispatch({
-					type: "alert", 
-					title: body.message
+					type: "task", 
+					id: taskid, 
+					task: {
+						name: `Error deleting '${name}'`,
+						progress: 100
+					}
 				});
 			}
 		});

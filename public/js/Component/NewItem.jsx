@@ -88,8 +88,12 @@ function NewItem(props) {
 				});
 			} else {
 				dispatch({
-					type: "alert", 
-					title: body.message
+					type: "task", 
+					id: taskid, 
+					task: {
+						name: `Error uploading`,
+						progress: 100
+					}
 				});
 			}
 		}
@@ -139,8 +143,12 @@ function NewItem(props) {
 				});
 			} else {
 				dispatch({
-					type: "alert", 
-					title: body.message
+					type: "task", 
+					id: taskid, 
+					task: {
+						name: `Error creating '${name}'`,
+						progress: 100
+					}
 				});
 			}
 		});

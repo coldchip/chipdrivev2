@@ -78,7 +78,10 @@ var accounts = [{
 var tokens = ["abcdef"];
 
 function auth(req, res, next) {
-	if(req.headers.token && tokens.includes(req.headers.token)) {
+
+	var token = req.headers.token ? req.headers.token : req.query.token;
+
+	if(token && tokens.includes(token)) {
 		req.user = "internal@chip.sg";
 		req.name = "test";
 		next();
@@ -145,6 +148,53 @@ app.get('/api/v2/drive/config', auth, (req, res) => {
 		}];
 
 		return res.status(200).json(list);
+	});
+});
+
+
+app.get('/api/v2/drive/breadcrumb', auth, (req, res) => {
+	queue.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
+
+
+		var id = req.query.id;
+		if(id) {
+			try {
+				var cd = new ChipDrive(req.user, null);
+				await cd.init();
+				if(await cd.has(id)) {
+
+					var result = [];
+					while(await cd.has(id)) {
+						var node = await cd.get(id);
+						id = node.parent;
+						result.unshift({
+							name: node.name,
+							id: node.id
+						});
+					}
+					
+					return res.status(200).json(result);
+
+				} else {
+					return res.status(404).json({
+						code: 404, 
+						message: "Node Not Found"
+					});
+				}
+			} catch(err) {
+				return res.status(500).json({
+					code: 500,
+					message: "Server Internal Error"
+				});
+			}
+		} else {
+			return res.status(400).json({
+				code: 400, 
+				message: "The server can't process the request"
+			});
+		}
 	});
 });
 
