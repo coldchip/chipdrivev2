@@ -1,7 +1,5 @@
 import React from 'react';
 
-import ButtonGreen from './ButtonGreen.jsx';
-
 import Types from '../Types';
 import Popup from 'reactjs-popup';
 import css from "../../css/index.scss";
@@ -50,10 +48,10 @@ function ItemViewer(props) {
 				<div className={cssf(css, "notice-container mt-2")}>
 					<p className={cssf(css, "notice-text text")}>Unable to preview</p>
 					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon mt-3")}></i>	
-					<ButtonGreen className={cssf(css, "mt-4")} onClick={download}>
+					<button className={cssf(css, "notice-button text mt-4")} onClick={download}>
 						<i className={cssf(css, "!fa !fa-download me-2")}></i>
 						Download Instead
-					</ButtonGreen>
+					</button>
 				</div>
 			)
 		}

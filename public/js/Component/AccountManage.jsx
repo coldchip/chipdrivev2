@@ -9,11 +9,10 @@ import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 import profile from '../../img/profile.png';
 
 import Popup from 'reactjs-popup';
-import AccountManage from './AccountManage.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function Account(props) {
+function AccountManage(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -57,24 +56,9 @@ function Account(props) {
 	if(!error) {
 		if(!loading) {
 			body = (
-				<div className={cssf(css, "cd-account-modal")}>
-					<img className={cssf(css, "account-profile")} src={profile} />
-					<p className={cssf(css, "account-name text mt-3")}>
-						{name}
-					</p>
-					<p className={cssf(css, "account-email text mt-2")}>
-						{username}
-					</p>
-					
-					<AccountManage
-						trigger={
-							<button className={cssf(css, "account-button text mt-4") + " " + props.className} onClick={props.onClick}>
-								<i className={cssf(css, "!fas !fa-pen me-2")}></i>
-								Manage Account
-							</button>
-						}
-					/>
-				</div>
+				<p className={cssf(css, "text")}>
+					Not Implemented
+				</p>
 			);
 		} else {
 			body = (
@@ -115,4 +99,4 @@ function Account(props) {
 	);
 }
 
-export default Account;
+export default AccountManage;

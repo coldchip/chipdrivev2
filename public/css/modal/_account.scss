@@ -16,4 +16,17 @@
 		font-size: 16px;
 		color: $textColor;
 	}
+
+	.account-button {
+		border: none;
+		font-weight: 500;
+		height: 40px;
+		font-size: 16px;
+		border-radius: 5px;
+		padding: 0 10px;
+		outline: 0;
+		background: $chipGreen;
+		color: #fff;
+	}
+
 }

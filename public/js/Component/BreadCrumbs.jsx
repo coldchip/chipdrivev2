@@ -89,8 +89,8 @@ function BreadCrumbs(props) {
 					display: 'block',
 					width: '100%',
 					height: '25px',
-					margin: '20px 30px'
-				}}>
+					margin: '20px 30px',
+				}} backgroundColor="#cccccc" foregroundColor="#9d9d9d">
 					<rect x="0" y="0" rx="5" ry="5" width="25" height="25" />
 					<rect x="35" y="0" rx="4" ry="4" width="200" height="10" />
 					<rect x="35" y="15" rx="4" ry="4" width="200" height="10" />
