@@ -7,9 +7,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin: 15px 20px;
+		margin: 20px 30px;
 		border-radius: 5px;
-		padding: 5px 10px;
 
 		.label-text {
 			font-size: 33px;
@@ -25,8 +24,7 @@
 	.breadcrumbs {
 		display: flex;
 		flex-direction: row;
-		margin: 15px 20px;
-    	padding: 5px 10px;
+		margin: 20px 30px;
 		overflow: scroll;
 
 		.breadcrumb {

@@ -51,7 +51,7 @@ app.use((req, res, next) =>  {
 	res.header("Server", "ColdChip");
 	res.header("Service-Worker-Allowed", "/");
 	console.log(`[${new Date().toUTCString()}] ${req.method.padEnd(6)} ${req.path}`);
-	next();
+	next()
 });
 
 app.set('x-powered-by', false);
@@ -61,8 +61,7 @@ function makeid(length) {
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
     for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * 
- charactersLength));
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
    }
    return result;
 }
@@ -151,7 +150,6 @@ app.get('/api/v2/drive/config', auth, (req, res) => {
 	});
 });
 
-
 app.get('/api/v2/drive/breadcrumb', auth, (req, res) => {
 	queue.push(async () => {
 		res.contentType("application/json");
@@ -176,7 +174,6 @@ app.get('/api/v2/drive/breadcrumb', auth, (req, res) => {
 					}
 					
 					return res.status(200).json(result);
-
 				} else {
 					return res.status(404).json({
 						code: 404, 

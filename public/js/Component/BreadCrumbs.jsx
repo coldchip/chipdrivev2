@@ -1,11 +1,12 @@
 import React, { useRef, useContext, useEffect, useState } from 'react';
 
+import ContentLoader from 'react-content-loader'
+
 import fetch from './../IO.js';
 
 import TokenContext from './../Context/TokenContext.jsx';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
-import Loader from './Loader.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -84,7 +85,16 @@ function BreadCrumbs(props) {
 			);
 		} else {
 			return (
-				<Loader />
+				<ContentLoader style={{
+					display: 'block',
+					width: '100%',
+					height: '25px',
+					margin: '20px 30px'
+				}}>
+					<rect x="0" y="0" rx="5" ry="5" width="25" height="25" />
+					<rect x="35" y="0" rx="4" ry="4" width="200" height="10" />
+					<rect x="35" y="15" rx="4" ry="4" width="200" height="10" />
+				</ContentLoader>
 			);
 		}
 	} else {

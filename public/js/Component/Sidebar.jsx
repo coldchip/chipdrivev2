@@ -93,6 +93,8 @@ function Sidebar(props) {
 				<DriveQuota 
 					folder={props.folder}
 				/>
+
+				<div className={cssf(css, "sidebar-seperator")}></div>
 			</div>
 			{
 				props.open ? (

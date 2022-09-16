@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
+import ContentLoader from 'react-content-loader'
 
 import fetch from './../IO.js';
 
 import TokenContext from './../Context/TokenContext.jsx';
 import ChipDriveContext from './../Context/ChipDriveContext.jsx';
 
-import Loader from './Loader.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -89,7 +89,22 @@ function DriveList(props) {
 			);
 		} else {
 			return (
-				<Loader />
+				<ContentLoader style={{
+					display: 'block',
+					width: '100%',
+					height: '130px',
+					margin: '20px 0'
+				}}>
+					<rect x="0" y="0" rx="5" ry="5" width="50" height="50" />
+					<rect x="60" y="0" rx="4" ry="4" width="200" height="20" />
+					<rect x="60" y="30" rx="4" ry="4" width="200" height="20" />
+
+					<rect x="0" y="80" rx="5" ry="5" width="50" height="50" />
+					<rect x="60" y="80" rx="4" ry="4" width="200" height="20" />
+					<rect x="60" y="110" rx="4" ry="4" width="200" height="20" />
+
+					
+				</ContentLoader>
 			);
 		}
 	} else {
