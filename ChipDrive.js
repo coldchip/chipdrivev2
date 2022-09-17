@@ -62,12 +62,22 @@ class ChipDrive {
 	}
 
 	async get(id) {
-		var nodes = await Node.findAll({
-			where: {
-				id: id,
-				user: this.user
-			}
-		});
+		var nodes;
+
+		if(this.user) {
+			nodes = await Node.findAll({
+				where: {
+					id: id,
+					user: this.user
+				}
+			});
+		} else {
+			nodes = await Node.findAll({
+				where: {
+					id: id
+				}
+			});
+		}
 
 		if(nodes.length > 0) {
 			return nodes[0];

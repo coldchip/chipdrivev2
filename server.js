@@ -5,6 +5,7 @@ const express = require('express');
 const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
 const compression = require('compression');
+var mime = require('mime-types');
 const path = require('path');
 const { pipeline } = require('stream');
 const { OAuth2Client } = require('google-auth-library');
@@ -440,7 +441,6 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 
 app.get('/api/v2/drive/object/:id', (req, res) => {
 	queue.push(async () => {
-		res.contentType("application/json");
 		res.set('Cache-Control', 'no-store');
 
 		var id = req.params.id;
@@ -450,7 +450,11 @@ app.get('/api/v2/drive/object/:id', (req, res) => {
 				await cd.init();
 
 				if(await cd.has(id)) {
-					res.contentType("application/octet-stream");
+					let object = await cd.get(id);
+					let type = mime.contentType(object.name);
+					if(type) {
+						res.contentType(type);
+					}
 					res.sendFile(path.join(__dirname, `./database/${id}`));
 				} else {
 					return res.status(404).json({
