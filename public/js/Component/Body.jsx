@@ -1,5 +1,6 @@
 import React from 'react';
 
+import DriveTitle from './DriveTitle.jsx';
 import BreadCrumbs from './BreadCrumbs.jsx';
 import List from './List.jsx';
 import NewItem from './NewItem.jsx';
@@ -10,14 +11,9 @@ import cssf from "../CSSFormat";
 function Body(props) {
 	return (
 		<div className={cssf(css, "chipdrive-body")}>
-			<div className={cssf(css, "label")}>
-				<p className={cssf(css, "label-text text")}>
-					<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
-					{props.title}
-				</p>
-			</div>
+			<DriveTitle title={props.title} />
 
-			<BreadCrumbs folder={props.folder}/>
+			<BreadCrumbs folder={props.folder} />
 
 			<List 
 				folder={props.folder}

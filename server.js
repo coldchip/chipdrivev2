@@ -2,8 +2,6 @@ const fs = require('fs');
 const async = require('async');
 const stream = require('stream');
 const express = require('express');
-const session = require('express-session');
-const cookieParser = require('cookie-parser');
 const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
 const compression = require('compression');
@@ -30,24 +28,9 @@ var queue = async.queue(async (task, executed) => {
 
 var app = express();
 
-app.use(session({
-	name: "chipdrive-session",
-	secret: "hteh4tgrgt4ttgrdfesfnyjthrawefds",
-	resave: false,
-	saveUninitialized: true,
-	cookie: {
-		expires: 1000 * 60 * 60 * 24
-	}
-}));
 app.use(compression());
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) =>  {
-	// res.header("strict-transport-security", "max-age=31536000; includeSubDomains");
-	// res.header("x-content-type-options", "nosniff");
-	// res.header("x-frame-options", "DENY");
-	// res.header("x-xss-protection", "1; mode=block");
-	console.log(req.headers);
 	res.header("Server", "ColdChip");
 	res.header("Service-Worker-Allowed", "/");
 	console.log(`[${new Date().toUTCString()}] ${req.method.padEnd(6)} ${req.path}`);
