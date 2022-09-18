@@ -1,31 +1,18 @@
 const fs = require('fs');
-const async = require('async');
-const stream = require('stream');
 const express = require('express');
 const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
 const compression = require('compression');
-var mime = require('mime-types');
-const path = require('path');
-const { pipeline } = require('stream');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
-const ChipDrive = require("./chipdrive");
+
+const driveRoute = require("./routes/chipdrive");
+const ssoRoute = require("./routes/sso");
 
 const db = require("./models");
+const Node = db.node;
 const User = db.user;
 const Token = db.token;
-
-const MAX_STORAGE = 1024 * 1024 * 1024 * 5;
-
-if(!fs.existsSync("database")){
-	fs.mkdirSync("database");
-}
-
-var queue = async.queue(async (task, executed) => {
-	console.log("Task Remaining:  " + queue.length());
-	await task();
-}, 1);
 
 var app = express();
 
@@ -50,444 +37,17 @@ function makeid(length) {
    return result;
 }
 
-function auth(req, res, next) {
-	var token = req.headers.token ? req.headers.token : req.query.token;
-
-	Token.findOne({ 
-        where: { 
-            id: token
-        },
-        include: [{
-			model: User,
-			required: true
-		}]
-    }).then((token) => {
-        if(token) {
-            req.user = token.user;
-            next();
-        } else {
-            return res.status(401).json({
-                message: "Unauthorized"
-            });
-        }
-    });
-
-}
-
-app.get('/api/v2/users/@me', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-			
-		return res.status(200).json({
-			name: req.user.username,
-			username: req.user.username
-		});
-	});
-});
-
-app.get('/api/v2/drive/quota', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		try {
-			var cd = new ChipDrive(req.user.id, null);
-			await cd.init();
-
-			var used = await cd.usage();
-
-			var quota = {
-				used: used,
-				available: MAX_STORAGE
-			};
-
-			return res.status(200).json(quota);
-		} catch(err) {
-			console.log(err);
-			return res.status(500).json({
-				code: 500,
-				message: "Server Internal Error"
-			});
-		}
-	});
-});
-
-app.get('/api/v2/drive/config', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		let list = [{
-			name: "Virtual Drive",
-			id: "root"
-		}, {
-			name: "Shared",
-			id: "c37a134e4be06e94840b6082135cb0d1"
-		}, {
-			name: "Recently Deleted",
-			id: "c37a134e4be06e94840b6082135cb0d2"
-		}];
-
-		return res.status(200).json(list);
-	});
-});
-
-app.get('/api/v2/drive/breadcrumb', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-
-		var id = req.query.id;
-		if(id) {
-			try {
-				var cd = new ChipDrive(req.user.id, null);
-				await cd.init();
-				if(await cd.has(id)) {
-
-					var result = [];
-					while(await cd.has(id)) {
-						var node = await cd.get(id);
-						id = node.parent;
-						result.unshift({
-							name: node.name,
-							id: node.id
-						});
-					}
-					
-					return res.status(200).json(result);
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500,
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-app.get('/api/v2/drive/list', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		var folderid = req.query.folderid;
-		var filter = req.query.filter;
-		if(folderid) {
-			try {
-				var cd = new ChipDrive(req.user.id, null);
-				await cd.init();
-
-				if(await cd.isFolder(folderid)) {
-					var list = await cd.list(folderid);
-
-					if(filter) {
-						list = list.filter((node) => {
-							return node.name.toLowerCase().includes(filter.toLowerCase());
-						});
-					}
-
-					return res.status(200).json(list);
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500,
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-app.post('/api/v2/drive/file', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		var folderid = req.body.folderid;
-		var name = req.body.name;
-		if(folderid && name) {
-			try {
-				var cd = new ChipDrive(req.user.id, null);
-				await cd.init();
-				
-				if(await cd.isFolder(folderid)) {
-					if((await cd.usage()) <= MAX_STORAGE) {
-						var node = await cd.create(folderid, name, ChipDrive.FILE);
-						return res.status(201).json(node);
-					} else {
-						return res.status(413).json({
-							code: 413, 
-							message: "No storage space left"
-						});
-					}
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-app.post('/api/v2/drive/folder', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		var name = req.body.name;
-		var folderid = req.body.folderid;
-		if(folderid && name) {
-			try {
-				var cd = new ChipDrive(req.user.id, null);
-				await cd.init();
-
-				if(await cd.isFolder(folderid)) {
-					if((await cd.usage()) <= MAX_STORAGE) {
-						var node = await cd.create(folderid, name, ChipDrive.FOLDER);
-						return res.status(201).json(node);
-					} else {
-						return res.status(413).json({
-							code: 413, 
-							message: "No storage space left"
-						});
-					}
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-app.patch('/api/v2/drive/object/:id', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		var id = req.params.id;
-		var name = req.body.name;
-		if(id && name) {
-			try {
-				var cd = new ChipDrive(req.user.id, null);
-				await cd.init();
-
-				if(await cd.has(id)) {
-					await cd.set(id, { name: name });
-
-					return res.status(200).json({});
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
-	queue.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
-
-		var id = req.params.id;
-		if(id) {
-			try {
-				var cd = new ChipDrive(req.user.id, null);
-				await cd.init();
-
-				if(await cd.has(id)) {
-					await cd.delete(id);
-
-					const params = {
-						Bucket: 'chipdrive',
-						Key: id
-					};
-
-					return res.status(200).json({});
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
-	res.contentType("application/json");
-	res.set('Cache-Control', 'no-store');
-
-	var id = req.params.id;
-	if(id) {
-		try {
-			var cd = new ChipDrive(req.user.id, null);
-			await cd.init();
-
-			if(await cd.has(id)) {
-				if((await cd.usage()) <= MAX_STORAGE) {
-					await new Promise((resolve, reject) => {
-						pipeline(req, fs.createWriteStream(path.join(__dirname, `/database/${id}`)), (err) => {
-							if(!err) {
-								resolve();
-							} else {
-								reject();
-							}
-						});
-					});
-
-					var size = fs.statSync(path.join(__dirname, `/database/${id}`)).size;
-
-					await cd.set(id, { size: size });
-
-					return res.status(200).json({});
-				} else {
-					return res.status(413).json({
-						code: 413, 
-						message: "No storage space left"
-					});
-				}
-			} else {
-				return res.status(404).json({
-					code: 404, 
-					message: "Node Not Found"
-				});
-			}
-		} catch(err) {
-			return res.status(500).json({
-				code: 500, 
-				message: "Server Internal Error"
-			});
-		}
-	} else {
-		return res.status(400).json({
-			code: 400, 
-			message: "The server can't process the request"
-		});
-	}
-});
-
-app.get('/api/v2/drive/object/:id', (req, res) => {
-	queue.push(async () => {
-		res.set('Cache-Control', 'no-store');
-
-		var id = req.params.id;
-		if(id) {
-			try {
-				var cd = new ChipDrive(null, null);
-				await cd.init();
-
-				if(await cd.has(id)) {
-					let object = await cd.get(id);
-					let type = mime.contentType(object.name);
-					if(type) {
-						res.contentType(type);
-					}
-					res.sendFile(path.join(__dirname, `./database/${id}`));
-				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
-					});
-				}
-			} catch(err) {
-				return res.status(500).json({
-					code: 500, 
-					message: "Server Internal Error"
-				});
-			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
-});
-
-const compiler = webpack(require("./webpack.config.js"));
-app.use(history());
-app.use(middleware(compiler, {
-	writeToDisk: true
-}));
-
 const port = process.env.PORT || 5001;
 
 (async function() {
 	try {
+		if(!fs.existsSync("database")){
+			fs.mkdirSync("database");
+		}
+
 		await db.sequelize.authenticate();
 		await db.sequelize.sync();
+		
 		let user = await User.findOrCreate({
 			where: {
 				username: "coldchip"
@@ -495,7 +55,8 @@ const port = process.env.PORT || 5001;
 			defaults: {
 				username: "coldchip",
 				password: "123456",
-				admin: true
+				admin: true,
+				quota: 1024 * 1024 * 1024 * 100
 			}
 		});
 
@@ -508,6 +69,34 @@ const port = process.env.PORT || 5001;
 				userId: user[0].id
 			}
 		});
+
+		/*
+			users can't delete the root folder
+		*/
+
+		await Node.findOrCreate({
+			where: {
+				id: "root",
+				userId: user[0].id
+			},
+			defaults: {
+				type: 2, 
+				name: "My Drive", 
+				id: "root", 
+				parent: null,
+				size: 0,
+				userId: user[0].id
+			}
+		});
+
+		app.use('/api/v2/drive', driveRoute);
+		app.use('/api/v2/sso', ssoRoute);
+
+		const compiler = webpack(require("./webpack.config.js"));
+		app.use(history());
+		app.use(middleware(compiler, {
+			writeToDisk: true
+		}));
 
 		app.listen(port, () =>  {
 			if(process.env.NODE_ENV) {
