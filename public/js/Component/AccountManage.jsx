@@ -26,7 +26,7 @@ function AccountManage(props) {
 		setLoading(true);
 		setError(undefined);
 
-		fetch("/api/v2/users/@me", {
+		fetch("/api/v2/sso/@me", {
 			method: "GET",
 			headers: {
 				token: token

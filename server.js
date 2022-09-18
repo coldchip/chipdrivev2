@@ -47,12 +47,14 @@ const port = process.env.PORT || 5001;
 
 		await db.sequelize.authenticate();
 		await db.sequelize.sync();
-		
+
 		let user = await User.findOrCreate({
 			where: {
 				username: "coldchip"
 			},
 			defaults: {
+				firstname: "Admin",
+				lastname: "",
 				username: "coldchip",
 				password: "123456",
 				admin: true,
@@ -66,6 +68,16 @@ const port = process.env.PORT || 5001;
 			},
 			defaults: {
 				id: "abcdef",
+				userId: user[0].id
+			}
+		});
+
+		await Token.findOrCreate({
+			where: {
+				id: "abcdef1"
+			},
+			defaults: {
+				id: "abcdef1",
 				userId: user[0].id
 			}
 		});

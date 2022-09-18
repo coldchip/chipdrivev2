@@ -13,7 +13,7 @@ router.get('/@me', auth, (req, res) => {
 	res.set('Cache-Control', 'no-store');
 		
 	return res.status(200).json({
-		name: req.user.username,
+		name: `${req.user.firstname} ${req.user.lastname}`,
 		username: req.user.username
 	});
 });
