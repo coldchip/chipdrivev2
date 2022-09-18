@@ -1,0 +1,5 @@
+{
+	"dialect": "sqlite",
+	"storage": "./database/node.db",
+	"logging": false
+}

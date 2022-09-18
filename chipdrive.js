@@ -1,27 +1,4 @@
-const { Sequelize, Model, DataTypes } = require('sequelize');
-const sequelize = new Sequelize({
-	dialect: 'sqlite',
-	storage: './database/node.db',
-	logging: false
-});
-
-class Node extends Model {}
-
-Node.init({
-	rid: {
-		type: DataTypes.INTEGER,
-		primaryKey: true,
-		autoIncrement: true
-	},
-	type: DataTypes.INTEGER,
-	name: DataTypes.STRING,
-	id: DataTypes.STRING,
-	parent: DataTypes.STRING,
-	size: DataTypes.INTEGER,
-	user: DataTypes.STRING
-}, { sequelize, modelName: 'node' });
-
-module.exports = Node || {};
+const Node = require("./models").node;
 
 class ChipDrive {
 	static FILE   = 1;
@@ -33,19 +10,19 @@ class ChipDrive {
 	}
 
 	async init() {
-		await sequelize.sync();
 		if(this.user) {
 			await Node.findOrCreate({
 				where: {
 					id: "root",
-					user: this.user
+					userId: this.user
 				},
-				defaults:{
+				defaults: {
 					type: 2, 
 					name: "My Drive", 
 					id: "root", 
 					parent: this.user,
-					user: this.user
+					size: 0,
+					userId: this.user
 				}
 			});
 		}
@@ -68,7 +45,7 @@ class ChipDrive {
 			nodes = await Node.findAll({
 				where: {
 					id: id,
-					user: this.user
+					userId: this.user
 				}
 			});
 		} else {
@@ -92,7 +69,7 @@ class ChipDrive {
 			await Node.update(data, {
 				where: { 
 					id: id,
-					user: this.user
+					userId: this.user
 				}
 			});
 
@@ -108,7 +85,7 @@ class ChipDrive {
 			nodes = await Node.findAll({
 				where: {
 					id: id,
-					user: this.user
+					userId: this.user
 				}
 			});
 		} else {
@@ -147,7 +124,7 @@ class ChipDrive {
 			var list = await Node.findAll({
 				where: {
 					parent: id,
-					user: this.user
+					userId: this.user
 				}
 			});
 
@@ -164,7 +141,7 @@ class ChipDrive {
 				name: name, 
 				id: ChipDrive.randID(32), 
 				parent: parent,
-				user: this.user
+				userId: this.user
 			});
 
 			return node.dataValues;
@@ -178,7 +155,7 @@ class ChipDrive {
 			await Node.destroy({
 				where: {
 					id: id,
-					user: this.user
+					userId: this.user
 				}
 			});
 
@@ -191,7 +168,7 @@ class ChipDrive {
 	async usage() {
 		var nodes = await Node.findAll({
 			where: {
-				user: this.user
+				userId: this.user
 			}
 		});
 

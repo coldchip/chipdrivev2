@@ -8,13 +8,13 @@ const compression = require('compression');
 var mime = require('mime-types');
 const path = require('path');
 const { pipeline } = require('stream');
-const { OAuth2Client } = require('google-auth-library');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
-const ChipDrive = require("./ChipDrive");
+const ChipDrive = require("./chipdrive");
 
-const CLIENT_ID = "580049191997-jk1igosg7ti92lq4kc5s693hbkp8k78g.apps.googleusercontent.com";
-const client = new OAuth2Client(CLIENT_ID);
+const db = require("./models");
+const User = db.user;
+const Token = db.token;
 
 const MAX_STORAGE = 1024 * 1024 * 1024 * 5;
 
@@ -50,30 +50,28 @@ function makeid(length) {
    return result;
 }
 
-var accounts = [{
-	username: "coldchip", 
-	password: "c"
-}, {
-	username: "a", 
-	password: "ab"
-}];
-
-var tokens = ["abcdef"];
-
 function auth(req, res, next) {
-
 	var token = req.headers.token ? req.headers.token : req.query.token;
 
-	if(token && tokens.includes(token)) {
-		req.user = "internal@chip.sg";
-		req.name = "test";
-		next();
-	} else {
-		return res.status(401).json({
-			code: 401, 
-			message: "Unauthorized"
-		});
-	}
+	Token.findOne({ 
+        where: { 
+            id: token
+        },
+        include: [{
+			model: User,
+			required: true
+		}]
+    }).then((token) => {
+        if(token) {
+            req.user = token.user;
+            next();
+        } else {
+            return res.status(401).json({
+                message: "Unauthorized"
+            });
+        }
+    });
+
 }
 
 app.get('/api/v2/users/@me', auth, (req, res) => {
@@ -82,8 +80,8 @@ app.get('/api/v2/users/@me', auth, (req, res) => {
 		res.set('Cache-Control', 'no-store');
 			
 		return res.status(200).json({
-			name: req.name,
-			username: req.user
+			name: req.user.username,
+			username: req.user.username
 		});
 	});
 });
@@ -94,7 +92,7 @@ app.get('/api/v2/drive/quota', auth, (req, res) => {
 		res.set('Cache-Control', 'no-store');
 
 		try {
-			var cd = new ChipDrive(req.user, null);
+			var cd = new ChipDrive(req.user.id, null);
 			await cd.init();
 
 			var used = await cd.usage();
@@ -106,6 +104,7 @@ app.get('/api/v2/drive/quota', auth, (req, res) => {
 
 			return res.status(200).json(quota);
 		} catch(err) {
+			console.log(err);
 			return res.status(500).json({
 				code: 500,
 				message: "Server Internal Error"
@@ -143,7 +142,7 @@ app.get('/api/v2/drive/breadcrumb', auth, (req, res) => {
 		var id = req.query.id;
 		if(id) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(req.user.id, null);
 				await cd.init();
 				if(await cd.has(id)) {
 
@@ -188,7 +187,7 @@ app.get('/api/v2/drive/list', auth, (req, res) => {
 		var filter = req.query.filter;
 		if(folderid) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(req.user.id, null);
 				await cd.init();
 
 				if(await cd.isFolder(folderid)) {
@@ -231,7 +230,7 @@ app.post('/api/v2/drive/file', auth, (req, res) => {
 		var name = req.body.name;
 		if(folderid && name) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(req.user.id, null);
 				await cd.init();
 				
 				if(await cd.isFolder(folderid)) {
@@ -274,7 +273,7 @@ app.post('/api/v2/drive/folder', auth, (req, res) => {
 		var folderid = req.body.folderid;
 		if(folderid && name) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(req.user.id, null);
 				await cd.init();
 
 				if(await cd.isFolder(folderid)) {
@@ -317,7 +316,7 @@ app.patch('/api/v2/drive/object/:id', auth, (req, res) => {
 		var name = req.body.name;
 		if(id && name) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(req.user.id, null);
 				await cd.init();
 
 				if(await cd.has(id)) {
@@ -353,7 +352,7 @@ app.delete('/api/v2/drive/object/:id', auth, (req, res) => {
 		var id = req.params.id;
 		if(id) {
 			try {
-				var cd = new ChipDrive(req.user, null);
+				var cd = new ChipDrive(req.user.id, null);
 				await cd.init();
 
 				if(await cd.has(id)) {
@@ -393,7 +392,7 @@ app.put('/api/v2/drive/object/:id', auth, async (req, res) => {
 	var id = req.params.id;
 	if(id) {
 		try {
-			var cd = new ChipDrive(req.user, null);
+			var cd = new ChipDrive(req.user.id, null);
 			await cd.init();
 
 			if(await cd.has(id)) {
@@ -485,10 +484,39 @@ app.use(middleware(compiler, {
 
 const port = process.env.PORT || 5001;
 
-app.listen(port, () =>  {
-	if(process.env.NODE_ENV) {
-		console.log("Production Mode is Activated");
-	}
-    console.log('ChipDrive is running on http://localhost:' + port);
-});
+(async function() {
+	try {
+		await db.sequelize.authenticate();
+		await db.sequelize.sync();
+		let user = await User.findOrCreate({
+			where: {
+				username: "coldchip"
+			},
+			defaults: {
+				username: "coldchip",
+				password: "123456",
+				admin: true
+			}
+		});
 
+		await Token.findOrCreate({
+			where: {
+				id: "abcdef"
+			},
+			defaults: {
+				id: "abcdef",
+				userId: user[0].id
+			}
+		});
+
+		app.listen(port, () =>  {
+			if(process.env.NODE_ENV) {
+				console.log("Production Mode is Activated");
+			}
+			console.log(`ChipDrive is running on http://localhost:${port}`);
+		});
+	} catch(e) {
+		console.log(`Unable to start server: ${e}`);
+		process.exit(1);
+	}
+})();
