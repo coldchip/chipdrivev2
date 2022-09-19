@@ -138,7 +138,16 @@ function ChipDrive(props) {
 		return body;
 	} else {
 		return (
-			<h1 className={cssf(css, "text")}>Invalid Token</h1>
+			<>
+				<h1 className={cssf(css, "text")}>Please Log In</h1>
+				<form>
+					<input type="text" placeholder="Username" />
+					<br />
+					<input type="password" placeholder="Password" />
+					<br />
+					<button type="button">Login</button>
+				</form>
+			</>
 		);
 	}
 }
