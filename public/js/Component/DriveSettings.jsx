@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import ContentLoader from 'react-content-loader'
 
 import fetch from './../IO.js';
@@ -13,30 +13,27 @@ import AccountManage from './AccountManage.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function Account(props) {
+function DriveSettings(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	const [name, setName] = useState("...");
-	const [username, setUsername] = useState("...");
+	const [name, setName] = useState();
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(undefined);
 
-	var loadAccount = () => {
+	var loadDrive = () => {
 		setLoading(true);
 		setError(undefined);
 
-		fetch("/api/v2/sso/@me", {
+		fetch(`/api/v2/drive/object/${props.id}/info`, {
 			method: "GET",
 			headers: {
 				token: token
 			}
 		}).then((response) => {
 			var {status, body} = response;
-
 			setName(body.name);
-			setUsername(body.username);
 		}).catch((response) => {
 			var {status, body} = response;
 
@@ -52,28 +49,50 @@ function Account(props) {
 		});
 	}
 
+	var saveDrive = () => {
+		setLoading(true);
+		setError(undefined);
+
+		fetch(`/api/v2/drive/object/${props.id}`, {
+			method: "PATCH",
+			body: new URLSearchParams({
+				name: name
+			}).toString(),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				token: token
+			}
+		}).then((response) => {
+			var {status, body} = response;
+			window.location.reload();
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				
+			}
+		}).finally(() => {
+			setLoading(false);
+		});
+	}
+
 	var body;
 
 	if(!error) {
 		if(!loading) {
 			body = (
-				<div className={cssf(css, "cd-account-modal")}>
-					<img className={cssf(css, "account-profile")} src={profile} />
-					<p className={cssf(css, "account-name text mt-3")}>
-						{name}
-					</p>
-					<p className={cssf(css, "account-email text mt-2")}>
-						{username}
-					</p>
-					
-					<AccountManage
-						trigger={
-							<button className={cssf(css, "account-button text mt-4") + " " + props.className} onClick={props.onClick}>
-								<i className={cssf(css, "!fas !fa-pen me-2")}></i>
-								Manage Account
-							</button>
-						}
-					/>
+				<div className={cssf(css, "drivesettings")}>
+					<form>
+						<label className={cssf(css, "input-label text")}>Drive Name:</label>
+						<input type="text" className={cssf(css, "input text mt-1")} placeholder="Drive Name" value={name} onChange={e => setName(e.target.value)}/>
+						<div className={cssf(css, "submit-wrapper mt-3")}>
+							<button type="button" className={cssf(css, "submit text")} onClick={saveDrive}>Save</button>
+						</div>
+					</form>
 				</div>
 			);
 		} else {
@@ -106,7 +125,7 @@ function Account(props) {
 		<Popup 
 			trigger={props.trigger}
 			keepTooltipInside="body"
-			onOpen={loadAccount}
+			onOpen={loadDrive}
 			modal
 			nested
 		>
@@ -115,4 +134,4 @@ function Account(props) {
 	);
 }
 
-export default Account;
+export default DriveSettings;

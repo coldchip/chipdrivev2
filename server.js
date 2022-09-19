@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const compression = require('compression');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
+var md5 = require('md5');
 
 const driveRoute = require("./routes/chipdrive");
 const ssoRoute = require("./routes/sso");
@@ -86,20 +87,25 @@ const port = process.env.PORT || 5001;
 			users can't delete the root folder
 		*/
 
-		await Node.findOrCreate({
-			where: {
-				id: "root",
-				userId: user[0].id
-			},
-			defaults: {
-				type: 2, 
-				name: "My Drive", 
-				id: "root", 
-				parent: null,
-				size: 0,
-				userId: user[0].id
-			}
-		});
+		let drives = ["My Drive #1", "My Drive #2", "My Drive #3", "My Drive #4", "My Drive #5"];
+
+		for(let name of drives) {
+			await Node.findOrCreate({
+				where: {
+					id: md5(name),
+					userId: user[0].id
+				},
+				defaults: {
+					type: 2, 
+					name: name, 
+					id: md5(name), 
+					parent: null,
+					size: 0,
+					root: true,
+					userId: user[0].id
+				}
+			});
+		}
 
 		app.use('/api/v2/drive', driveRoute);
 		app.use('/api/v2/sso', ssoRoute);

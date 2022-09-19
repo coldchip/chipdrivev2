@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
 			autoIncrement: false
 		},
 		parent: DataTypes.STRING,
-		size: DataTypes.INTEGER
+		size: DataTypes.INTEGER,
+		root: DataTypes.BOOLEAN
 	}, {
 		sequelize,
 		modelName: 'node',

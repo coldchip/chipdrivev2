@@ -22,11 +22,6 @@ function DriveList(props) {
 		setLoading(true);
 		setError(undefined);
 
-		dispatch({
-			type: "drive", 
-			name: undefined
-		});
-
 		fetch("/api/v2/drive/config", {
 			method: "GET",
 			headers: {
@@ -41,7 +36,7 @@ function DriveList(props) {
 				var drive = body[0];
 				dispatch({
 					type: "drive", 
-					name: drive.name
+					id: drive.id
 				});
 				dispatch({
 					type: "list", 
@@ -76,7 +71,7 @@ function DriveList(props) {
 									onClick={() => {
 										dispatch({
 											type: "drive", 
-											name: drive.name
+											id: drive.id
 										});
 										dispatch({
 											type: "list", 

@@ -1,18 +1,67 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import ContentLoader from 'react-content-loader'
+
+import fetch from './../IO.js';
+
+import TokenContext from './../Context/TokenContext.jsx';
+import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+
+import DriveSettings from './DriveSettings.jsx';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function DriveTitle(props) {
-	if(props.title) {
+	var token = useContext(TokenContext);
+	var dispatch = useContext(ChipDriveContext);
+
+	const [name, setName] = useState();
+
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(undefined);
+
+	useEffect(() => {
+		setLoading(true);
+		setError(undefined);
+
+		fetch(`/api/v2/drive/object/${props.id}/info`, {
+			method: "GET",
+			headers: {
+				token: token
+			}
+		}).then((response) => {
+			var {status, body} = response;
+			setName(body.name);
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				dispatch({
+					type: "login"
+				});
+			} else {
+				setError(body.message);
+			}
+		}).finally(() => {
+			setLoading(false);
+		});
+	}, [dispatch, props.id, token]);
+
+	if(!loading) {
 		return (
 			<div className={cssf(css, "label")}>
 				<p className={cssf(css, "label-text text")}>
 					<i className={cssf(css, "!fas !fa-hdd label-icon me-3")}></i>
-					{props.title}
+					{name}
 				</p>
+
+				<DriveSettings
+					trigger={
+						<p className={cssf(css, "label-edit text")}>EDIT</p>
+					}
+					id={props.id}
+				/>
 			</div>
 		);
 	} else {

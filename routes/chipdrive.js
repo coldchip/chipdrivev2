@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream');
 var mime = require('mime-types');
+
+const random = require("./../utils/random");
 const auth = require("./../middleware/auth");
 const quota = require("./../middleware/quota");
 const db = require("./../models");
@@ -13,32 +15,27 @@ const Token = db.token;
 
 const router = express.Router();
 
-function randID(length) {
-	var result           = [];
-	var characters       = '0123456789abcdef';
-	var charactersLength = characters.length;
-	for ( var i = 0; i < length; i++ ) {
-		result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
-	}
-	return result.join('');
-}
-
-router.get('/config', auth, (req, res) => {
+router.get('/config', auth, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
-	let list = [{
-		name: "My Drive",
-		id: "root"
-	}, {
-		name: "Shared",
-		id: "c37a134e4be06e94840b6082135cb0d1"
-	}, {
-		name: "Recently Deleted",
-		id: "c37a134e4be06e94840b6082135cb0d2"
-	}];
+	try {
+		var nodes = await Node.findAll({
+			where: {
+				root: true,
+				userId: req.user.id
+			}
+		});
 
-	return res.status(200).json(list);
+		return res.status(200).json(nodes);
+	} catch(err) {
+		console.log(err);
+		return res.status(500).json({
+			code: 500,
+			message: "Server Internal Error"
+		});
+	}
+
 });
 
 router.get('/quota', auth, async (req, res) => {
@@ -193,8 +190,9 @@ router.post('/file', auth, quota, async (req, res) => {
 				var node = await Node.create({
 					type: 1, 
 					name: name, 
-					id: randID(32), 
+					id: random(64), 
 					parent: folderid,
+					root: false,
 					userId: req.user.id
 				});
 
@@ -238,8 +236,9 @@ router.post('/folder', auth, quota, async (req, res) => {
 				var node = await Node.create({
 					type: 2, 
 					name: name, 
-					id: randID(32), 
+					id: random(64), 
 					parent: folderid,
+					root: false,
 					userId: req.user.id
 				});
 
@@ -325,14 +324,21 @@ router.delete('/object/:id', auth, async (req, res) => {
 			});
 
 			if(node) {
-				await Node.destroy({
-					where: {
-						id: id,
-						userId: req.user.id
-					}
-				});
+				if(node.root === false) {
+					await Node.destroy({
+						where: {
+							id: id,
+							userId: req.user.id
+						}
+					});
 
-				return res.status(200).json({});
+					return res.status(200).json({});
+				} else {
+					return res.status(403).json({
+						code: 403, 
+						message: "No permissions to delete this node"
+					});
+				}
 			} else {
 				return res.status(404).json({
 					code: 404, 
@@ -428,6 +434,40 @@ router.get('/object/:id', async (req, res) => {
 					res.contentType(type);
 				}
 				res.sendFile(path.join(__dirname, `./../database/${id}`));
+			} else {
+				return res.status(404).json({
+					code: 404, 
+					message: "Node Not Found"
+				});
+			}
+		} catch(err) {
+			return res.status(500).json({
+				code: 500, 
+				message: "Server Internal Error"
+			});
+		}
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
+});
+
+router.get('/object/:id/info', async (req, res) => {
+	res.set('Cache-Control', 'no-store');
+
+	var id = req.params.id;
+	if(id) {
+		try {
+			var node = await Node.findOne({ 
+				where: { 
+					id: id
+				} 
+			});
+
+			if(node) {
+				return res.status(200).json(node);
 			} else {
 				return res.status(404).json({
 					code: 404, 

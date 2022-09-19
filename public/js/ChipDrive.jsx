@@ -39,7 +39,7 @@ const reducer = (state, action) => {
 		case 'drive': {
 			return { 
 				...state, 
-				drive: action.name
+				root: action.id
 			};
 		}
 		case 'list': {
@@ -81,21 +81,18 @@ function ChipDrive(props) {
 	const [{
 		filter,
 		sidebar, 
-		drive, 
+		root,
 		folder, 
 		tasks,
 		login
 	}, dispatch] = useReducer(reducer, {
 		filter: "",
 		sidebar: false,
-		drive: "Unknown",
-		folder: "root",
+		root: undefined,
+		folder: undefined,
 		tasks: {},
 		login: false
 	});
-
-
-	const [dir, setDir] = useState(["ss", "ss"]);
 
 	useEffect(() => {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
@@ -115,8 +112,8 @@ function ChipDrive(props) {
 					/>
 
 					<Body 
-						title={drive} 
 						folder={folder}
+						root={root}
 						filter={filter}
 					/>
 

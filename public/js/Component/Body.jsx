@@ -11,23 +11,28 @@ import cssf from "../CSSFormat";
 function Body(props) {
 	return (
 		<div className={cssf(css, "chipdrive-body")}>
-			<DriveTitle title={props.title} />
+			{
+				props.root && props.folder &&
+				<>
+					<DriveTitle id={props.root} />
 
-			<BreadCrumbs folder={props.folder} />
+					<BreadCrumbs folder={props.folder} />
 
-			<List 
-				folder={props.folder}
-				filter={props.filter}
-			/>
+					<List 
+						folder={props.folder}
+						filter={props.filter}
+					/>
 
-			<NewItem 
-				trigger={
-					<button className={cssf(css, "upload-round p-0")}>
-						<i className={cssf(css, "!fas !fa-plus")}></i>
-					</button>
-				} 
-				folder={props.folder}
-			/>
+					<NewItem 
+						trigger={
+							<button className={cssf(css, "upload-round p-0")}>
+								<i className={cssf(css, "!fas !fa-plus")}></i>
+							</button>
+						} 
+						folder={props.folder}
+					/>
+				</>
+			}
 		</div>
 	);
 }
