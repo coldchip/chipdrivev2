@@ -1,11 +1,11 @@
 const fs = require('fs');
+var md5 = require('md5');
 const express = require('express');
 const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
 const compression = require('compression');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
-var md5 = require('md5');
 
 const driveRoute = require("./routes/chipdrive");
 const ssoRoute = require("./routes/sso");
@@ -28,16 +28,6 @@ app.use((req, res, next) =>  {
 
 app.set('x-powered-by', false);
 
-function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
-}
-
 const port = process.env.PORT || 5001;
 
 (async function() {
@@ -54,32 +44,12 @@ const port = process.env.PORT || 5001;
 				username: "coldchip"
 			},
 			defaults: {
-				firstname: "Admin",
-				lastname: "",
+				firstname: "Ryan",
+				lastname: "Loh",
 				username: "coldchip",
-				password: "123456",
+				password: "8f1f7aaf3e931f2b42af99f6720c27b4",
 				admin: true,
 				quota: 1024 * 1024 * 1024 * 100
-			}
-		});
-
-		await Token.findOrCreate({
-			where: {
-				id: "abcdef"
-			},
-			defaults: {
-				id: "abcdef",
-				userId: user[0].id
-			}
-		});
-
-		await Token.findOrCreate({
-			where: {
-				id: "abcdef1"
-			},
-			defaults: {
-				id: "P2VDwVkBUnE53A4ojjbvnfY3sAZuBzH3",
-				userId: user[0].id
 			}
 		});
 

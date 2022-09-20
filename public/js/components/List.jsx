@@ -2,8 +2,8 @@ import React, { useContext, useState, useEffect } from 'react';
 
 import fetch from './../IO.js';
 
-import TokenContext from './../Context/TokenContext.jsx';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import TokenContext from './../contexts/TokenContext.jsx';
+import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import Loader from './Loader.jsx';
 import Item from './Item.jsx';

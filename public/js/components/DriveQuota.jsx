@@ -3,8 +3,8 @@ import ContentLoader from 'react-content-loader'
 
 import fetch from './../IO.js';
 
-import TokenContext from './../Context/TokenContext.jsx';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import TokenContext from './../contexts/TokenContext.jsx';
+import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";

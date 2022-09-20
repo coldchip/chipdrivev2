@@ -2,8 +2,8 @@ import React, { useContext, useCallback } from 'react';
 
 import fetch from './../IO.js';
 
-import TokenContext from './../Context/TokenContext.jsx';
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import TokenContext from './../contexts/TokenContext.jsx';
+import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import Confirm from './Confirm.jsx';
 import NewItem from './NewItem.jsx';
@@ -18,7 +18,7 @@ function Sidebar(props) {
 	var dispatch = useContext(ChipDriveContext);
 
 	var logout = useCallback((name) => {
-		fetch("/api/v2/auth/logout", {
+		fetch("/api/v2/sso/logout", {
 			method: "GET",
 			headers: {
 				token: token
@@ -33,6 +33,10 @@ function Sidebar(props) {
 			if(status === 401) {
 				dispatch({
 					type: "login"
+				});
+				dispatch({
+					type: "token",
+					token: ""
 				});
 			} else {
 				dispatch({

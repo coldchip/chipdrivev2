@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import ChipDrive from './ChipDrive.jsx';
+import Login from './Login.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
@@ -53,6 +54,7 @@ function App() {
 				<Routes>
 					<Route path="/" element={<Index />} />
 					<Route path="/drive" element={<ChipDrive />} />
+					<Route path="/login" element={<Login />} />
 					<Route path="*" element={<h1>404</h1>} />
 				</Routes>
 			</BrowserRouter>

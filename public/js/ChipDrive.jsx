@@ -1,25 +1,18 @@
 import React, { useEffect, useReducer, useState } from 'react';
 
-import Header from './Component/Header.jsx';
-import Sidebar from './Component/Sidebar.jsx';
-import Body from './Component/Body.jsx';
-import Alert from './Component/Alert.jsx';
-import TaskModal from './Component/TaskModal.jsx';
+import Header from './components/Header.jsx';
+import Sidebar from './components/Sidebar.jsx';
+import Body from './components/Body.jsx';
+import Alert from './components/Alert.jsx';
+import TaskModal from './components/TaskModal.jsx';
 
-import TokenContext from './Context/TokenContext.jsx';
-import ChipDriveContext from './Context/ChipDriveContext.jsx';
+import Login from './Login.jsx';
+
+import TokenContext from './contexts/TokenContext.jsx';
+import ChipDriveContext from './contexts/ChipDriveContext.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
-
-function getQuery(name, url = window.location.href) {
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
 
 const reducer = (state, action) => {
 	console.log(state, action);
@@ -71,9 +64,6 @@ const reducer = (state, action) => {
 				login: true
 			};
 		}
-		default: {
-			return state;
-		}
 	}
 };
 
@@ -98,8 +88,16 @@ function ChipDrive(props) {
 		console.log(`%cChip%cDrive %cClient`, 'color: #43833a; font-size: 30px;', 'color: #a5a5a5; font-size: 30px;', 'color: #4d4d4d; font-size: 30px;');
 	}, []);
 
-	let body = (
-		<TokenContext.Provider value={getQuery("token")}>
+	useEffect(() => {
+		if(login === true) {
+			window.location.href = "/login";
+		}
+	}, [login]);
+
+	let token = localStorage.getItem("token");
+
+	return (
+		<TokenContext.Provider value={token}>
 			<ChipDriveContext.Provider value={dispatch}>
 				<div className={cssf(css, "!chipdrive-app chipdrive")}>
 					<Header 
@@ -129,24 +127,6 @@ function ChipDrive(props) {
 			</ChipDriveContext.Provider>
 		</TokenContext.Provider>
 	);
-
-
-	if(!login) {
-		return body;
-	} else {
-		return (
-			<>
-				<h1 className={cssf(css, "text")}>Please Log In</h1>
-				<form>
-					<input type="text" placeholder="Username" />
-					<br />
-					<input type="password" placeholder="Password" />
-					<br />
-					<button type="button">Login</button>
-				</form>
-			</>
-		);
-	}
 }
 
 export default ChipDrive;

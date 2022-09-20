@@ -3,11 +3,11 @@ const db = require("./../models");
 const User = db.user;
 const Token = db.token;
 
-function auth(req, res, next) {
+async function auth(req, res, next) {
 	var token = req.headers.token ? req.headers.token : req.query.token;
 
     if(token) {
-        Token.findOne({ 
+        let result = await Token.findOne({ 
             where: { 
                 id: token
             },
@@ -15,16 +15,17 @@ function auth(req, res, next) {
             	model: User,
             	required: true
             }]
-        }).then((token) => {
-            if(token) {
-                req.user = token.user;
-                next();
-            } else {
-                return res.status(401).json({
-                    message: "Unauthorized"
-                });
-            }
         });
+
+        if(result) {
+            req.user = result.user;
+            req.token = token;
+            return next();
+        } else {
+            return res.status(401).json({
+                message: "Unauthorized"
+            });
+        }
     } else {
         return res.status(401).json({
             message: "Unauthorized"

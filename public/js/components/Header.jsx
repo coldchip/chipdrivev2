@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import ChipDriveContext from './../Context/ChipDriveContext.jsx';
+import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import Account from './Account.jsx';
 import css from "../../css/index.scss";
