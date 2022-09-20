@@ -62,7 +62,7 @@ function BreadCrumbs(props) {
 			return (
 				<div className={cssf(css, "breadcrumbs")} ref={breadCrumbsRef}>
 					{
-						breadcrumbs.map((breadcrumb) => {
+						breadcrumbs.map((breadcrumb, index) => {
 							return (
 								<>
 									<p className={cssf(css, "breadcrumb text")} onClick={() => {
@@ -71,7 +71,12 @@ function BreadCrumbs(props) {
 											id: breadcrumb.id
 										});
 									}}>
+										{
+											index === 0 &&
+											<i className={cssf(css, "!fas !fa-hdd breadcrumb-icon me-2")}></i>
+										}
 										{breadcrumb.name}
+										
 									</p>
 
 									<p className={cssf(css, "breadcrumb-seperator text")}>

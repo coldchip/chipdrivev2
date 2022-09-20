@@ -50,7 +50,7 @@ module.exports = {
                     index = Math.floor(index / 62) - 1
                   }
 
-                  return "cd-" + prefix;
+                  return prefix;
                 } else {
                   return localName;
                 }
