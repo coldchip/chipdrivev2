@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			primaryKey: true,
 			autoIncrement: false
+		},
+		expire: {
+			type: DataTypes.INTEGER
 		}
 	}, {
 		sequelize,

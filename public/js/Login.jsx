@@ -78,6 +78,7 @@ function Login() {
 				<div className={cssf(css, "form-group")}>
 					<input 
 						type="text" 
+						autocomplete="none"
 						id="username" 
 						className={cssf(css, `login-input text ${username.length > 0 && "active"}`)}
 						value={username}

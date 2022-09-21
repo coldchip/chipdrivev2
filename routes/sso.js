@@ -31,6 +31,7 @@ router.post('/login', async (req, res) => {
 
 				await Token.create({
 					id: token,
+					expire: Math.floor(Date.now() / 1000) + 60 * 60,
 					userId: user.id
 				});
 

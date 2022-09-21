@@ -47,7 +47,7 @@ const port = process.env.PORT || 5001;
 				firstname: "Ryan",
 				lastname: "Loh",
 				username: "coldchip",
-				password: "8f1f7aaf3e931f2b42af99f6720c27b4",
+				password: "0b3f45b266a97d7029dde7c2ba372093",
 				admin: true,
 				quota: 1024 * 1024 * 1024 * 100
 			}
