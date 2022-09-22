@@ -37,7 +37,7 @@ function NewItem(props) {
 					method: "POST",
 					body: new URLSearchParams({
 						name: file.name,
-						folderid: props.folder
+						id: props.folder
 					}).toString(),
 					headers: {
 						"Content-Type": "application/x-www-form-urlencoded",
@@ -115,7 +115,7 @@ function NewItem(props) {
 			method: "POST",
 			body: new URLSearchParams({
 				name: name,
-				folderid: props.folder
+				id: props.folder
 			}).toString(),
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",

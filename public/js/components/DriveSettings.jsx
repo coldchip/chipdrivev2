@@ -26,7 +26,7 @@ function DriveSettings(props) {
 		setLoading(true);
 		setError(undefined);
 
-		fetch(`/api/v2/drive/object/${props.id}/info`, {
+		fetch(`/api/v2/drive/info/${props.id}`, {
 			method: "GET",
 			headers: {
 				token: token

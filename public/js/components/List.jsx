@@ -23,10 +23,9 @@ function List(props) {
 		setLoading(true);
 		setError(undefined);
 
-		fetch("/api/v2/drive/list", {
+		fetch(`/api/v2/drive/list/${props.folder}`, {
 			method: "GET",
 			query: {
-				folderid: props.folder, 
 				filter: props.filter
 			},
 			headers: {

@@ -29,11 +29,8 @@ function BreadCrumbs(props) {
 		setLoading(true);
 		setError(undefined);
 
-		fetch("/api/v2/drive/breadcrumb", {
+		fetch(`/api/v2/drive/breadcrumb/${props.folder}`, {
 			method: "GET",
-			query: {
-				id: props.folder, 
-			},
 			headers: {
 				token: token
 			}

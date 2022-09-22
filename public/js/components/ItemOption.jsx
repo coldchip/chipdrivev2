@@ -5,6 +5,7 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
+import GetLink from './GetLink.jsx';
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
 import Popup from 'reactjs-popup';
@@ -18,6 +19,7 @@ function ItemOption(props) {
 	var dropdown = useRef(null);
 	var [renamePrompt, setRenamePrompt] = useState(false);
 	var [deletePrompt, setDeletePrompt] = useState(false);
+	var [getLinkPrompt, setGetLinkPrompt] = useState(false);
 	var [downloadPrompt, setDownloadPrompt] = useState(false);
 
 	var rename = useCallback((name) => {
@@ -146,27 +148,38 @@ function ItemOption(props) {
 				dropdown.current.close();
 				setRenamePrompt(true);
 			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>Rename
+				<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>
+				Rename
 			</button>
 
 			<button onClick={() => {
 				dropdown.current.close();
 				setDeletePrompt(true);
 			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>Delete
+				<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>
+				Delete
 			</button>
 			
 			{
 				props.item.type === 1
 				?
-				(
+				<>
+				
+					<button onClick={() => {
+						dropdown.current.close();
+						setGetLinkPrompt(true);
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-link me-2")}></i>
+						Get link
+					</button>
 					<button onClick={() => {
 						dropdown.current.close();
 						setDownloadPrompt(true);
 					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-						<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>Download
+						<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>
+						Download
 					</button>
-				)
+				</>
 				:
 				null
 			}
@@ -211,6 +224,14 @@ function ItemOption(props) {
 				onReject={() => {
 					setDeletePrompt(false);
 				}} 
+			/>
+
+			<GetLink 
+				open={getLinkPrompt}
+				onClose={() => {
+					setGetLinkPrompt(false);
+				}}
+				item={props.item}
 			/>
 
 			<Confirm 

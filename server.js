@@ -1,5 +1,6 @@
+const chalk = require('chalk');
 const fs = require('fs');
-var md5 = require('md5');
+const md5 = require('md5');
 const express = require('express');
 const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
@@ -22,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use((req, res, next) =>  {
 	res.header("Server", "ColdChip");
 	res.header("Service-Worker-Allowed", "/");
-	console.log(`[${new Date().toUTCString()}] ${req.method.padEnd(6)} ${req.path}`);
+	console.log(`[${chalk.blue(new Date().toUTCString())}] ${chalk.yellow(req.method.padEnd(6))} ${chalk.green(req.path)}`);
 	next()
 });
 
@@ -31,6 +32,7 @@ app.set('x-powered-by', false);
 const port = process.env.PORT || 5001;
 
 (async function() {
+	console.log(chalk.yellow("ChipDrive Server"));
 	try {
 		if(!fs.existsSync("database")){
 			fs.mkdirSync("database");

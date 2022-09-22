@@ -70,12 +70,12 @@ router.get('/quota', auth, async (req, res) => {
 	}
 });
 
-router.get('/breadcrumb', auth, async (req, res) => {
+router.get('/breadcrumb/:id', auth, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
 
-	var id = req.query.id;
+	var id = req.params.id;
 	if(id) {
 		try {
 			var result = [];
@@ -121,17 +121,17 @@ router.get('/breadcrumb', auth, async (req, res) => {
 	}
 });
 
-router.get('/list', auth, async (req, res) => {
+router.get('/list/:id', auth, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
-	var folderid = req.query.folderid;
+	var id = req.params.id;
 	var filter = req.query.filter;
-	if(folderid) {
+	if(id) {
 		try {
 			var folder = await Node.findOne({ 
 				where: { 
-					id: folderid,
+					id: id,
 					userId: req.user.id
 				} 
 			});
@@ -139,7 +139,7 @@ router.get('/list', auth, async (req, res) => {
 			if(folder) {
 				var list = await Node.findAll({ 
 					where: { 
-						parent: folderid,
+						parent: id,
 						userId: req.user.id
 					} 
 				});
@@ -175,13 +175,13 @@ router.post('/file', auth, quota, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
-	var folderid = req.body.folderid;
+	var id = req.body.id;
 	var name = req.body.name;
-	if(folderid && name) {
+	if(id && name) {
 		try {
 			var folder = await Node.findOne({ 
 				where: { 
-					id: folderid,
+					id: id,
 					userId: req.user.id
 				} 
 			});
@@ -191,7 +191,7 @@ router.post('/file', auth, quota, async (req, res) => {
 					type: 1, 
 					name: name, 
 					id: random(64), 
-					parent: folderid,
+					parent: id,
 					root: false,
 					userId: req.user.id
 				});
@@ -221,13 +221,13 @@ router.post('/folder', auth, quota, async (req, res) => {
 	res.contentType("application/json");
 	res.set('Cache-Control', 'no-store');
 
+	var id = req.body.id;
 	var name = req.body.name;
-	var folderid = req.body.folderid;
-	if(folderid && name) {
+	if(id && name) {
 		try {
 			var folder = await Node.findOne({ 
 				where: { 
-					id: folderid,
+					id: id,
 					userId: req.user.id
 				} 
 			});
@@ -237,7 +237,7 @@ router.post('/folder', auth, quota, async (req, res) => {
 					type: 2, 
 					name: name, 
 					id: random(64), 
-					parent: folderid,
+					parent: id,
 					root: false,
 					userId: req.user.id
 				});
@@ -454,7 +454,7 @@ router.get('/object/:id', async (req, res) => {
 	}
 });
 
-router.get('/object/:id/info', async (req, res) => {
+router.get('/info/:id', async (req, res) => {
 	res.set('Cache-Control', 'no-store');
 
 	var id = req.params.id;
