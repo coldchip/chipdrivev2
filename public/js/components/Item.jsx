@@ -1,4 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
+
+import Types from '../Types';
 
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
@@ -10,10 +12,13 @@ import cssf from "../CSSFormat";
 function Item(props) {
 	var dispatch = useContext(ChipDriveContext);
 
+	const [previewLoaded, setPreviewLoaded] = useState(false);
+
 	const TYPE_FILE   = 1;
 	const TYPE_FOLDER = 2;
 
 	if(props.item.type === TYPE_FILE) {
+		var ext = props.item.name.substr(props.item.name.lastIndexOf('.') + 1).toLowerCase();
 		return (
 			<div className={cssf(css, "list-item")}>
 				<ItemOption 
@@ -26,7 +31,24 @@ function Item(props) {
 				<ItemViewer 
 					trigger={
 						<div className={cssf(css, "list-item-inner")}>
-							<i className={cssf(css, "!fas !fa-file item-icon")}></i>
+							{
+								Types.image.indexOf(ext) >= 0 ?
+								<>
+									<i 
+										className={cssf(css, "!fas !fa-file item-icon")} 
+										style={ previewLoaded ? {display: "none"} : {}}
+									></i>
+									<img 
+										src={`/api/v2/drive/preview/${props.item.id}`}
+										className={cssf(css, "!fas !fa-file item-icon-image")} 
+										onLoad={() => setPreviewLoaded(true)}
+										style={ previewLoaded ? {} : {display: "none"}}
+										loading="lazy"
+									/>
+								</>
+								:
+								<i className={cssf(css, "!fas !fa-file item-icon")}></i>
+							}
 							<p className={cssf(css, "item-label text")}>{props.item.name}</p>
 						</div>
 					} 

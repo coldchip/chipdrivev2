@@ -7,6 +7,7 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 import logo from "../../img/logo.png";
+import profile from "../../img/profile.png";
 
 function Header(props) {
 	var dispatch = useContext(ChipDriveContext);
@@ -38,7 +39,7 @@ function Header(props) {
 
 				<Account
 					trigger={
-						<img className={cssf(css, "header-profile me-3")} src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="Manage Profile" />
+						<img className={cssf(css, "header-profile me-3")} src={profile} alt="My Account" />
 					}
 				/>
 			</div>

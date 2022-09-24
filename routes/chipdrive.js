@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const sharp = require('sharp');
 const { pipeline } = require('stream');
 var mime = require('mime-types');
 
@@ -434,6 +435,46 @@ router.get('/object/:id', async (req, res) => {
 					res.contentType(type);
 				}
 				res.sendFile(path.join(__dirname, `./../database/${id}`));
+			} else {
+				return res.status(404).json({
+					code: 404, 
+					message: "Node Not Found"
+				});
+			}
+		} catch(err) {
+			return res.status(500).json({
+				code: 500, 
+				message: "Server Internal Error"
+			});
+		}
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
+});
+
+router.get('/preview/:id', async (req, res) => {
+	res.set('Cache-Control', 'no-store');
+
+	var id = req.params.id;
+	if(id) {
+		try {
+			var node = await Node.findOne({ 
+				where: { 
+					id: id
+				} 
+			});
+
+			if(node) {
+				res.contentType("image/png");
+
+				let resized = sharp(path.join(__dirname, `./../database/${id}`))
+					.resize(200, 200)
+					.png();
+
+				pipeline(resized, res, (err) => {});
 			} else {
 				return res.status(404).json({
 					code: 404, 
