@@ -455,7 +455,7 @@ router.get('/object/:id', async (req, res) => {
 	}
 });
 
-router.get('/preview/:id', async (req, res) => {
+router.get('/thumbnail/:id', async (req, res) => {
 	res.set('Cache-Control', 'no-store');
 
 	var id = req.params.id;
@@ -468,13 +468,20 @@ router.get('/preview/:id', async (req, res) => {
 			});
 
 			if(node) {
-				res.contentType("image/png");
+				if(node.size <= 104857600) {
+					res.contentType("image/png");
 
-				let resized = sharp(path.join(__dirname, `./../database/${id}`))
-					.resize(200, 200)
-					.png();
+					let resized = sharp(path.join(__dirname, `./../database/${id}`))
+						.resize(200, 200)
+						.png();
 
-				pipeline(resized, res, (err) => {});
+					pipeline(resized, res, (err) => {});
+				} else {
+					return res.status(403).json({
+						code: 403, 
+						message: "Unable to generate thumbnail because the file too large"
+					});
+				}
 			} else {
 				return res.status(404).json({
 					code: 404, 

@@ -39,7 +39,7 @@ function Item(props) {
 										style={ previewLoaded ? {display: "none"} : {}}
 									></i>
 									<img 
-										src={`/api/v2/drive/preview/${props.item.id}`}
+										src={`/api/v2/drive/thumbnail/${props.item.id}`}
 										className={cssf(css, "!fas !fa-file item-icon-image")} 
 										onLoad={() => setPreviewLoaded(true)}
 										style={ previewLoaded ? {} : {display: "none"}}
