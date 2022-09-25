@@ -1,6 +1,8 @@
 const chalk = require('chalk');
 const fs = require('fs');
+const path = require('path');
 const md5 = require('md5');
+const sharp = require('sharp');
 const express = require('express');
 const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
@@ -10,6 +12,8 @@ const middleware = require("webpack-dev-middleware");
 
 const driveRoute = require("./routes/chipdrive");
 const ssoRoute = require("./routes/sso");
+
+const random = require("./utils/random");
 
 const db = require("./models");
 const Node = db.node;
@@ -82,6 +86,8 @@ const port = process.env.PORT || 5001;
 		app.use('/api/v2/drive', driveRoute);
 		app.use('/api/v2/sso', ssoRoute);
 
+		worker();
+
 		const compiler = webpack(require("./webpack.config.js"));
 		app.use(history());
 		app.use(middleware(compiler, {
@@ -95,7 +101,54 @@ const port = process.env.PORT || 5001;
 			console.log(`ChipDrive is running on http://localhost:${port}`);
 		});
 	} catch(e) {
-		console.log(`Unable to start server: ${e}`);
+		console.log(`Unable to start server: ${e.toString()}`);
 		process.exit(1);
 	}
 })();
+
+async function worker() {
+	let nodes = await Node.findAll({
+		where: {
+			type: 1,
+			thumbnail: {
+				[db.Sequelize.Op.eq]: null
+			}
+		}
+	});
+
+	for(let node of nodes) {
+		if(node) {
+			try {
+				let id = random(64);
+
+				console.log(node);
+
+				let success = await sharp(path.join(__dirname, `./database/${node.id}`))
+				.resize(200, 200)
+				.toFile(path.join(__dirname, `./database/${id}`));
+
+				if(success) {
+					await Node.create({
+						type: 1, 
+						name: `${node.name}_thumbnail`,
+						thumbnail: id,
+						id: id, 
+						parent: id,
+						root: false,
+						userId: node.userId
+					});
+
+					await Node.update({ 
+						thumbnail: id
+					}, { 
+						where: { 
+							id: node.id 
+						} 
+					});
+				}
+			} catch(e) {}
+		}
+	}
+
+	setTimeout(worker, 1000);
+}

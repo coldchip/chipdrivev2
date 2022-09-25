@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 	Node.init({
 		type: DataTypes.INTEGER,
 		name: DataTypes.STRING,
+		thumbnail: DataTypes.STRING,
 		id: {
 			type: DataTypes.STRING,
 			primaryKey: true,

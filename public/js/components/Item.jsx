@@ -12,7 +12,7 @@ import cssf from "../CSSFormat";
 function Item(props) {
 	var dispatch = useContext(ChipDriveContext);
 
-	const [previewLoaded, setPreviewLoaded] = useState(false);
+	const [previewLoaded, setPreviewLoaded] = useState(true);
 
 	const TYPE_FILE   = 1;
 	const TYPE_FOLDER = 2;
@@ -39,9 +39,9 @@ function Item(props) {
 										style={ previewLoaded ? {display: "none"} : {}}
 									></i>
 									<img 
-										src={`/api/v2/drive/thumbnail/${props.item.id}`}
+										src={`/api/v2/drive/object/${props.item.thumbnail}`}
 										className={cssf(css, "!fas !fa-file item-icon-image")} 
-										onLoad={() => setPreviewLoaded(true)}
+										onError={() => setPreviewLoaded(false)}
 										style={ previewLoaded ? {} : {display: "none"}}
 										loading="lazy"
 									/>
