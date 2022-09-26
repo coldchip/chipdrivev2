@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import ChipDrive from './ChipDrive.jsx';
 import Login from './Login.jsx';
+import NotFound from './NotFound.jsx';
 
 import css from "../css/index.scss";
 import cssf from "./CSSFormat";
@@ -55,7 +56,7 @@ function App() {
 					<Route path="/" element={<Index />} />
 					<Route path="/drive" element={<ChipDrive />} />
 					<Route path="/login" element={<Login />} />
-					<Route path="*" element={<h1>404</h1>} />
+					<Route path="*" element={<NotFound />} />
 				</Routes>
 			</BrowserRouter>
 		</React.StrictMode>
