@@ -49,14 +49,25 @@ function fetch(url, opts) {
 				if(xhr.status >= 100 && xhr.status <= 599) {
 					var basetype = Math.floor(xhr.status / 100);
 
-					var response = {
-						status: xhr.status,
-						body: JSON.parse(xhr.responseText)
-					};
+					try {
+						var response = {
+							status: xhr.status,
+							body: JSON.parse(xhr.responseText)
+						};
 
-					if(basetype === 2) {
-						resolve(response);
-					} else {
+						if(basetype === 2) {
+							resolve(response);
+						} else {
+							reject(response);
+						}
+					} catch(e) {
+						var response = {
+							status: 0,
+							body: {
+								code: 0,
+								message: "Unable to parse response"
+							}
+						};
 						reject(response);
 					}
 				}

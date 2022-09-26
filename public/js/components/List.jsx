@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
 
 import fetch from './../IO.js';
 
@@ -13,6 +13,15 @@ import cssf from "../CSSFormat";
 function List(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
+
+	const selectable = useRef(null);
+	const [select, setSelect] = useState(false);
+	const [selectStartX, setSelectStartX] = useState(0);
+	const [selectStartY, setSelectStartY] = useState(0);
+	const [selectX, setSelectX] = useState(0);
+	const [selectY, setSelectY] = useState(0);
+	const [selectWidth, setSelectWidth] = useState(0);
+	const [selectHeight, setSelectHeight] = useState(0);
 
 	const [list, setList] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -51,12 +60,70 @@ function List(props) {
 
 	}, [dispatch, props.folder, props.filter, token]);
 
+	var onMouseDown = (e) => {
+		if(selectable.current === e.target) {
+			var x = e.pageX;
+			var y = e.pageY;
+
+			setSelect(true);
+			setSelectX(x);
+			setSelectY(y);
+			setSelectStartX(x);
+			setSelectStartY(y);
+			setSelectWidth(0);
+			setSelectHeight(0);
+		}
+	};
+
+	var onMouseMove = (e) => {
+		var x = e.pageX;
+		var y = e.pageY;
+
+		var width = x - selectStartX;
+		var height = y - selectStartY;
+
+		if(width < 0) {
+			setSelectX(x);
+		}
+
+		if(height < 0) {
+			setSelectY(y);
+		}
+
+		setSelectWidth(Math.abs(width));
+		setSelectHeight(Math.abs(height));
+	};
+
+	var onMouseUp = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setSelect(false);
+	};
+
 
 	if(!error) {
 		if(!loading) {
 			if(list.length > 0) {
 				return (
-					<div className={cssf(css, "list-container")}>
+					<div 
+						className={cssf(css, "list-container")} 
+						onMouseDown={onMouseDown} 
+						onMouseMove={onMouseMove} 
+						onMouseUp={onMouseUp}
+						ref={selectable}
+					>
+						{
+							select &&
+							<div 
+								className={cssf(css, "select-box")}
+								style={{
+									top: selectY, 
+									left: selectX,
+									width: selectWidth, 
+									height: selectHeight
+								}}
+							></div>
+						}
 						{
 							list.map((item) => {
 								return (

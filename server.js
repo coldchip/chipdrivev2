@@ -15,6 +15,8 @@ const ssoRoute = require("./routes/sso");
 
 const random = require("./utils/random");
 
+const { tasks } = require("./globals");
+
 const db = require("./models");
 const Node = db.node;
 const User = db.user;
@@ -109,6 +111,12 @@ const port = process.env.PORT || 5001;
 var image = ["jpg", "png", "jpeg", "bmp", "h264", "gif", "svg"]
 
 async function worker() {
+	if(tasks.length > 0) {
+		console.log(chalk.yellow(`Dequeuing tasks, ${tasks.length} in queue`));
+		let task = tasks.pop();
+		await task();
+	}
+
 	let nodes = await Node.findAll({
 		where: {
 			type: 1,
@@ -154,5 +162,5 @@ async function worker() {
 		}
 	}
 
-	setTimeout(worker, 1000);
+	setTimeout(worker, 10);
 }
