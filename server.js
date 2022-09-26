@@ -106,6 +106,8 @@ const port = process.env.PORT || 5001;
 	}
 })();
 
+var image = ["jpg", "png", "jpeg", "bmp", "h264", "gif", "svg"]
+
 async function worker() {
 	let nodes = await Node.findAll({
 		where: {
@@ -117,7 +119,9 @@ async function worker() {
 	});
 
 	for(let node of nodes) {
-		if(node) {
+		var ext = node.name.substr(node.name.lastIndexOf('.') + 1).toLowerCase();
+		if(node && image.includes(ext)) {
+			console.log(node);
 			try {
 				let id = random(64);
 
@@ -130,7 +134,7 @@ async function worker() {
 				if(success) {
 					await Node.create({
 						type: 1, 
-						name: `${node.name}_thumbnail`,
+						name: `${node.name}_thumbnail.png`,
 						thumbnail: id,
 						id: id, 
 						parent: id,

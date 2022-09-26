@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 
 import Types from '../Types';
 
@@ -11,8 +11,6 @@ import cssf from "../CSSFormat";
 
 function Item(props) {
 	var dispatch = useContext(ChipDriveContext);
-
-	const [previewLoaded, setPreviewLoaded] = useState(true);
 
 	const TYPE_FILE   = 1;
 	const TYPE_FOLDER = 2;
@@ -32,20 +30,12 @@ function Item(props) {
 					trigger={
 						<div className={cssf(css, "list-item-inner")}>
 							{
-								Types.image.indexOf(ext) >= 0 ?
-								<>
-									<i 
-										className={cssf(css, "!fas !fa-file item-icon")} 
-										style={ previewLoaded ? {display: "none"} : {}}
-									></i>
-									<img 
-										src={`/api/v2/drive/object/${props.item.thumbnail}`}
-										className={cssf(css, "!fas !fa-file item-icon-image")} 
-										onError={() => setPreviewLoaded(false)}
-										style={ previewLoaded ? {} : {display: "none"}}
-										loading="lazy"
-									/>
-								</>
+								Types.image.indexOf(ext) >= 0 && props.item.thumbnail ?
+								<img 
+									src={`/api/v2/drive/object/${props.item.thumbnail}`}
+									className={cssf(css, "!fas !fa-file item-icon-image")} 
+									loading="lazy"
+								/>
 								:
 								<i className={cssf(css, "!fas !fa-file item-icon")}></i>
 							}
