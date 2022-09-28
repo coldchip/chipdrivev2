@@ -188,6 +188,7 @@ router.post('/file', auth, quota, (req, res) => {
 				var folder = await Node.findOne({ 
 					where: { 
 						id: id,
+						type: 2,
 						userId: req.user.id
 					} 
 				});
@@ -236,6 +237,7 @@ router.post('/folder', auth, quota, (req, res) => {
 				var folder = await Node.findOne({ 
 					where: { 
 						id: id,
+						type: 2,
 						userId: req.user.id
 					} 
 				});
@@ -251,6 +253,69 @@ router.post('/folder', auth, quota, (req, res) => {
 					});
 
 					return res.status(201).json(node);
+				} else {
+					return res.status(404).json({
+						code: 404, 
+						message: "Node Not Found"
+					});
+				}
+			} catch(err) {
+				return res.status(500).json({
+					code: 500, 
+					message: "Server Internal Error"
+				});
+			}
+		} else {
+			return res.status(400).json({
+				code: 400, 
+				message: "The server can't process the request"
+			});
+		}
+	});
+});
+
+router.post('/cut', auth, (req, res) => {
+	tasks.push(async () => {
+		res.contentType("application/json");
+		res.set('Cache-Control', 'no-store');
+
+		var src = req.body.src;
+		var dst = req.body.dst;
+		if(src && dst) {
+			try {
+				var srcNode = await Node.findOne({ 
+					where: { 
+						id: src,
+						userId: req.user.id
+					} 
+				});
+
+				var dstNode = await Node.findOne({ 
+					where: { 
+						id: dst,
+						type: 2,
+						userId: req.user.id
+					} 
+				});
+
+				if(srcNode && dstNode) {
+					if(src !== dst) {
+						await Node.update({ 
+							parent: dst 
+						}, {
+							where: { 
+								id: src,
+								userId: req.user.id
+							}
+						});
+
+						return res.status(200).json({});
+					} else {
+						return res.status(403).json({
+							code: 403, 
+							message: "Cannot move itself into itself"
+						});
+					}
 				} else {
 					return res.status(404).json({
 						code: 404, 

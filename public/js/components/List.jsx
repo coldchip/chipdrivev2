@@ -5,8 +5,12 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+
 import Loader from './Loader.jsx';
-import Item from './Item.jsx';
+import File from './File.jsx';
+import Folder from './Folder.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -55,20 +59,31 @@ function List(props) {
 		if(!loading) {
 			if(list.length > 0) {
 				return (
-					<div 
-						className={cssf(css, "list-container")} 
-					>
-						{
-							list.map((item) => {
-								return (
-									<Item 
-										item={item} 
-										key={item.id}
-									/>
-								);
-							})
-						}
-					</div>
+					<DndProvider backend={HTML5Backend}>
+						<div 
+							className={cssf(css, "list-container")} 
+						>
+							{
+								list.map((item) => {
+									if(item.type === 1) {
+										return (
+											<File 
+												item={item} 
+												key={item.id}
+											/>
+										);
+									} else {
+										return (
+											<Folder 
+												item={item} 
+												key={item.id}
+											/>
+										);
+									}
+								})
+							}
+						</div>
+					</DndProvider>
 				);
 			} else {
 				return (
