@@ -298,8 +298,28 @@ router.post('/cut', auth, (req, res) => {
 					} 
 				});
 
-				if(srcNode && dstNode) {
-					if(src !== dst) {
+				var idd = dst;
+				var result = [];
+
+				while(true) {
+					var node = await Node.findOne({ 
+						where: { 
+							id: idd,
+							userId: req.user.id
+						} 
+					});
+
+					if(!node) {
+						break;
+					}
+
+					idd = node.parent;
+
+					result.push(node.id);
+				}
+
+				if(!result.includes(src)) {
+					if(srcNode && dstNode) {
 						await Node.update({ 
 							parent: dst 
 						}, {
@@ -311,15 +331,15 @@ router.post('/cut', auth, (req, res) => {
 
 						return res.status(200).json({});
 					} else {
-						return res.status(403).json({
-							code: 403, 
-							message: "Cannot move itself into itself"
+						return res.status(404).json({
+							code: 404, 
+							message: "Node Not Found"
 						});
 					}
 				} else {
-					return res.status(404).json({
-						code: 404, 
-						message: "Node Not Found"
+					return res.status(403).json({
+						code: 403, 
+						message: "Cannot move itself into itself"
 					});
 				}
 			} catch(err) {

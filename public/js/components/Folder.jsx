@@ -93,7 +93,7 @@ function Folder(props) {
 	drag(drop(ref));
 
 	return (
-		<div className={cssf(css, "list-item")} ref={ref}>
+		<div className={cssf(css, "list-item")} style={{visibility: isDragging ? "hidden" : "visible"}} ref={ref}>
 			<ItemOption 
 				trigger={
 					<i className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>

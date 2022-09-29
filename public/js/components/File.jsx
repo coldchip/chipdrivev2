@@ -25,7 +25,7 @@ function File(props) {
 
 	var ext = props.item.name.substr(props.item.name.lastIndexOf('.') + 1).toLowerCase();
 	return (
-		<div className={cssf(css, "list-item")} ref={drag}>
+		<div className={cssf(css, "list-item")} style={{visibility: isDragging ? "hidden" : "visible"}} ref={drag}>
 			<ItemOption 
 				trigger={
 					<i className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
@@ -52,7 +52,6 @@ function File(props) {
 				item={props.item} 
 			/>
 		</div>
-		
 	)
 }
 
