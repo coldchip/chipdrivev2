@@ -5,10 +5,11 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
+import DropDown from './DropDown.jsx';
 import GetLink from './GetLink.jsx';
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
-import Popup from 'reactjs-popup';
+import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -16,7 +17,6 @@ function ItemOption(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	var dropdown = useRef(null);
 	var [renamePrompt, setRenamePrompt] = useState(false);
 	var [deletePrompt, setDeletePrompt] = useState(false);
 	var [getLinkPrompt, setGetLinkPrompt] = useState(false);
@@ -142,65 +142,44 @@ function ItemOption(props) {
 		document.body.removeChild(a);
 	}
 
-	var dropdownInner = (
-		<React.Fragment>
-			<button onClick={() => {
-				dropdown.current.close();
-				setRenamePrompt(true);
-			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>
-				Rename
-			</button>
-
-			<button onClick={() => {
-				dropdown.current.close();
-				setDeletePrompt(true);
-			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>
-				Delete
-			</button>
-			
-			{
-				props.item.type === 1
-				?
-				<>
-				
-					<button onClick={() => {
-						dropdown.current.close();
-						setGetLinkPrompt(true);
-					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-						<i className={cssf(css, "!fas !fa-link me-2")}></i>
-						Get link
-					</button>
-					<button onClick={() => {
-						dropdown.current.close();
-						setDownloadPrompt(true);
-					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-						<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>
-						Download
-					</button>
-				</>
-				:
-				null
-			}
-			
-		</React.Fragment>
-	);
-
 	return (
-		<React.Fragment>
-			<Popup 
-				trigger={props.trigger}
-				keepTooltipInside="body"
-				closeOnDocumentClick
-				ref={dropdown}
-				arrow={false}
-				nested
-			>
+		<>
+			<DropDown {...props}>
 				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-					{dropdownInner}
+					<button onClick={() => {
+						setRenamePrompt(true);
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>
+						Rename
+					</button>
+
+					<button onClick={() => {
+						setDeletePrompt(true);
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>
+						Delete
+					</button>
+					
+					{
+						props.item.type === 1 &&
+						<>
+						
+							<button onClick={() => {
+								setGetLinkPrompt(true);
+							}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+								<i className={cssf(css, "!fas !fa-link me-2")}></i>
+								Get link
+							</button>
+							<button onClick={() => {
+								setDownloadPrompt(true);
+							}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+								<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>
+								Download
+							</button>
+						</>
+					}
 				</div>
-			</Popup>
+			</DropDown>
 
 			<Prompt 
 				title="Rename this item?" 
@@ -209,7 +188,7 @@ function ItemOption(props) {
 					setRenamePrompt(false);
 					rename(name);
 				}}
-				onReject={() => {
+				onClose={() => {
 					setRenamePrompt(false);
 				}} 
 			/>
@@ -221,7 +200,7 @@ function ItemOption(props) {
 					setDeletePrompt(false);
 					remove();
 				}}
-				onReject={() => {
+				onClose={() => {
 					setDeletePrompt(false);
 				}} 
 			/>
@@ -241,11 +220,11 @@ function ItemOption(props) {
 					setDownloadPrompt(false);
 					download();
 				}}
-				onReject={() => {
+				onClose={() => {
 					setDownloadPrompt(false);
 				}} 
 			/>
-		</React.Fragment>
+		</>
 	);
 }
 

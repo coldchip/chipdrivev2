@@ -1,29 +1,20 @@
 import React, { useRef } from 'react';
-import Popup from 'reactjs-popup';
+import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function Alert(props) {
 	var modal = useRef(null);
 
-	var onAccept = () => {
-		modal.current.close();
-		if(typeof props.onAccept === 'function') {
-			props.onAccept();
+	var onClose = () => {
+		if(typeof props.onClose === 'function') {
+			props.onClose();
 		}
 	}
 
 	return (
 		<React.Fragment>
-			<Popup 
-				open={props.open} 
-				trigger={props.trigger}
-				closeOnDocumentClick={false}
-				closeOnEscape={false}
-				ref={modal}
-				nested
-				modal
-			>
+			<Popup open={props.open}>
 				<div className={cssf(css, "cd-modal")}>
 					<div className={cssf(css, "cd-modal-header")}>
 						<p className={cssf(css, "cd-modal-title text")}>{props.title}</p>

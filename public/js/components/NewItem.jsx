@@ -5,8 +5,9 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
+import DropDown from './DropDown.jsx';
 import Prompt from './Prompt.jsx';
-import Popup from 'reactjs-popup';
+import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -14,7 +15,6 @@ function NewItem(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	var dropdown = useRef(null);
 	var [createPrompt, setCreatePrompt] = useState(false);
 	const uploadRef = useRef(null);
 
@@ -154,54 +154,40 @@ function NewItem(props) {
 		});
 	}, [dispatch, props.folder, token])
 
-	var dropdownInner = (
-		<React.Fragment>
-			<button onClick={() => {
-				dropdown.current.close();
-				uploadRef.current.click()
-			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-upload me-2")}></i>
-				Upload
-			</button>
-
-			<button onClick={() => {
-				dropdown.current.close();
-				setCreatePrompt(true);
-			}} className={cssf(css, "col-12 cd-option-modal-button text")}>
-				<i className={cssf(css, "!fas !fa-folder me-2")}></i>
-				Folder
-			</button>
-		</React.Fragment>
-	)
-
 	return (
-		<React.Fragment>
-			<Popup 
-				trigger={props.trigger}
-				keepTooltipInside="body"
-				closeOnDocumentClick
-				ref={dropdown}
-				arrow={false}
-				nested
-			>
+		<>
+			<DropDown {...props}>
 				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
-					{dropdownInner}
+					<button onClick={() => {
+						uploadRef.current.click()
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-upload me-2")}></i>
+						Upload
+					</button>
+
+					<button onClick={() => {
+						setCreatePrompt(true);
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+						Folder
+					</button>
 				</div>
-			</Popup>
-			<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
+			</DropDown>
 
 			<Prompt
 				title="Create Folder"
-				open={createPrompt} 
+				open={createPrompt}
 				onAccept={(input) => {
 					setCreatePrompt(false);
 					create(input);
 				}}
-				onReject={() => {
+				onClose={() => {
 					setCreatePrompt(false);
 				}}
 			/>
-		</React.Fragment>
+					
+			<input type="file" className={cssf(css, "d-none")} ref={uploadRef} onChange={upload} multiple />
+		</>
 	);
 }
 

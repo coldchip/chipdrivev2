@@ -13,22 +13,27 @@
 
 .popup-overlay {
 	background: rgba(0, 0, 0, 0.5);
+	position: fixed;
+    display: flex;
+    z-index: 999;
+    pointer-events: auto;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 
-	&[data-popup='tooltip'] {
-		background: transparent;
-	}
-}
+    .popup-content {
+		position: relative;
+		pointer-events: auto;
+		margin: auto;
+		background: rgb(255, 255, 255);
+		width: 50%;
+		padding: 10px;
+		border-radius: 5px;
+		animation: popup-animation 0.3s forwards;
+		-webkit-animation: popup-animation 0.3s forwards;
 
-.popup-content {
-	margin: auto;
-	background: rgb(255, 255, 255);
-	width: 50%;
-	padding: 10px;
-	border-radius: 5px;
-	animation: popup-animation 0.3s forwards;
-	-webkit-animation: popup-animation 0.3s forwards;
 
-	&:not([role='tooltip']) {
 		@media (min-width: 0px) and (max-width: 767px) {
 			width: 90%;
 		}
@@ -36,101 +41,213 @@
 		@media (min-width: 768px) {
 			width: 50%;
 		}
-	}
 
-	&[role='tooltip'] {
-		width: 200px;
-		box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
-	}
 
-	.popup-arrow {
-		display: none;
-	}
-
-	.cd-modal {
-		width: 100%;
-
-		.spinner {
-			color: $chipGreen;
+		.popup-arrow {
+			display: none;
 		}
 
-		.cd-modal-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin: 5px 0 15px 0;
+		.cd-modal {
 			width: 100%;
 
-			.cd-modal-title {
-				font-size: 19px;
-				font-weight: 600;
-				color: $textColor;
-				margin: 0;
-				overflow: hidden;
-				text-overflow: ellipsis;
+			.spinner {
+				color: $chipGreen;
 			}
 
-			.cd-modal-x {
-				font-size: 22px;
-				color: $textColor;
-			}
-		}
-
-		.cd-modal-body {
-			.cd-modal-text {
-				font-size: 17px;
-				font-weight: 600;
-				color: $textColor;
-				margin: 0;
-			}
-
-			.cd-modal-form {
+			.cd-modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin: 5px 0 15px 0;
 				width: 100%;
 
-				.cd-modal-input {
-					width: 100%;
-					height: 38px;
-					background: none;
-					border-radius: 0;
-					border: 0;
-					border-bottom: 2px solid #797979;
-					font-weight: 500;
+				.cd-modal-title {
+					font-size: 19px;
+					font-weight: 600;
 					color: $textColor;
-					outline: 0;
-					padding-left: 0px;
+					margin: 0;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				.cd-modal-x {
+					font-size: 22px;
+					color: $textColor;
 				}
 			}
-		}
 
-		.cd-modal-footer {
-			display: flex;
-			justify-content: flex-end;
-			margin: 10px 0 0 0;
-			width: 100%;
+			.cd-modal-body {
+				.cd-modal-text {
+					font-size: 17px;
+					font-weight: 600;
+					color: $textColor;
+					margin: 0;
+				}
 
-			.cd-modal-button {
-				border: none;
-				background: none;
-				font-weight: 500;
+				.cd-modal-form {
+					width: 100%;
+
+					.cd-modal-input {
+						width: 100%;
+						height: 38px;
+						background: none;
+						border-radius: 0;
+						border: 0;
+						border-bottom: 2px solid #797979;
+						font-weight: 500;
+						color: $textColor;
+						outline: 0;
+						padding-left: 0px;
+					}
+				}
+			}
+
+			.cd-modal-footer {
+				display: flex;
+				justify-content: flex-end;
+				margin: 10px 0 0 0;
+				width: 100%;
+
+				.cd-modal-button {
+					border: none;
+					background: none;
+					font-weight: 500;
+					color: $textColor;
+					padding: 10px;
+					outline: 0;
+					border-radius: 2px;
+					font-size: 15px;
+					outline: none;
+				}
+			}
+
+			.cd-modal-loader-text {
 				color: $textColor;
-				padding: 10px;
-				outline: 0;
-				border-radius: 2px;
-				font-size: 15px;
-				outline: none;
+				font-size: 18px;
+				font-weight: 500;
+			}
+
+			.cd-modal-footer .cd-modal-button:hover {
+				background-color: $hoverColor;
 			}
 		}
+	}
+}
 
-		.cd-modal-loader-text {
-			color: $textColor;
-			font-size: 18px;
-			font-weight: 500;
+.context-menu-overlay {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	z-index: 999;
+
+	.context-menu {
+		position: absolute;
+		z-index: 9999;
+		top: 227px;
+		left: 540px;
+		margin: auto;
+		background: rgb(255, 255, 255);
+		width: 50%;
+		padding: 10px;
+		border-radius: 5px;
+		animation: popup-animation 0.3s forwards;
+		-webkit-animation: popup-animation 0.3s forwards;
+
+		width: 200px;
+		box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
+
+		.popup-arrow {
+			display: none;
 		}
 
-		.cd-modal-footer .cd-modal-button:hover {
-			background-color: $hoverColor;
+		.cd-modal {
+			width: 100%;
+
+			.spinner {
+				color: $chipGreen;
+			}
+
+			.cd-modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin: 5px 0 15px 0;
+				width: 100%;
+
+				.cd-modal-title {
+					font-size: 19px;
+					font-weight: 600;
+					color: $textColor;
+					margin: 0;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				.cd-modal-x {
+					font-size: 22px;
+					color: $textColor;
+				}
+			}
+
+			.cd-modal-body {
+				.cd-modal-text {
+					font-size: 17px;
+					font-weight: 600;
+					color: $textColor;
+					margin: 0;
+				}
+
+				.cd-modal-form {
+					width: 100%;
+
+					.cd-modal-input {
+						width: 100%;
+						height: 38px;
+						background: none;
+						border-radius: 0;
+						border: 0;
+						border-bottom: 2px solid #797979;
+						font-weight: 500;
+						color: $textColor;
+						outline: 0;
+						padding-left: 0px;
+					}
+				}
+			}
+
+			.cd-modal-footer {
+				display: flex;
+				justify-content: flex-end;
+				margin: 10px 0 0 0;
+				width: 100%;
+
+				.cd-modal-button {
+					border: none;
+					background: none;
+					font-weight: 500;
+					color: $textColor;
+					padding: 10px;
+					outline: 0;
+					border-radius: 2px;
+					font-size: 15px;
+					outline: none;
+				}
+			}
+
+			.cd-modal-loader-text {
+				color: $textColor;
+				font-size: 18px;
+				font-weight: 500;
+			}
+
+			.cd-modal-footer .cd-modal-button:hover {
+				background-color: $hoverColor;
+			}
 		}
 	}
+
 }
 
 .task-modal {

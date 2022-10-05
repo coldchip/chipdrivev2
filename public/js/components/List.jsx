@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 
 import fetch from './../IO.js';
 
@@ -9,6 +9,7 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import Loader from './Loader.jsx';
+import NewItem from './NewItem.jsx';
 import File from './File.jsx';
 import Folder from './Folder.jsx';
 import css from "../../css/index.scss";
@@ -17,6 +18,8 @@ import cssf from "../CSSFormat";
 function List(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
+
+	var menuRef = useRef(null);
 
 	const [list, setList] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -60,9 +63,7 @@ function List(props) {
 			if(list.length > 0) {
 				return (
 					<DndProvider backend={HTML5Backend}>
-						<div 
-							className={cssf(css, "list-container")} 
-						>
+						<div className={cssf(css, "list-container")} ref={menuRef}>
 							{
 								list.map((item) => {
 									if(item.type === 1) {
@@ -83,6 +84,12 @@ function List(props) {
 								})
 							}
 						</div>
+
+						<NewItem 
+							rightclick
+							trigger={menuRef} 
+							folder={props.folder}
+						/>
 					</DndProvider>
 				);
 			} else {

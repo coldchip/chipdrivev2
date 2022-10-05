@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useRef } from 'react';
 
 import fetch from './../IO.js';
 
@@ -16,6 +16,8 @@ import cssf from "../CSSFormat";
 function Sidebar(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
+
+	var menuRef = useRef(null);
 
 	var logout = useCallback((name) => {
 		fetch("/api/v2/sso/logout", {
@@ -62,13 +64,13 @@ function Sidebar(props) {
 					}}></i>
 				</div>
 
+				<button className={cssf(css, "sidebar-upload text mb-3")} tabIndex="0" ref={menuRef}>
+					<i className={cssf(css, "!fas !fa-plus cross me-2")} ></i>
+					New
+				</button>
+
 				<NewItem 
-					trigger={
-						<button className={cssf(css, "sidebar-upload text mb-3")} tabIndex="0">
-							<i className={cssf(css, "!fas !fa-plus cross me-2")} ></i>
-							New
-						</button>
-					}
+					trigger={menuRef}
 					folder={props.folder}
 				/>
 

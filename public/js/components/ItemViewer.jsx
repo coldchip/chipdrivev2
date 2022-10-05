@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Types from '../Types';
-import Popup from 'reactjs-popup';
+import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 

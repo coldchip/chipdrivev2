@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 
 import Types from '../Types';
 
@@ -14,6 +14,23 @@ import cssf from "../CSSFormat";
 function File(props) {
 	var dispatch = useContext(ChipDriveContext);
 
+	const [hasMouse, setHasMouse] = useState(false);
+
+	const [popupViewer, setPopupViewer] = useState(false);
+	const optionRef = useRef(null);
+	const ref = useRef(null);
+
+	useEffect(() => {
+		function checkMouse() {
+			setHasMouse(matchMedia('(pointer:fine)').matches);
+		}
+
+		checkMouse();
+
+		window.addEventListener("resize", checkMouse);
+
+		return () => window.removeEventListener("resize", checkMouse);
+	}, []);
 
 	const [{isDragging}, drag] = useDrag(() => ({
 		type: "FILE",
@@ -23,35 +40,47 @@ function File(props) {
 		}),
 	}));
 
+	drag(ref);
+
 	var ext = props.item.name.substr(props.item.name.lastIndexOf('.') + 1).toLowerCase();
 	return (
-		<div className={cssf(css, "list-item")} style={{visibility: isDragging ? "hidden" : "visible"}} ref={drag}>
-			<ItemOption 
-				trigger={
-					<i className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
-				} 
+		<>
+			<div className={cssf(css, "list-item")} ref={ref}>
+				<i ref={optionRef} style={{display: hasMouse ? "none" : "block"}} className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
+
+				<div className={cssf(css, "list-item-inner")} onClick={() => setPopupViewer(true)}>
+					{
+						Types.image.indexOf(ext) >= 0 && props.item.thumbnail ?
+						<img 
+							src={`/api/v2/drive/object/${props.item.thumbnail}`}
+							className={cssf(css, "!fas !fa-file item-icon-image")} 
+							loading="lazy"
+						/>
+						:
+						<i className={cssf(css, "!fas !fa-file item-icon")}></i>
+					}
+					<p className={cssf(css, "item-label text")}>{props.item.name}</p>
+				</div>
+			</div>
+
+			<ItemViewer 
+				open={popupViewer}
+				onClose={() => setPopupViewer(false)}
 				item={props.item} 
 			/>
 
-			<ItemViewer 
-				trigger={
-					<div className={cssf(css, "list-item-inner")}>
-						{
-							Types.image.indexOf(ext) >= 0 && props.item.thumbnail ?
-							<img 
-								src={`/api/v2/drive/object/${props.item.thumbnail}`}
-								className={cssf(css, "!fas !fa-file item-icon-image")} 
-								loading="lazy"
-							/>
-							:
-							<i className={cssf(css, "!fas !fa-file item-icon")}></i>
-						}
-						<p className={cssf(css, "item-label text")}>{props.item.name}</p>
-					</div>
-				} 
+			<ItemOption
+				trigger={optionRef}
 				item={props.item} 
 			/>
-		</div>
+
+			<ItemOption
+				rightclick 
+				multi
+				trigger={ref}
+				item={props.item} 
+			/>
+		</>
 	)
 }
 

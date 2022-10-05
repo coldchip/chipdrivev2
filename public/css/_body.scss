@@ -118,6 +118,10 @@
 					}
 				}
 			}
+
+			&:hover {
+				background: $hoverColor;
+			}
 		}
 
 		.list-item-selected {

@@ -8,7 +8,7 @@ import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import profile from '../../img/profile.png';
 
-import Popup from 'reactjs-popup';
+import Popup from './Popup.jsx';
 import AccountManage from './AccountManage.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
@@ -122,13 +122,7 @@ function DriveSettings(props) {
 	}
 
 	return (
-		<Popup 
-			trigger={props.trigger}
-			keepTooltipInside="body"
-			onOpen={loadDrive}
-			modal
-			nested
-		>
+		<Popup {...props}>
 			{body}
 		</Popup>
 	);

@@ -16,6 +16,8 @@ function DriveTitle(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
+	const [popupSettings, setPopupSettings] = useState(false);
+
 	const [name, setName] = useState();
 
 	const [loading, setLoading] = useState(false);
@@ -56,10 +58,11 @@ function DriveTitle(props) {
 					{name}
 				</p>
 
+				<p onClick={() => setPopupSettings(true)} className={cssf(css, "label-edit text")}>EDIT</p>
+
 				<DriveSettings
-					trigger={
-						<p className={cssf(css, "label-edit text")}>EDIT</p>
-					}
+					open={popupSettings}
+					onClose={() => setPopupSettings(false)}
 					id={props.id}
 				/>
 			</div>

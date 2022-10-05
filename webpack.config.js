@@ -34,7 +34,7 @@ module.exports = {
           options: {
             modules: {
               getLocalIdent: (context, localIdentName, localName, options) => {
-                var exclude = ["popup-overlay", "popup-content", "popup-arrow"];
+                var exclude = [];
 
                 if(!exclude.includes(localName)) {
 

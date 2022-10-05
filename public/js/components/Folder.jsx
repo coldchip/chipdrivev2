@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 
 import fetch from './../IO.js';
 
@@ -16,7 +16,22 @@ function Folder(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
+	const [hasMouse, setHasMouse] = useState(false);
+
+	const optionRef = useRef(null);
 	const ref = useRef(null);
+
+	useEffect(() => {
+		function checkMouse() {
+			setHasMouse(matchMedia('(pointer:fine)').matches);
+		}
+
+		checkMouse();
+
+		window.addEventListener("resize", checkMouse);
+
+		return () => window.removeEventListener("resize", checkMouse);
+	}, []);
 
 	const [{isDragging}, drag] = useDrag(() => ({
 		type: "FOLDER",
@@ -93,26 +108,35 @@ function Folder(props) {
 	drag(drop(ref));
 
 	return (
-		<div className={cssf(css, "list-item")} style={{visibility: isDragging ? "hidden" : "visible"}} ref={ref}>
-			<ItemOption 
-				trigger={
-					<i className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
-				} 
+		<>
+			<div className={cssf(css, "list-item")} ref={ref}>
+				<i ref={optionRef} style={{display: hasMouse ? "none" : "block"}} className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
+
+				<div className={cssf(css, "list-item-inner")} onClick={() => {
+					var {item} = props;
+
+					dispatch({
+						type: "list", 
+						id: item.id
+					});
+				}}>
+					<i className={cssf(css, "!fas !fa-folder item-icon")}></i>
+					<p className={cssf(css, "item-label text")}>{props.item.name}</p>
+				</div>
+			</div>
+
+			<ItemOption
+				trigger={optionRef}
 				item={props.item} 
 			/>
 
-			<div className={cssf(css, "list-item-inner")} onClick={() => {
-				var {item} = props;
-
-				dispatch({
-					type: "list", 
-					id: item.id
-				});
-			}}>
-				<i className={cssf(css, "!fas !fa-folder item-icon")}></i>
-				<p className={cssf(css, "item-label text")}>{props.item.name}</p>
-			</div>
-		</div>
+			<ItemOption 
+				rightclick
+				multi
+				trigger={ref}
+				item={props.item} 
+			/>
+		</>
 	)
 }
 
