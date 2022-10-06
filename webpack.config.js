@@ -50,7 +50,7 @@ module.exports = {
                     index = Math.floor(index / 62) - 1
                   }
 
-                  return prefix;
+                  return 'css-' + prefix;
                 } else {
                   return localName;
                 }
