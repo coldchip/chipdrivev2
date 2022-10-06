@@ -87,13 +87,7 @@ function AccountManage(props) {
 	}
 
 	return (
-		<Popup 
-			trigger={props.trigger}
-			keepTooltipInside="body"
-			onOpen={loadAccount}
-			modal
-			nested
-		>
+		<Popup {...props}>
 			{body}
 		</Popup>
 	);

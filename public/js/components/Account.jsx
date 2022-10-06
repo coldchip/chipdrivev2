@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import ContentLoader from 'react-content-loader'
 
 import fetch from './../IO.js';
@@ -17,40 +17,44 @@ function Account(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
+	const [managePopup, setManagePopup] = useState(false);
+
 	const [name, setName] = useState("...");
 	const [username, setUsername] = useState("...");
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(undefined);
 
-	var loadAccount = () => {
-		setLoading(true);
-		setError(undefined);
+	useEffect(() => {
+		if(props.open === true) {
+			setLoading(true);
+			setError(undefined);
 
-		fetch("/api/v2/sso/@me", {
-			method: "GET",
-			headers: {
-				token: token
-			}
-		}).then((response) => {
-			var {status, body} = response;
+			fetch("/api/v2/sso/@me", {
+				method: "GET",
+				headers: {
+					token: token
+				}
+			}).then((response) => {
+				var {status, body} = response;
 
-			setName(body.name);
-			setUsername(body.username);
-		}).catch((response) => {
-			var {status, body} = response;
+				setName(body.name);
+				setUsername(body.username);
+			}).catch((response) => {
+				var {status, body} = response;
 
-			if(status === 401) {
-				dispatch({
-					type: "login"
-				});
-			} else {
-				setError(body.message);
-			}
-		}).finally(() => {
-			setLoading(false);
-		});
-	}
+				if(status === 401) {
+					dispatch({
+						type: "login"
+					});
+				} else {
+					setError(body.message);
+				}
+			}).finally(() => {
+				setLoading(false);
+			});
+		}
+	}, [dispatch, props.open, token]);
 
 	var body;
 
@@ -66,13 +70,14 @@ function Account(props) {
 						{username}
 					</p>
 					
+					<button className={cssf(css, "account-button text mt-4")} onClick={() => setManagePopup(true)}>
+						<i className={cssf(css, "!fas !fa-pen me-2")}></i>
+						Manage Account
+					</button>
+
 					<AccountManage
-						trigger={
-							<button className={cssf(css, "account-button text mt-4") + " " + props.className} onClick={props.onClick}>
-								<i className={cssf(css, "!fas !fa-pen me-2")}></i>
-								Manage Account
-							</button>
-						}
+						open={managePopup}
+						onClose={() => setManagePopup(false)}
 					/>
 				</div>
 			);
@@ -103,13 +108,7 @@ function Account(props) {
 	}
 
 	return (
-		<Popup 
-			trigger={props.trigger}
-			keepTooltipInside="body"
-			onOpen={loadAccount}
-			modal
-			nested
-		>
+		<Popup {...props}>
 			{body}
 		</Popup>
 	);

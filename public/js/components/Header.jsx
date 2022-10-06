@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
@@ -11,6 +11,8 @@ import profile from "../../img/profile.png";
 
 function Header(props) {
 	var dispatch = useContext(ChipDriveContext);
+
+	const [accountPopup, setAccountPopup] = useState(false);
 
 	return (
 		<React.Fragment>
@@ -37,10 +39,11 @@ function Header(props) {
 
 				<div className={cssf(css, "flex-fill")}></div>
 
+				<img onClick={() => setAccountPopup(true)} className={cssf(css, "header-profile me-3")} src={profile} alt="My Account" />
+
 				<Account
-					trigger={
-						<img className={cssf(css, "header-profile me-3")} src={profile} alt="My Account" />
-					}
+					open={accountPopup}
+					onClose={() => setAccountPopup(false)}
 				/>
 			</div>
 		</React.Fragment>

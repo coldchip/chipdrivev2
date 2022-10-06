@@ -57,7 +57,7 @@ function DropDown(props) {
 				openMenu(e);
 			}
 		}
-	}, []);
+	}, [props.trigger, props.rightclick, props.multi, openMenu]);
 
 	var content = (
 		<div className={cssf(css, "context-menu-overlay")} onClick={() => {
