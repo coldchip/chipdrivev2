@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import ContentLoader from 'react-content-loader'
 
 import fetch from './../IO.js';
@@ -13,7 +13,7 @@ import AccountManage from './AccountManage.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function DriveSettings(props) {
+function DriveSettingsPopup(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -22,32 +22,34 @@ function DriveSettings(props) {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(undefined);
 
-	var loadDrive = () => {
-		setLoading(true);
-		setError(undefined);
+	useEffect(() => {
+		if(props.open === true) {
+			setLoading(true);
+			setError(undefined);
 
-		fetch(`/api/v2/drive/info/${props.id}`, {
-			method: "GET",
-			headers: {
-				token: token
-			}
-		}).then((response) => {
-			var {status, body} = response;
-			setName(body.name);
-		}).catch((response) => {
-			var {status, body} = response;
+			fetch(`/api/v2/drive/info/${props.id}`, {
+				method: "GET",
+				headers: {
+					token: token
+				}
+			}).then((response) => {
+				var {status, body} = response;
+				setName(body.name);
+			}).catch((response) => {
+				var {status, body} = response;
 
-			if(status === 401) {
-				dispatch({
-					type: "login"
-				});
-			} else {
-				setError(body.message);
-			}
-		}).finally(() => {
-			setLoading(false);
-		});
-	}
+				if(status === 401) {
+					dispatch({
+						type: "login"
+					});
+				} else {
+					setError(body.message);
+				}
+			}).finally(() => {
+				setLoading(false);
+			});
+		}
+	}, [dispatch, props.open, props.id, token]);
 
 	var saveDrive = () => {
 		setLoading(true);
@@ -128,4 +130,4 @@ function DriveSettings(props) {
 	);
 }
 
-export default DriveSettings;
+export default DriveSettingsPopup;

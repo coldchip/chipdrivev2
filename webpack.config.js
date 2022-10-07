@@ -19,6 +19,9 @@ module.exports = {
       {
         test: /\.(js|jsx)$/i,
         exclude: /(node_modules|bower_components)/,
+        resolve: {
+          extensions: ['', '.js', '.jsx']
+        },
         use: {
           loader: "babel-loader",
           options: {

@@ -1,9 +1,8 @@
 import React, { useEffect, useReducer, useState } from 'react';
 
-import Header from './components/Header.jsx';
-import Sidebar from './components/Sidebar.jsx';
-import Body from './components/Body.jsx';
-import Alert from './components/Alert.jsx';
+import DriveHeader from './components/DriveHeader.jsx';
+import DriveSidebar from './components/DriveSidebar.jsx';
+import DriveBody from './components/DriveBody.jsx';
 import TaskModal from './components/TaskModal.jsx';
 
 import Login from './Login.jsx';
@@ -100,16 +99,16 @@ function ChipDrive(props) {
 		<TokenContext.Provider value={token}>
 			<ChipDriveContext.Provider value={dispatch}>
 				<div className={cssf(css, "!chipdrive-app chipdrive")}>
-					<Header 
+					<DriveHeader 
 						folder={folder}
 					/>
 
-					<Sidebar 
+					<DriveSidebar 
 						open={sidebar} 
 						folder={folder}
 					/>
 
-					<Body 
+					<DriveBody 
 						folder={folder}
 						root={root}
 						filter={filter}

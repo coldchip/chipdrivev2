@@ -145,8 +145,8 @@
 	.context-menu {
 		position: absolute;
 		z-index: 9999;
-		top: 227px;
-		left: 540px;
+		top: 0px;
+		left: 0px;
 		margin: auto;
 		background: rgb(255, 255, 255);
 		width: 50%;
@@ -157,10 +157,6 @@
 
 		width: 200px;
 		box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
-
-		.popup-arrow {
-			display: none;
-		}
 
 		.cd-modal {
 			width: 100%;

@@ -5,7 +5,7 @@ import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function GetLink(props) {
+function GetLinkPopup(props) {
 	let link = `${window.location.protocol}//${window.location.host}/api/v2/drive/object/${props.item.id}`;
 	var body = (
 		<div className={cssf(css, "getlink")}>
@@ -32,4 +32,4 @@ function GetLink(props) {
 	);
 }
 
-export default GetLink;
+export default GetLinkPopup;

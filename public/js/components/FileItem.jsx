@@ -6,12 +6,12 @@ import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import { useDrag, useDrop } from 'react-dnd'
 
-import ItemOption from './ItemOption.jsx';
-import ItemViewer from './ItemViewer.jsx';
+import ItemDropdown from './ItemDropdown.jsx';
+import ItemPopup from './ItemPopup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function File(props) {
+function FileItem(props) {
 	var dispatch = useContext(ChipDriveContext);
 
 	const [hasMouse, setHasMouse] = useState(false);
@@ -63,18 +63,20 @@ function File(props) {
 				</div>
 			</div>
 
-			<ItemViewer 
+			<ItemPopup 
 				open={popupViewer}
 				onClose={() => setPopupViewer(false)}
 				item={props.item} 
 			/>
 
-			<ItemOption
+			{/* for mobile */}
+			<ItemDropdown
 				trigger={optionRef}
 				item={props.item} 
 			/>
 
-			<ItemOption
+			{/* for desktops */}
+			<ItemDropdown
 				rightclick 
 				multi
 				trigger={ref}
@@ -84,4 +86,4 @@ function File(props) {
 	)
 }
 
-export default File;
+export default FileItem;

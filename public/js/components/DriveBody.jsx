@@ -2,13 +2,13 @@ import React, { useRef } from 'react';
 
 import DriveTitle from './DriveTitle.jsx';
 import BreadCrumbs from './BreadCrumbs.jsx';
-import List from './List.jsx';
-import NewItem from './NewItem.jsx';
+import ItemList from './ItemList.jsx';
+import CreateDropdown from './CreateDropdown.jsx';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function Body(props) {
+function DriveBody(props) {
 	var newRef = useRef(null);
 	var menuRef = useRef(null);
 
@@ -22,7 +22,7 @@ function Body(props) {
 
 						<BreadCrumbs folder={props.folder} />
 
-						<List 
+						<ItemList 
 							folder={props.folder}
 							filter={props.filter}
 						/>
@@ -31,7 +31,7 @@ function Body(props) {
 							<i className={cssf(css, "!fas !fa-plus")}></i>
 						</button>
 
-						<NewItem 
+						<CreateDropdown 
 							trigger={newRef} 
 							folder={props.folder}
 						/>
@@ -40,7 +40,7 @@ function Body(props) {
 				}
 			</div>
 
-			<NewItem 
+			<CreateDropdown 
 				rightclick
 				trigger={menuRef}
 				folder={props.folder}
@@ -49,4 +49,4 @@ function Body(props) {
 	);
 }
 
-export default Body;
+export default DriveBody;

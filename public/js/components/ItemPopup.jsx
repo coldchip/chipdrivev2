@@ -5,7 +5,7 @@ import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function ItemViewer(props) {
+function ItemPopup(props) {
 	var download = () => {
 		var {item} = props;
 
@@ -74,4 +74,4 @@ function ItemViewer(props) {
 	);
 }
 
-export default ItemViewer;
+export default ItemPopup;

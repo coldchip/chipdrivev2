@@ -7,6 +7,8 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
+import BreadCrumb from './BreadCrumb.jsx';
+
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -62,19 +64,11 @@ function BreadCrumbs(props) {
 						breadcrumbs.map((breadcrumb, index) => {
 							return (
 								<>
-									<p className={cssf(css, "breadcrumb text")} onClick={() => {
-										dispatch({
-											type: "list", 
-											id: breadcrumb.id
-										});
-									}}>
-										{
-											index === 0 &&
-											<i className={cssf(css, "!fas !fa-hdd breadcrumb-icon me-2")}></i>
-										}
-										{breadcrumb.name}
-										
-									</p>
+									<BreadCrumb 
+										icon={index === 0}
+										name={breadcrumb.name}
+										id={breadcrumb.id}
+									/>
 
 									<p className={cssf(css, "breadcrumb-seperator text")}>
 										/

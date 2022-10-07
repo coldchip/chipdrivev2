@@ -7,12 +7,11 @@ import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import { useDrag, useDrop } from 'react-dnd'
 
-import ItemOption from './ItemOption.jsx';
-import ItemViewer from './ItemViewer.jsx';
+import ItemDropdown from './ItemDropdown.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function Folder(props) {
+function FolderItem(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -125,12 +124,12 @@ function Folder(props) {
 				</div>
 			</div>
 
-			<ItemOption
+			<ItemDropdown
 				trigger={optionRef}
 				item={props.item} 
 			/>
 
-			<ItemOption 
+			<ItemDropdown 
 				rightclick
 				multi
 				trigger={ref}
@@ -140,4 +139,4 @@ function Folder(props) {
 	)
 }
 
-export default Folder;
+export default FolderItem;

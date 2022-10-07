@@ -9,13 +9,13 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import Loader from './Loader.jsx';
-import NewItem from './NewItem.jsx';
-import File from './File.jsx';
-import Folder from './Folder.jsx';
+import CreateDropdown from './CreateDropdown.jsx';
+import FileItem from './FileItem.jsx';
+import FolderItem from './FolderItem.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function List(props) {
+function ItemList(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -68,14 +68,14 @@ function List(props) {
 								list.map((item) => {
 									if(item.type === 1) {
 										return (
-											<File 
+											<FileItem 
 												item={item} 
 												key={item.id}
 											/>
 										);
 									} else {
 										return (
-											<Folder 
+											<FolderItem 
 												item={item} 
 												key={item.id}
 											/>
@@ -85,7 +85,7 @@ function List(props) {
 							}
 						</div>
 
-						<NewItem 
+						<CreateDropdown 
 							rightclick
 							trigger={menuRef} 
 							folder={props.folder}
@@ -113,4 +113,4 @@ function List(props) {
 	}
 }
 
-export default React.memo(List);
+export default React.memo(ItemList);

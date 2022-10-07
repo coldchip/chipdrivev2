@@ -7,7 +7,7 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
-import DriveSettings from './DriveSettings.jsx';
+import DriveSettingsPopup from './DriveSettingsPopup.jsx';
 
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
@@ -60,7 +60,7 @@ function DriveTitle(props) {
 
 				<p onClick={() => setPopupSettings(true)} className={cssf(css, "label-edit text")}>EDIT</p>
 
-				<DriveSettings
+				<DriveSettingsPopup
 					open={popupSettings}
 					onClose={() => setPopupSettings(false)}
 					id={props.id}

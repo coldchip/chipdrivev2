@@ -6,14 +6,13 @@ import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import DropDown from './DropDown.jsx';
-import GetLink from './GetLink.jsx';
+import GetLinkPopup from './GetLinkPopup.jsx';
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
-import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function ItemOption(props) {
+function ItemDropdown(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -205,7 +204,7 @@ function ItemOption(props) {
 				}} 
 			/>
 
-			<GetLink 
+			<GetLinkPopup 
 				open={getLinkPrompt}
 				onClose={() => {
 					setGetLinkPrompt(false);
@@ -228,4 +227,4 @@ function ItemOption(props) {
 	);
 }
 
-export default ItemOption;
+export default ItemDropdown;

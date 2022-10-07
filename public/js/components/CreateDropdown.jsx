@@ -11,7 +11,7 @@ import Popup from './Popup.jsx';
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function NewItem(props) {
+function CreateDropdown(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -191,4 +191,4 @@ function NewItem(props) {
 	);
 }
 
-export default NewItem;
+export default CreateDropdown;

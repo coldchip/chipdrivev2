@@ -8,7 +8,9 @@ function Popup(props) {
 	var content = (
 		<div className={cssf(css, "popup-overlay")} onClick={(e) => {
 			if(e.target.className === cssf(css, "popup-overlay")) {
-				props.onClose();
+				if(typeof props.onClose === 'function') {
+					props.onClose();
+				}
 			}
 		}}>
 			<div className={cssf(css, "popup-content")}>

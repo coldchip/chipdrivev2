@@ -15,6 +15,7 @@
 
 	.header-logo {
 		width: 145px;
+		cursor: default;
 	}
 
 	.header-search {
@@ -46,5 +47,6 @@
 		height: 45px;
 		border-radius: 100%;
 		border: 2px solid $textColor;
+		cursor: pointer;
 	}
 }
