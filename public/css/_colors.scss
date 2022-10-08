@@ -11,6 +11,8 @@
 
 	--chip-green: #43833a;
 
+	--breadcrumb-color: #CCCCCC;
+
 	--text-color-white: #FFFFFF;
 	--text-color: #4D4D4D;
 	--text-color-light: #666666;
@@ -30,6 +32,8 @@
 
 	--chip-green: #43833a;
 
+	--breadcrumb-color: #525358;
+
 	--text-color-white: #FFFFFF;
 	--text-color: #b5b5b5;
 	--text-color-light: var(--text-color);
@@ -47,6 +51,8 @@ $buttonColor: var(--button-color);
 $hoverColor: var(--hover-color);
 
 $chipGreen: var(--chip-green);
+
+$breadCrumbColor: var(--breadcrumb-color);
 
 $textColorWhite: var(--text-color-white);
 $textColor: var(--text-color);

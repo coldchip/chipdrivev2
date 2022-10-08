@@ -75,7 +75,9 @@ function DropDown(props) {
 		</div>
 	);
 
-	return open && ReactDOM.createPortal(content, document.body);
+	var parent = document.getElementsByClassName(cssf(css, "chipdrive"))[0];
+
+	return open && ReactDOM.createPortal(content, parent);
 }
 
 export default DropDown;

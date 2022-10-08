@@ -7,6 +7,7 @@ import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
 import DropDown from './DropDown.jsx';
 import GetLinkPopup from './GetLinkPopup.jsx';
+import ItemInfoPopup from './ItemInfoPopup.jsx';
 import Prompt from './Prompt.jsx';
 import Confirm from './Confirm.jsx';
 import css from "../../css/index.scss";
@@ -20,6 +21,7 @@ function ItemDropdown(props) {
 	var [deletePrompt, setDeletePrompt] = useState(false);
 	var [getLinkPrompt, setGetLinkPrompt] = useState(false);
 	var [downloadPrompt, setDownloadPrompt] = useState(false);
+	var [itemInfoPopup, setItemInfoPopup] = useState(false);
 
 	var rename = useCallback((name) => {
 		var taskid = 'task_' + Math.random();
@@ -163,17 +165,17 @@ function ItemDropdown(props) {
 						props.item.type === 1 &&
 						<>
 						
-							<button onClick={() => {
-								setGetLinkPrompt(true);
-							}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<button onClick={() => setGetLinkPrompt(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
 								<i className={cssf(css, "!fas !fa-link me-2")}></i>
 								Get link
 							</button>
-							<button onClick={() => {
-								setDownloadPrompt(true);
-							}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<button onClick={() => setDownloadPrompt(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
 								<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>
 								Download
+							</button>
+							<button onClick={() => setItemInfoPopup(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
+								<i className={cssf(css, "!fas !fa-info-circle me-2")}></i>
+								Info
 							</button>
 						</>
 					}
@@ -221,6 +223,13 @@ function ItemDropdown(props) {
 				}}
 				onClose={() => {
 					setDownloadPrompt(false);
+				}} 
+			/>
+
+			<ItemInfoPopup 
+				open={itemInfoPopup}
+				onClose={() => {
+					setItemInfoPopup(false);
 				}} 
 			/>
 		</>

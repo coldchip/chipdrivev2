@@ -4,7 +4,8 @@ import Types from '../Types';
 
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
-import { useDrag, useDrop } from 'react-dnd'
+import { getEmptyImage } from 'react-dnd-html5-backend'
+import { useDrag } from 'react-dnd'
 
 import ItemDropdown from './ItemDropdown.jsx';
 import ItemPopup from './ItemPopup.jsx';
@@ -32,13 +33,17 @@ function FileItem(props) {
 		return () => window.removeEventListener("resize", checkMouse);
 	}, []);
 
-	const [{isDragging}, drag] = useDrag(() => ({
+	const [{isDragging}, drag, preview] = useDrag(() => ({
 		type: "FILE",
 		item: props.item,
 		collect: monitor => ({
 			isDragging: !!monitor.isDragging(),
 		}),
 	}));
+
+	useEffect(() => {
+		preview(getEmptyImage(), { captureDraggingState: true });
+	}, [preview]);
 
 	drag(ref);
 

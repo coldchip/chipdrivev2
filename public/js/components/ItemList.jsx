@@ -62,7 +62,7 @@ function ItemList(props) {
 		if(!loading) {
 			if(list.length > 0) {
 				return (
-					<DndProvider backend={HTML5Backend}>
+					<>
 						<div className={cssf(css, "list-container")} ref={menuRef}>
 							{
 								list.map((item) => {
@@ -90,7 +90,7 @@ function ItemList(props) {
 							trigger={menuRef} 
 							folder={props.folder}
 						/>
-					</DndProvider>
+					</>
 				);
 			} else {
 				return (

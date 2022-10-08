@@ -21,6 +21,11 @@ function AccountDropdown(props) {
 						My Account
 					</button>
 
+					<button onClick={() => {}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-hdd me-2")}></i>
+						Upgrade Plan
+					</button>
+
 					<button onClick={() => setLogoutPrompt(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
 						<i className={cssf(css, "!fas !fa-sign-out me-2")}></i>
 						Logout

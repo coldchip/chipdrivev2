@@ -5,7 +5,12 @@ import DriveSidebar from './components/DriveSidebar.jsx';
 import DriveBody from './components/DriveBody.jsx';
 import TaskModal from './components/TaskModal.jsx';
 
+import ItemDragLayer from './components/ItemDragLayer.jsx'
+
 import Login from './Login.jsx';
+
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import TokenContext from './contexts/TokenContext.jsx';
 import ChipDriveContext from './contexts/ChipDriveContext.jsx';
@@ -98,31 +103,35 @@ function ChipDrive(props) {
 	return (
 		<TokenContext.Provider value={token}>
 			<ChipDriveContext.Provider value={dispatch}>
-				<div className={cssf(css, "!chipdrive-app chipdrive")}>
-					<DriveHeader 
-						folder={folder}
-					/>
+				<DndProvider backend={HTML5Backend}>
+					<div className={cssf(css, "!chipdrive-app chipdrive")}>
+						<ItemDragLayer />
 
-					<DriveSidebar 
-						open={sidebar} 
-						folder={folder}
-					/>
+						<DriveHeader 
+							folder={folder}
+						/>
 
-					<DriveBody 
-						folder={folder}
-						root={root}
-						filter={filter}
-					/>
+						<DriveSidebar 
+							open={sidebar} 
+							folder={folder}
+						/>
 
-					<TaskModal 
-						tasks={tasks}
-						onClear={() => {
-							dispatch({
-								type: "closeTask"
-							})
-						}}
-					/>
-				</div>
+						<DriveBody 
+							folder={folder}
+							root={root}
+							filter={filter}
+						/>
+
+						<TaskModal 
+							tasks={tasks}
+							onClear={() => {
+								dispatch({
+									type: "closeTask"
+								})
+							}}
+						/>
+					</div>
+				</DndProvider>
 			</ChipDriveContext.Provider>
 		</TokenContext.Provider>
 	);

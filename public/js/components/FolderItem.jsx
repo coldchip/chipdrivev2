@@ -5,6 +5,7 @@ import fetch from './../IO.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
+import { getEmptyImage } from 'react-dnd-html5-backend'
 import { useDrag, useDrop } from 'react-dnd'
 
 import ItemDropdown from './ItemDropdown.jsx';
@@ -14,6 +15,8 @@ import cssf from "../CSSFormat";
 function FolderItem(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
+
+	const [hover, setHover] = useState(false);
 
 	const [hasMouse, setHasMouse] = useState(false);
 
@@ -32,7 +35,7 @@ function FolderItem(props) {
 		return () => window.removeEventListener("resize", checkMouse);
 	}, []);
 
-	const [{isDragging}, drag] = useDrag(() => ({
+	const [{isDragging}, drag, preview] = useDrag(() => ({
 		type: "FOLDER",
 		item: props.item,
 		collect: monitor => ({
@@ -40,8 +43,12 @@ function FolderItem(props) {
 		}),
 	}));
 
-	const [, drop] = useDrop(() => ({
+	const [{isOver}, drop] = useDrop(() => ({
 		accept: ["FILE", "FOLDER"],
+		collect: (monitor) => ({
+			isOver: monitor.isOver(),
+			canDrop: monitor.canDrop()
+		}),
 		drop: (src) => {
 			if(src.id !== props.item.id) {
 				var taskid = 'task_' + Math.random();
@@ -104,11 +111,15 @@ function FolderItem(props) {
 		}
 	}));
 
+	useEffect(() => {
+		preview(getEmptyImage(), { captureDraggingState: true });
+	}, [preview]);
+
 	drag(drop(ref));
 
 	return (
 		<>
-			<div className={cssf(css, "list-item")} ref={ref}>
+			<div className={cssf(css, `list-item ${isOver && 'hover'}`)} ref={ref}>
 				<i ref={optionRef} style={{display: hasMouse ? "none" : "block"}} className={cssf(css, "!fas !fa-chevron-circle-down item-option-icon")}></i>
 
 				<div className={cssf(css, "list-item-inner")} onClick={() => {

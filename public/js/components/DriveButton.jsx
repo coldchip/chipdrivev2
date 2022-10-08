@@ -1,14 +1,14 @@
-import React, { useRef, useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
+
+import { useDrop } from 'react-dnd'
 
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
-import { useDrop } from 'react-dnd'
-
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
-function BreadCrumbs(props) {
+function DriveButton(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
@@ -81,19 +81,26 @@ function BreadCrumbs(props) {
 	}));
 
 	return (
-		<p ref={drop} className={cssf(css, `breadcrumb text ${isOver && 'hover'}`)} onClick={() => {
-			dispatch({
-				type: "list", 
-				id: props.id
-			});
-		}}>
-			{
-				props.icon && 
-				<i className={cssf(css, "!fas !fa-hdd breadcrumb-icon me-2")}></i>
-			}
+		<button 
+			ref={drop}
+			className={cssf(css, `sidebar-item text ${isOver && 'hover'}`)}
+			onClick={() => {
+				dispatch({
+					type: "drive", 
+					id: props.id
+				});
+				dispatch({
+					type: "list", 
+					id: props.id
+				});
+			}} 
+			tabIndex="0"
+			key={props.id}
+		>
+			<i className={cssf(css, "!fas !fa-hdd me-2")}></i>
 			{props.name}
-		</p>
+		</button>
 	);
 }
 
-export default BreadCrumbs;
+export default DriveButton;

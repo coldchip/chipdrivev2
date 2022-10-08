@@ -2,6 +2,7 @@ import React from 'react';
 
 import Types from '../Types';
 import Popup from './Popup.jsx';
+
 import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
@@ -58,19 +59,11 @@ function ItemPopup(props) {
 	}
 
 	return (
-		<React.Fragment>
-			<Popup 
-				open={props.open} 
-				trigger={props.trigger}
-				onClose={props.onClose}
-				closeOnDocumentClick
-				modal
-			>
-				<div className={cssf(css, "cd-preview-modal")}>
-					{renderView()}
-				</div>
-			</Popup>
-		</React.Fragment>
+		<Popup {...props}>
+			<div className={cssf(css, "cd-preview-modal")}>
+				{renderView()}
+			</div>
+		</Popup>
 	);
 }
 

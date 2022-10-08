@@ -1,5 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
+
 import ContentLoader from 'react-content-loader'
+
+import DriveButton from './DriveButton.jsx'
 
 import fetch from './../IO.js';
 
@@ -66,24 +69,11 @@ function DriveList(props) {
 					{
 						list.map((drive) => {
 							return (
-								<button 
-									className={cssf(css, "sidebar-item text")}
-									onClick={() => {
-										dispatch({
-											type: "drive", 
-											id: drive.id
-										});
-										dispatch({
-											type: "list", 
-											id: drive.id
-										});
-									}} 
-									tabIndex="0"
+								<DriveButton 
+									name={drive.name}
+									id={drive.id}
 									key={drive.id}
-								>
-									<i className={cssf(css, "!fas !fa-hdd me-2")}></i>
-									{drive.name}
-								</button>
+								/>
 							);
 						})
 					}

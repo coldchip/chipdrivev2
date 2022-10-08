@@ -26,7 +26,7 @@
 		position: relative;
 		pointer-events: auto;
 		margin: auto;
-		background: rgb(255, 255, 255);
+		background: $modalColor;
 		width: 50%;
 		padding: 10px;
 		border-radius: 5px;
@@ -148,7 +148,7 @@
 		top: 0px;
 		left: 0px;
 		margin: auto;
-		background: rgb(255, 255, 255);
+		background: $modalColor;
 		width: 50%;
 		padding: 10px;
 		border-radius: 5px;

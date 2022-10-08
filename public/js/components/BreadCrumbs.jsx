@@ -68,6 +68,7 @@ function BreadCrumbs(props) {
 										icon={index === 0}
 										name={breadcrumb.name}
 										id={breadcrumb.id}
+										key={breadcrumb.id}
 									/>
 
 									<p className={cssf(css, "breadcrumb-seperator text")}>

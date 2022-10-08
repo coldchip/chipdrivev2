@@ -19,7 +19,9 @@ function Popup(props) {
 		</div>
 	);
 
-	return props.open && ReactDOM.createPortal(content, document.body);
+	var parent = document.getElementsByClassName(cssf(css, "chipdrive"))[0];
+
+	return props.open && ReactDOM.createPortal(content, parent);
 }
 
 export default Popup;

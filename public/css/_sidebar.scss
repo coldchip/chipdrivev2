@@ -35,15 +35,12 @@
 		outline: none;
 		cursor: pointer;
 		box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302), 0 1px 3px 1px rgba(60, 64, 67, 0.149);
+		transition: all 0.5s cubic-bezier(.25,.8,.25,1);
 
 		.cross {
 			color: $chipGreen;
 			font-size: 23px;
 		}
-	}
-
-	.drive-list {
-
 	}
 
 	.notice-container {
@@ -77,6 +74,11 @@
 		font-size: 16px;
 		border: none;
 		padding: 0 15px;
+		transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+
+		&.hover {
+			border: 2px solid $chipGreen;
+		}
 
 		&:hover {
 			background: $hoverColor;
