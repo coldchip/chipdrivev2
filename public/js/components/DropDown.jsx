@@ -21,7 +21,6 @@ function DropDown(props) {
             top: e.clientY,
             left: e.clientX
         };
-
 		const { innerWidth, innerHeight } = window;
         const rect = menu.current.getBoundingClientRect();
 

@@ -1,6 +1,9 @@
 .getlink {
 	.getlink-title {
 		font-size: 20px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.getlink-input {
 		width: 100%;

@@ -227,6 +227,7 @@ function ItemDropdown(props) {
 			/>
 
 			<ItemInfoPopup 
+				item={props.item}
 				open={itemInfoPopup}
 				onClose={() => {
 					setItemInfoPopup(false);

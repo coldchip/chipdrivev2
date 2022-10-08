@@ -2,8 +2,6 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 
 import Types from '../Types';
 
-import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
-
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { useDrag } from 'react-dnd'
 
@@ -13,8 +11,6 @@ import css from "../../css/index.scss";
 import cssf from "../CSSFormat";
 
 function FileItem(props) {
-	var dispatch = useContext(ChipDriveContext);
-
 	const [hasMouse, setHasMouse] = useState(false);
 
 	const [popupViewer, setPopupViewer] = useState(false);

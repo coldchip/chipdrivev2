@@ -43,6 +43,10 @@ function FolderItem(props) {
 		}),
 	}));
 
+	useEffect(() => {
+		preview(getEmptyImage(), { captureDraggingState: true });
+	}, [preview]);
+
 	const [{isOver}, drop] = useDrop(() => ({
 		accept: ["FILE", "FOLDER"],
 		collect: (monitor) => ({
@@ -110,10 +114,6 @@ function FolderItem(props) {
 			}
 		}
 	}));
-
-	useEffect(() => {
-		preview(getEmptyImage(), { captureDraggingState: true });
-	}, [preview]);
 
 	drag(drop(ref));
 

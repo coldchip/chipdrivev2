@@ -38,12 +38,14 @@ body, html {
 		justify-content: start;
 		flex-direction: row;
 		border-radius: 10px;
-		width: 200px;
+		width: 250px;
 		height: 50px;
-		background: white;
+		background: $modalColor;
 		box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
 		padding: 15px;
 		transition: all 0.1s cubic-bezier(.25,.8,.25,1);
+		animation: item-drag-animation 0.3s forwards;
+		-webkit-animation: item-drag-animation 0.3s forwards;
 
 		.title {
 			margin: 0;
@@ -53,6 +55,19 @@ body, html {
 			overflow: hidden;
 			color: $textColor;
 			font-weight: 500;
+		}
+	}
+
+	@keyframes item-drag-animation {
+		0% {
+			opacity: 0;
+			width: 0px;
+			height: 0px;
+		}
+		100% {
+			opacity: 1;
+			width: 250px;
+			height: 50px;
 		}
 	}
 }

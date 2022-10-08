@@ -130,6 +130,20 @@
 			.cd-modal-footer .cd-modal-button:hover {
 				background-color: $hoverColor;
 			}
+
+			table {
+				width: 100%;
+				table-layout: fixed;
+
+				tr {
+					td {
+						color: $textColor;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+			}
 		}
 	}
 }

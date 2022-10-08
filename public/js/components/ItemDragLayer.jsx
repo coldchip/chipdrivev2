@@ -25,12 +25,21 @@ const CustomDragLayer = (props) => {
 				}}>
 					<p className={cssf(css, "title text")}>
 						{
-							item.type === 1 ?
-							<i className={cssf(css, "!fas !fa-file me-2")}></i>
+							item.files ?
+							<i className={cssf(css, "!fas !fa-upload me-2")}></i>
 							:
-							<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+							<>
+								{
+									item.type === 1 ?
+									<i className={cssf(css, "!fas !fa-file me-2")}></i>
+									:
+									<i className={cssf(css, "!fas !fa-folder me-2")}></i>
+								}
+							</>
 						}
-						{item.name}
+						{
+							item.files ? "Drop file(s) to upload" : item.name
+						}
 					</p>
 				</div>
 			</div>

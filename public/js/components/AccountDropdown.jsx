@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 
-import Account from './Account.jsx';
+import AccountPopup from './AccountPopup.jsx';
+import PlanPopup from './PlanPopup.jsx';
 import LogoutPrompt from './LogoutPrompt.jsx';
 
 import DropDown from './DropDown.jsx';
@@ -10,6 +11,7 @@ import cssf from "../CSSFormat";
 
 function AccountDropdown(props) {
 	const [accountPopup, setAccountPopup] = useState(false);
+	const [planPopup, setPlanPopup] = useState(false);
 	const [logoutPrompt, setLogoutPrompt] = useState(false);
 
 	return (
@@ -21,7 +23,7 @@ function AccountDropdown(props) {
 						My Account
 					</button>
 
-					<button onClick={() => {}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+					<button onClick={() => setPlanPopup(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
 						<i className={cssf(css, "!fas !fa-hdd me-2")}></i>
 						Upgrade Plan
 					</button>
@@ -33,9 +35,14 @@ function AccountDropdown(props) {
 				</div>
 			</DropDown>
 
-			<Account
+			<AccountPopup
 				open={accountPopup}
 				onClose={() => setAccountPopup(false)}
+			/>
+
+			<PlanPopup 
+				open={planPopup}
+				onClose={() => setPlanPopup(false)}
 			/>
 
 			<LogoutPrompt
