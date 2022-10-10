@@ -40,7 +40,7 @@ function ItemPopup(props) {
 			)
 		} else if(Types.audio.indexOf(ext) >= 0) {
 			return (
-				<audio className={cssf(css, "cd-preview-audio")} controls="true" preload="auto">
+				<audio className={cssf(css, "preview-audio")} controls="true" preload="auto">
 					<source type="audio/mp3" src={ `/api/v2/drive/object/${item.id}` } />
 				</audio>
 			)
