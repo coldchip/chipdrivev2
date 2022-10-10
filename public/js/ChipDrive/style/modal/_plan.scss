@@ -1,0 +1,15 @@
+.plan-modal {
+	.plans {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: row;
+		.plan {
+			width: 200px;
+			height: 200px;
+			border-radius: 5px;
+			box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
+			margin: 20px;
+		}
+	}
+}

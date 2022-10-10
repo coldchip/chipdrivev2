@@ -12,7 +12,7 @@ module.exports = {
     hints: false
   },
   entry: {
-    'main': './public/js/index.jsx'
+    'main': './public/js/App.jsx'
   },
   module: {
     rules: [
@@ -81,6 +81,9 @@ module.exports = {
     ]
   },
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
     minimize: true,
     minimizer: [
       '...',
@@ -103,7 +106,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
-      favicon: './public/img/favicon.ico'
+      favicon: './public/js/assets/img/favicon.ico'
     })
   ]
 }
