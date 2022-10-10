@@ -1,0 +1,34 @@
+.account-popup {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	padding: 10px;
+	.account-profile {
+		width: 100px;
+		height: 100px;
+		border-radius: 100%;
+	}
+	.account-name {
+		font-size: 16px;
+		font-weight: 600;
+		color: $textColor;
+	}
+	.account-email {
+		font-size: 16px;
+		color: $textColor;
+	}
+
+	.account-button {
+		border: none;
+		font-weight: 500;
+		height: 40px;
+		font-size: 16px;
+		border-radius: 5px;
+		padding: 0 10px;
+		outline: 0;
+		background: $chipGreen;
+		color: #fff;
+		cursor: pointer;
+	}
+
+}

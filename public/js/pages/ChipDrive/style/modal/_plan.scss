@@ -1,0 +1,58 @@
+.plan-popup {
+	.title {
+
+	}
+
+	.plans {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, max-content));
+		grid-gap: 16px;
+		justify-content: center;
+		padding: initial;
+		.plan {
+			width: 230px;
+			background: none;
+			margin: 10px;
+			padding: 10px;
+			border-radius: 6px;
+			animation: item-animation 0.3s forwards;
+			-webkit-animation: item-animation 0.3s forwards;
+			transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+			box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+
+			.title {
+				font-size: 22px;
+				font-weight: 600;
+			}
+
+			.size {
+				font-size: 22px;
+				font-weight: 400;
+			}
+
+			.price {
+				font-size: 16px;
+				font-weight: 500;
+			}
+
+			.purchase {
+				background: $chipGreen;
+				border: none;
+				border-radius: 5px;
+				color: #fff;
+				font-size: 16px;
+				font-weight: 500;
+				height: 40px;
+				outline: 0;
+				padding: 0 10px;
+				cursor: pointer;
+			}
+		}
+	}
+}

@@ -12,6 +12,7 @@ const middleware = require("webpack-dev-middleware");
 
 const driveRoute = require("./routes/chipdrive");
 const ssoRoute = require("./routes/sso");
+const purchaseRoute = require("./routes/purchase");
 
 const random = require("./utils/random");
 
@@ -57,7 +58,7 @@ const port = process.env.PORT || 5001;
 				username: "coldchip",
 				password: "0b3f45b266a97d7029dde7c2ba372093",
 				admin: true,
-				quota: 1024 * 1024 * 1024 * 100
+				quota: 1024 * 1024 * 100
 			}
 		});
 
@@ -87,6 +88,7 @@ const port = process.env.PORT || 5001;
 
 		app.use('/api/v2/drive', driveRoute);
 		app.use('/api/v2/sso', ssoRoute);
+		app.use('/api/v2/purchase', purchaseRoute);
 
 		worker();
 

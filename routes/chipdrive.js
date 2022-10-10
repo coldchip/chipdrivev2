@@ -475,17 +475,19 @@ router.put('/object/:id', auth, quota, (req, res) => {
 				if(node) {
 					pipeline(req, fs.createWriteStream(path.join(__dirname, `./../database/${id}`)), async (err) => {
 						if(!err) {
-							var size = fs.statSync(path.join(__dirname, `./../database/${id}`)).size;
+							tasks.push(async () => {
+								var size = fs.statSync(path.join(__dirname, `./../database/${id}`)).size;
 
-							await Node.update({ 
-								size: size 
-							}, {
-								where: { 
-									id: id
-								}
+								await Node.update({ 
+									size: size 
+								}, {
+									where: { 
+										id: id
+									}
+								});
+
+								return res.status(200).json({});
 							});
-
-							return res.status(200).json({});
 						} else {
 							return res.status(500).json({
 								code: 500, 
