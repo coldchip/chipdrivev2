@@ -7,7 +7,7 @@ import fetch from './../../../fetch.js';
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
-import DriveSettingsPopup from './DriveSettingsPopup.jsx';
+import Prompt from './Prompt.jsx';
 
 import css from "./../style/index.scss";
 import cssf from "./../../../CSSFormat";
@@ -16,7 +16,10 @@ function DriveTitle(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	const [popupSettings, setPopupSettings] = useState(false);
+	// rename prompt
+	const [renamePrompt, setRenamePrompt] = useState(false);
+	const [renamePromptLoading, setRenamePromptLoading] = useState(false);
+	const [renamePromptError, setRenamePromptError] = useState("");
 
 	const [name, setName] = useState();
 
@@ -51,6 +54,40 @@ function DriveTitle(props) {
 		});
 	}, [dispatch, props.id, token]);
 
+	var rename = (name) => {
+		setRenamePromptLoading(true);
+		setRenamePromptError(undefined);
+
+		fetch(`/api/v2/drive/object/${props.id}`, {
+			method: "PATCH",
+			body: new URLSearchParams({
+				name: name
+			}).toString(),
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				token: token
+			}
+		}).then((response) => {
+			var {status, body} = response;
+			window.location.reload();
+			setRenamePrompt(false);
+		}).catch((response) => {
+			var {status, body} = response;
+
+			if(status === 401) {
+				setRenamePrompt(false);
+				dispatch({
+					type: "login",
+					data: true
+				});
+			} else {
+				setRenamePromptError(body.message);
+			}
+		}).finally(() => {
+			setRenamePromptLoading(false);
+		});
+	}
+
 	if(!loading) {
 		return (
 			<div className={cssf(css, "label")}>
@@ -59,12 +96,23 @@ function DriveTitle(props) {
 					{name}
 				</p>
 
-				<p onClick={() => setPopupSettings(true)} className={cssf(css, "label-edit text")}>EDIT</p>
+				<p onClick={() => {
+					setRenamePrompt(true);
+					setRenamePromptLoading(false);
+					setRenamePromptError("");
+				}} className={cssf(css, "label-edit text")}>EDIT</p>
 
-				<DriveSettingsPopup
-					open={popupSettings}
-					onClose={() => setPopupSettings(false)}
-					id={props.id}
+				<Prompt
+					title="Rename Drive"
+					open={renamePrompt}
+					loading={renamePromptLoading}
+					error={renamePromptError}
+					onAccept={(input) => {
+						rename(input);
+					}}
+					onClose={() => {
+						setRenamePrompt(false);
+					}}
 				/>
 			</div>
 		);

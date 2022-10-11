@@ -16,6 +16,9 @@ function CreateDropdown(props) {
 	var dispatch = useContext(ChipDriveContext);
 
 	var [createPrompt, setCreatePrompt] = useState(false);
+	var [createPromptLoading, setCreatePromptLoading] = useState(false);
+	var [createPromptError, setCreatePromptError] = useState("");
+
 	const uploadRef = useRef(null);
 
 	var upload = useCallback(async (e) => {
@@ -101,16 +104,8 @@ function CreateDropdown(props) {
 	}, [dispatch, props.folder, token]);
 
 	var create = useCallback((name) => {
-		var taskid = 'task_' + Math.random();
-
-		dispatch({
-			type: "task", 
-			id: taskid, 
-			task: {
-				name: `Creating '${name}'`,
-				progress: 0.0
-			}
-		});
+		setCreatePromptLoading(true);
+		setCreatePromptError(undefined);
 
 		fetch("/api/v2/drive/folder", {
 			method: "POST",
@@ -123,14 +118,7 @@ function CreateDropdown(props) {
 				token: token
 			}
 		}).then(() => {
-			dispatch({
-				type: "task", 
-				id: taskid, 
-				task: {
-					name: `Created '${name}'`,
-					progress: 100
-				}
-			});
+			setCreatePrompt(false);
 
 			dispatch({
 				type: "list"
@@ -139,20 +127,16 @@ function CreateDropdown(props) {
 			var {status, body} = response;
 
 			if(status === 401) {
+				setCreatePrompt(false);
 				dispatch({
 					type: "login",
 					data: true
 				});
 			} else {
-				dispatch({
-					type: "task", 
-					id: taskid, 
-					task: {
-						name: `Error creating '${name}'`,
-						progress: 100
-					}
-				});
+				setCreatePromptError(body.message);
 			}
+		}).finally(() => {
+			setCreatePromptLoading(false);
 		});
 	}, [dispatch, props.folder, token]);
 
@@ -169,6 +153,8 @@ function CreateDropdown(props) {
 
 					<button onClick={() => {
 						setCreatePrompt(true);
+						setCreatePromptLoading(false);
+						setCreatePromptError("");
 					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
 						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
 						Folder
@@ -179,8 +165,9 @@ function CreateDropdown(props) {
 			<Prompt
 				title="Create Folder"
 				open={createPrompt}
+				loading={createPromptLoading}
+				error={createPromptError}
 				onAccept={(input) => {
-					setCreatePrompt(false);
 					create(input);
 				}}
 				onClose={() => {

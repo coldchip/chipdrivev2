@@ -26,8 +26,16 @@ function Confirm(props) {
 						<p className={cssf(css, "cd-modal-title text")}>{props.title}</p>
 					</div>
 					<div className={cssf(css, "cd-modal-footer")}>
-						<button className={cssf(css, "cd-modal-button text")} onClick={onClose}>CANCEL</button>
-						<button className={cssf(css, "cd-modal-button text")} onClick={onAccept}>OK</button>
+						<p className={cssf(css, "error text")}>{props.error}</p>
+
+						<div className={cssf(css, "flex-fill")}></div>
+
+						<button className={cssf(css, "cd-modal-button text")} onClick={onClose} disabled={props.loading}>
+							CANCEL
+						</button>
+						<button className={cssf(css, `cd-modal-button ${props.loading ? "loading" : null} text`)} onClick={onAccept} disabled={props.loading}>
+							<span>OK</span>
+						</button>
 					</div>
 				</div>
 			</Popup>

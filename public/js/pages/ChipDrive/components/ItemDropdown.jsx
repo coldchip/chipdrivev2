@@ -17,23 +17,28 @@ function ItemDropdown(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	var [renamePrompt, setRenamePrompt] = useState(false);
-	var [deletePrompt, setDeletePrompt] = useState(false);
-	var [getLinkPrompt, setGetLinkPrompt] = useState(false);
-	var [downloadPrompt, setDownloadPrompt] = useState(false);
+	// rename prompt
+	const [renamePrompt, setRenamePrompt] = useState(false);
+	const [renamePromptLoading, setRenamePromptLoading] = useState(false);
+	const [renamePromptError, setRenamePromptError] = useState("");
+
+	// delete prompt
+	const [deletePrompt, setDeletePrompt] = useState(false);
+	const [deletePromptLoading, setDeletePromptLoading] = useState(false);
+	const [deletePromptError, setDeletePromptError] = useState("");
+
+	// GetLink popup
+	var [getLinkPopup, setGetLinkPopup] = useState(false);
+
+	// Download prompt
+	var [downloadPrompt, setdownloadPrompt] = useState(false);
+
+	// ItemInfo popup
 	var [itemInfoPopup, setItemInfoPopup] = useState(false);
 
 	var rename = useCallback((name) => {
-		var taskid = 'task_' + Math.random();
-
-		dispatch({
-			type: "task", 
-			id: taskid, 
-			task: {
-				name: `Renaming '${name}'`,
-				progress: 0.0
-			}
-		});
+		setRenamePromptLoading(true);
+		setRenamePromptError(undefined);
 
 		fetch(`/api/v2/drive/object/${props.item.id}`, {
 			method: "PATCH",
@@ -45,14 +50,7 @@ function ItemDropdown(props) {
 				token: token
 			}
 		}).then(() => {
-			dispatch({
-				type: "task", 
-				id: taskid, 
-				task: {
-					name: `Renamed '${name}'`,
-					progress: 100.0
-				}
-			});
+			setRenamePrompt(false);
 
 			dispatch({
 				type: "list"
@@ -61,34 +59,22 @@ function ItemDropdown(props) {
 			var {status, body} = response;
 
 			if(status === 401) {
+				setRenamePrompt(false);
 				dispatch({
 					type: "login",
 					data: true
 				});
 			} else {
-				dispatch({
-					type: "task", 
-					id: taskid, 
-					task: {
-						name: `Error renaming '${name}'`,
-						progress: 100
-					}
-				});
+				setRenamePromptError(body.message);
 			}
+		}).finally(() => {
+			setRenamePromptLoading(false);
 		});
 	}, [dispatch, props.item.id, token]);
 
 	var remove = useCallback(() => {
-		var taskid = 'task_' + Math.random();
-
-		dispatch({
-			type: "task", 
-			id: taskid, 
-			task: {
-				name: `Deleting '${props.item.name}'`,
-				progress: 0.0
-			}
-		});
+		setDeletePromptLoading(true);
+		setDeletePromptError(undefined);
 
 		fetch(`/api/v2/drive/object/${props.item.id}`, {
 			method: "DELETE",
@@ -96,14 +82,7 @@ function ItemDropdown(props) {
 				token: token
 			}
 		}).then(() => {
-			dispatch({
-				type: "task", 
-				id: taskid, 
-				task: {
-					name: `Deleted '${props.item.name}'`,
-					progress: 100.0
-				}
-			});
+			setDeletePrompt(false);
 
 			dispatch({
 				type: "list"
@@ -112,22 +91,18 @@ function ItemDropdown(props) {
 			var {status, body} = response;
 
 			if(status === 401) {
+				setDeletePrompt(false);
 				dispatch({
 					type: "login",
 					data: true
 				});
 			} else {
-				dispatch({
-					type: "task", 
-					id: taskid, 
-					task: {
-						name: `Error deleting '${props.item.name}'`,
-						progress: 100
-					}
-				});
+				setDeletePromptError(body.message);
 			}
+		}).finally(() => {
+			setDeletePromptLoading(false);
 		});
-	}, [dispatch, props.item.name, props.item.id, token]);
+	}, [dispatch, props.item.id, token]);
 
 	var download = () => {
 		var {item} = props;
@@ -151,6 +126,8 @@ function ItemDropdown(props) {
 				<div className={cssf(css, "row cd-option-modal m-0 p-0")}>
 					<button onClick={() => {
 						setRenamePrompt(true);
+						setRenamePromptLoading(false);
+						setRenamePromptError("");
 					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
 						<i className={cssf(css, "!fas !fa-pen-square me-2")}></i>
 						Rename
@@ -158,6 +135,8 @@ function ItemDropdown(props) {
 
 					<button onClick={() => {
 						setDeletePrompt(true);
+						setDeletePromptLoading(false);
+						setDeletePromptError("");
 					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
 						<i className={cssf(css, "!fas !fa-trash-alt me-2")}></i>
 						Delete
@@ -167,11 +146,11 @@ function ItemDropdown(props) {
 						props.item.type === 1 &&
 						<>
 						
-							<button onClick={() => setGetLinkPrompt(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<button onClick={() => setGetLinkPopup(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
 								<i className={cssf(css, "!fas !fa-link me-2")}></i>
 								Get link
 							</button>
-							<button onClick={() => setDownloadPrompt(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
+							<button onClick={() => setdownloadPrompt(true)} className={cssf(css, "col-12 cd-option-modal-button text")}>
 								<i className={cssf(css, "!fas !fa-arrow-circle-down me-2")}></i>
 								Download
 							</button>
@@ -187,8 +166,9 @@ function ItemDropdown(props) {
 			<Prompt 
 				title="Rename this item?" 
 				open={renamePrompt}
+				loading={renamePromptLoading}
+				error={renamePromptError}
 				onAccept={(name) => {
-					setRenamePrompt(false);
 					rename(name);
 				}}
 				onClose={() => {
@@ -199,8 +179,9 @@ function ItemDropdown(props) {
 			<Confirm 
 				title="Delete this item?" 
 				open={deletePrompt}
+				loading={deletePromptLoading}
+				error={deletePromptError}
 				onAccept={() => {
-					setDeletePrompt(false);
 					remove();
 				}}
 				onClose={() => {
@@ -209,9 +190,9 @@ function ItemDropdown(props) {
 			/>
 
 			<GetLinkPopup 
-				open={getLinkPrompt}
+				open={getLinkPopup}
 				onClose={() => {
-					setGetLinkPrompt(false);
+					setGetLinkPopup(false);
 				}}
 				item={props.item}
 			/>
@@ -220,11 +201,11 @@ function ItemDropdown(props) {
 				title="Download this item?" 
 				open={downloadPrompt}
 				onAccept={() => {
-					setDownloadPrompt(false);
+					setdownloadPrompt(false);
 					download();
 				}}
 				onClose={() => {
-					setDownloadPrompt(false);
+					setdownloadPrompt(false);
 				}} 
 			/>
 

@@ -113,8 +113,15 @@
 			.cd-modal-footer {
 				display: flex;
 				justify-content: flex-end;
+				align-items: center;
 				margin: 10px 0 0 0;
 				width: 100%;
+
+				.error {
+					color: $textColorWarning;
+					font-weight: 500;
+					font-size: 15px;
+				}
 
 				.cd-modal-button {
 					border: none;
@@ -126,6 +133,30 @@
 					border-radius: 2px;
 					font-size: 15px;
 					outline: none;
+					position: relative;
+
+					&.loading {
+						span {
+							display: none;
+						}
+						&:after {
+							content: "";
+							position: absolute;
+							width: 16px;
+							height: 16px;
+							top: 0;
+							left: 0;
+							right: 0;
+							bottom: 0;
+							margin: auto;
+							border-top: 3px solid $chipGreen;
+							border-right: 3px solid transparent;
+							border-bottom: 3px solid $chipGreen;
+							border-left: 3px solid transparent;
+							border-radius: 50%;
+							animation: submit-spinner 1s ease infinite;
+						}
+					}
 				}
 			}
 
