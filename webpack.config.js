@@ -12,7 +12,7 @@ module.exports = {
     hints: false
   },
   entry: {
-    'main': './public/js/App.jsx'
+    'main': './public/js/index.jsx'
   },
   module: {
     rules: [

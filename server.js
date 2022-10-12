@@ -4,7 +4,6 @@ const path = require('path');
 const md5 = require('md5');
 const sharp = require('sharp');
 const express = require('express');
-const history = require("connect-history-api-fallback");
 const bodyParser = require("body-parser");
 const compression = require('compression');
 const webpack = require("webpack");
@@ -90,13 +89,12 @@ const port = process.env.PORT || 5001;
 		app.use('/api/v2/sso', ssoRoute);
 		app.use('/api/v2/purchase', purchaseRoute);
 
-		worker();
-
 		const compiler = webpack(require("./webpack.config.js"));
-		app.use(history());
 		app.use(middleware(compiler, {
 			writeToDisk: true
 		}));
+
+		worker();
 
 		app.listen(port, () =>  {
 			if(process.env.NODE_ENV) {
@@ -164,5 +162,5 @@ async function worker() {
 		}
 	}
 
-	setTimeout(worker, 10);
+	setTimeout(worker, 50);
 }

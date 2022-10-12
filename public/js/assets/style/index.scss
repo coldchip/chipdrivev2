@@ -1,0 +1,194 @@
+@import "global";
+
+* {
+	user-select: none;
+	box-sizing: border-box;
+}
+
+body, html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-font-smoothing: antialiased;
+}
+
+.chipdrive {
+	width: 100%;
+	height: 100%;
+	background: $bodyColor;
+	@import "header";
+	@import "sidebar";
+	@import "body";
+}
+
+.item-drag-container {
+	position: fixed;
+	z-index: 99999;
+	pointer-events: none;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+
+	.item-drag {
+		display: flex;
+		align-items: center;
+		justify-content: start;
+		flex-direction: row;
+		border-radius: 10px;
+		width: 250px;
+		height: 50px;
+		background: $modalColor;
+		box-shadow: rgb(0 0 0 / 28%) 0px 8px 28px;
+		padding: 15px;
+		transition: all 0.1s cubic-bezier(.25,.8,.25,1);
+		animation: item-drag-animation 0.3s forwards;
+		-webkit-animation: item-drag-animation 0.3s forwards;
+
+		.title {
+			margin: 0;
+			padding: 0;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+			color: $textColor;
+			font-weight: 500;
+		}
+	}
+
+	@keyframes item-drag-animation {
+		0% {
+			opacity: 0;
+			width: 0px;
+			height: 0px;
+		}
+		100% {
+			opacity: 1;
+			width: 250px;
+			height: 50px;
+		}
+	}
+}
+
+@import "modal";
+@import "modal/account";
+@import "modal/accountmanage";
+@import "modal/drivesettings";
+@import "modal/preview";
+@import "modal/dropdown";
+@import "modal/getlink";
+@import "modal/iteminfo";
+@import "modal/login";
+@import "modal/plan";
+
+@import "spinner";
+
+
+@media (min-width: 0px) and (max-width: 767px) {
+	.chipdrive {
+		.chipdrive-header {
+			z-index: 500;
+			.header-bars {
+				display: block;
+			}
+			.header-search {
+				display: none;
+			}
+		}
+
+		.chipdrive-sidebar {
+			top: 0;
+			box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.55);
+
+			.sidebar-close {
+				display: flex;
+			}
+
+			.sidebar-upload {
+				display: none;
+			}
+		}
+
+		.chipdrive-sidebar-hidden {
+			left: -300px !important;
+		}
+
+		.chipdrive-sidebar-backdrop {
+
+		}
+
+		.chipdrive-body {
+			padding-left: 0px;
+			.list-container {
+				grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
+				.list-item {
+					width: 130px;
+					.list-item-inner {
+						.item-icon {
+							font-size: 70px;
+						}
+					}
+				}
+			}
+
+			.upload-round {
+				display: block;
+			}
+		}
+	}
+}
+
+@media (min-width: 768px) {
+	.chipdrive {
+		.chipdrive-header {
+			z-index: 503;
+			.header-bars {
+				display: none;
+			}
+			.header-search {
+				display: flex;
+			}
+		}
+
+		.chipdrive-sidebar {
+			top: 60px;
+			box-shadow: none;
+
+			.sidebar-close {
+				display: none;
+			}
+
+			.sidebar-upload {
+				display: block;
+			}
+		}
+
+		.chipdrive-sidebar-hidden {
+
+		}
+
+		.chipdrive-sidebar-backdrop {
+			display: none !important;
+		}
+
+		.chipdrive-body {
+			padding-left: 300px;
+			.list-container {
+				grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+				.list-item {
+					width: 180px;
+					.list-item-inner {
+						.item-icon {
+							font-size: 100px;
+						}
+					}
+				}
+			}
+
+			.upload-round {
+				display: none;
+			}
+		}
+	}
+}

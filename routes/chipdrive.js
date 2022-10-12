@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream');
 var mime = require('mime-types');
+const { body, validationResult } = require('express-validator');
 
 const { tasks } = require("./../globals");
 const random = require("./../utils/random");
@@ -176,14 +177,21 @@ router.get('/list/:id', auth, (req, res) => {
 	});
 });
 
-router.post('/file', auth, quota, (req, res) => {
-	tasks.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
+router.post('/file', 
+	body('id').isLength({ min: 1 }),
+	body('name').isLength({ min: 1 }),
+	auth, 
+	quota, 
+	(req, res) => {
 
-		var id = req.body.id;
-		var name = req.body.name;
-		if(id && name) {
+	const errors = validationResult(req);
+	if (errors.isEmpty()) {
+		tasks.push(async () => {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var id = req.body.id;
+			var name = req.body.name;
 			try {
 				var folder = await Node.findOne({ 
 					where: { 
@@ -216,23 +224,30 @@ router.post('/file', auth, quota, (req, res) => {
 					message: "Server Internal Error"
 				});
 			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
+		});
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
 });
 
-router.post('/folder', auth, quota, (req, res) => {
-	tasks.push(async () => {
-		res.contentType("application/json");
-		res.set('Cache-Control', 'no-store');
+router.post('/folder', 
+	body('id').isLength({ min: 1 }),
+	body('name').isLength({ min: 1 }),
+	auth, 
+	quota, 
+	(req, res) => {
 
-		var id = req.body.id;
-		var name = req.body.name;
-		if(id && name) {
+	const errors = validationResult(req);
+	if(errors.isEmpty()) {
+		tasks.push(async () => {
+			res.contentType("application/json");
+			res.set('Cache-Control', 'no-store');
+
+			var id = req.body.id;
+			var name = req.body.name;
 			try {
 				var folder = await Node.findOne({ 
 					where: { 
@@ -265,13 +280,13 @@ router.post('/folder', auth, quota, (req, res) => {
 					message: "Server Internal Error"
 				});
 			}
-		} else {
-			return res.status(400).json({
-				code: 400, 
-				message: "The server can't process the request"
-			});
-		}
-	});
+		});
+	} else {
+		return res.status(400).json({
+			code: 400, 
+			message: "The server can't process the request"
+		});
+	}
 });
 
 router.post('/cut', auth, (req, res) => {
