@@ -99,18 +99,16 @@ function FolderItem(props) {
 							type: "login",
 							data: true
 						});
-					} else {
-						dispatch({
-							type: "task", 
-							id: taskid, 
-							task: {
-								name: `Error Moving '${src.name}'`,
-								progress: 100
-							}
-						});
-					}
-				}).finally(() => {
-					
+					} 
+
+					dispatch({
+						type: "task", 
+						id: taskid, 
+						task: {
+							name: `Error Moving '${src.name}'`,
+							progress: 100
+						}
+					});
 				});
 			}
 		}

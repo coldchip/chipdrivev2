@@ -178,10 +178,10 @@ router.get('/list/:id', auth, (req, res) => {
 });
 
 router.post('/file', 
-	body('id').isLength({ min: 1 }),
-	body('name').isLength({ min: 1 }),
 	auth, 
 	quota, 
+	body('id').isLength({ min: 1 }),
+	body('name').isLength({ min: 1 }),
 	(req, res) => {
 
 	const errors = validationResult(req);
@@ -234,10 +234,10 @@ router.post('/file',
 });
 
 router.post('/folder', 
-	body('id').isLength({ min: 1 }),
-	body('name').isLength({ min: 1 }),
 	auth, 
 	quota, 
+	body('id').isLength({ min: 1 }),
+	body('name').isLength({ min: 1 }),
 	(req, res) => {
 
 	const errors = validationResult(req);

@@ -1,7 +1,7 @@
 import React, { useContext, useCallback } from 'react';
-import ReactDOM from 'react-dom';
 
 import fetch from './../fetch.js';
+
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
@@ -36,16 +36,16 @@ function LogoutPrompt(props) {
 					type: "token",
 					token: ""
 				});
-			} else {
-				dispatch({
-					type: "task", 
-					id: "0", 
-					task: {
-						name: `Error logging out`,
-						progress: 100
-					}
-				});
-			}
+			} 
+			
+			dispatch({
+				type: "task", 
+				id: "0", 
+				task: {
+					name: `Error logging out`,
+					progress: 100
+				}
+			});
 		});
 	}, [dispatch, token]);
 

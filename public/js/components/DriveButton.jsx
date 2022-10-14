@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
 
+import fetch from './../fetch.js';
+
 import { useDrop } from 'react-dnd'
 
 import TokenContext from './../contexts/TokenContext.jsx';
@@ -42,6 +44,7 @@ function DriveButton(props) {
 						token: token
 					}
 				}).then((response) => {
+					console.log(response);
 					var {status, body} = response;
 
 					dispatch({
@@ -64,18 +67,16 @@ function DriveButton(props) {
 							type: "login",
 							data: true
 						});
-					} else {
-						dispatch({
-							type: "task", 
-							id: taskid, 
-							task: {
-								name: `Error Moving '${src.name}'`,
-								progress: 100
-							}
-						});
 					}
-				}).finally(() => {
-					
+
+					dispatch({
+						type: "task", 
+						id: taskid, 
+						task: {
+							name: `Error Moving '${src.name}'`,
+							progress: 100
+						}
+					});
 				});
 			}
 		}

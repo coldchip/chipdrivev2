@@ -90,16 +90,16 @@ function CreateDropdown(props) {
 					type: "login",
 					data: true
 				});
-			} else {
-				dispatch({
-					type: "task", 
-					id: taskid, 
-					task: {
-						name: `Error uploading`,
-						progress: 100
-					}
-				});
 			}
+			
+			dispatch({
+				type: "task", 
+				id: taskid, 
+				task: {
+					name: `Error uploading`,
+					progress: 100
+				}
+			});
 		}
 	}, [dispatch, props.folder, token]);
 

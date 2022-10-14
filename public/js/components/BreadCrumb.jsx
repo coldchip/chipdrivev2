@@ -1,5 +1,7 @@
 import React, { useRef, useContext, useEffect, useState } from 'react';
 
+import fetch from './../fetch.js';
+
 import TokenContext from './../contexts/TokenContext.jsx';
 import ChipDriveContext from './../contexts/ChipDriveContext.jsx';
 
@@ -64,18 +66,16 @@ function BreadCrumbs(props) {
 							type: "login",
 							data: true
 						});
-					} else {
-						dispatch({
-							type: "task", 
-							id: taskid, 
-							task: {
-								name: `Error Moving '${src.name}'`,
-								progress: 100
-							}
-						});
 					}
-				}).finally(() => {
-					
+
+					dispatch({
+						type: "task", 
+						id: taskid, 
+						task: {
+							name: `Error Moving '${src.name}'`,
+							progress: 100
+						}
+					});
 				});
 			}
 		}
