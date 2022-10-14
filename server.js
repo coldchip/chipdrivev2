@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const compression = require('compression');
 const webpack = require("webpack");
 const middleware = require("webpack-dev-middleware");
+require('dotenv').config()
 
 const driveRoute = require("./routes/chipdrive");
 const ssoRoute = require("./routes/sso");
@@ -47,42 +48,44 @@ const port = process.env.PORT || 5001;
 		await db.sequelize.authenticate();
 		await db.sequelize.sync();
 
-		let user = await User.findOrCreate({
-			where: {
-				username: "coldchip"
-			},
-			defaults: {
-				firstname: "Ryan",
-				lastname: "Loh",
-				username: "coldchip",
-				password: "0b3f45b266a97d7029dde7c2ba372093",
-				admin: true,
-				quota: 1024 * 1024 * 100
-			}
-		});
-
-		/*
-			users can't delete the root folder
-		*/
-
-		let drives = ["My Drive #1", "My Drive #2", "My Drive #3", "My Drive #4", "My Drive #5"];
-
-		for(let name of drives) {
-			await Node.findOrCreate({
+		if(process.env.username && process.env.password) {
+			let user = await User.findOrCreate({
 				where: {
-					id: md5(name),
-					userId: user[0].id
+					username: process.env.username
 				},
 				defaults: {
-					type: 2, 
-					name: name, 
-					id: md5(name), 
-					parent: null,
-					size: 0,
-					root: true,
-					userId: user[0].id
+					firstname: "ChipDrive",
+					lastname: "Admin",
+					username: process.env.username,
+					password: process.env.password,
+					admin: true,
+					quota: 1024 * 1024 * 100
 				}
 			});
+
+			/*
+				users can't delete the root folder
+			*/
+
+			let drives = ["My Drive #1", "My Drive #2", "My Drive #3", "My Drive #4", "My Drive #5"];
+
+			for(let name of drives) {
+				await Node.findOrCreate({
+					where: {
+						id: md5(user[0].id + name),
+						userId: user[0].id
+					},
+					defaults: {
+						type: 2, 
+						name: name, 
+						id: md5(user[0].id + name), 
+						parent: null,
+						size: 0,
+						root: true,
+						userId: user[0].id
+					}
+				});
+			}
 		}
 
 		app.use('/api/v2/drive', driveRoute);

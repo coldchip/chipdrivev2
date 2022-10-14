@@ -20,6 +20,7 @@
     "compression": "^1.7.4",
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^4.1.0",
+    "dotenv": "^16.0.3",
     "eslint": "^8.8.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
