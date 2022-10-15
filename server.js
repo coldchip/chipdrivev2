@@ -16,7 +16,7 @@ const purchaseRoute = require("./routes/purchase");
 
 const random = require("./utils/random");
 
-const { tasks } = require("./globals");
+const queue = require("./queue");
 
 const db = require("./models");
 const Node = db.node;
@@ -97,7 +97,9 @@ const port = process.env.PORT || 5001;
 			writeToDisk: true
 		}));
 
-		worker();
+		mainWorker();
+		loginWorker();
+		thumbnailWorker();
 
 		app.listen(port, () =>  {
 			if(process.env.NODE_ENV) {
@@ -113,13 +115,27 @@ const port = process.env.PORT || 5001;
 
 var image = ["jpg", "png", "jpeg", "bmp", "h264", "gif", "svg"]
 
-async function worker() {
-	if(tasks.length > 0) {
-		console.log(chalk.yellow(`Dequeuing tasks, ${tasks.length} in queue`));
-		let task = tasks.pop();
+async function mainWorker() {
+	if(queue.length("main") > 0) {
+		console.log(chalk.yellow(`Dequeuing main tasks, ${queue.length("main")} in queue`));
+		let task = queue.dequeue("main");
 		await task();
 	}
 
+	setTimeout(mainWorker, 50);
+}
+
+async function loginWorker() {
+	if(queue.length("login") > 0) {
+		console.log(chalk.yellow(`Dequeuing login tasks, ${queue.length("login")} in queue`));
+		let task = queue.dequeue("login");
+		await task();
+	}
+
+	setTimeout(loginWorker, 5000);
+}
+
+async function thumbnailWorker() {
 	let nodes = await Node.findAll({
 		where: {
 			type: 1,
@@ -165,5 +181,5 @@ async function worker() {
 		}
 	}
 
-	setTimeout(worker, 50);
+	setTimeout(thumbnailWorker, 100);
 }

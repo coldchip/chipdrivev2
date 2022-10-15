@@ -118,7 +118,7 @@ function LoginPopup(props) {
 						</label>
 					</div>
 					
-					<button type="button" className={cssf(css, `login-submit ${loading ? "submit-loading" : null} text`)} onClick={login} disabled={loading}>
+					<button type="button" className={cssf(css, `login-submit ${loading ? "submit-loading" : null} text`)} onClick={login}>
 						<span>Continue</span>
 					</button>
 				</form>
