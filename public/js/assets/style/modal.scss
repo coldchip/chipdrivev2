@@ -37,8 +37,15 @@
 		&.popup-partial {
 			width: 50%;
 			max-width: 600px;
-			max-height: 90%;
 			border-radius: 8px;
+
+			@media (min-width: 0px) and (max-width: 767px) {
+				width: 90%;
+			}
+
+			@media (min-width: 768px) {
+				width: 50%;
+			}
 		}
 
 		&.popup-fullscreen {
