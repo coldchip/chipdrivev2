@@ -27,11 +27,15 @@ var app = express();
 
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+let count = 0;
+
 app.use((req, res, next) =>  {
 	res.header("Server", "ColdChip");
-	res.header("Service-Worker-Allowed", "/");
+	res.header("ChipDrive-Request-ID", String(count).padStart(16, '0'));
 	console.log(`[${chalk.blue(new Date().toUTCString())}] ${chalk.yellow(req.method.padEnd(6))} ${chalk.green(req.path)}`);
-	next()
+	count++;
+	next();
 });
 
 app.set('x-powered-by', false);

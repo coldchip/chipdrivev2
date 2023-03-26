@@ -19,6 +19,10 @@ function CreateDropdown(props) {
 	var [createPromptLoading, setCreatePromptLoading] = useState(false);
 	var [createPromptError, setCreatePromptError] = useState("");
 
+	var [hostingPrompt, setHostingPrompt] = useState(false);
+	var [hostingPromptLoading, setHostingPromptLoading] = useState(false);
+	var [hostingPromptError, setHostingPromptError] = useState("");
+
 	const uploadRef = useRef(null);
 
 	var upload = useCallback(async (e) => {
@@ -159,6 +163,15 @@ function CreateDropdown(props) {
 						<i className={cssf(css, "!fas !fa-folder me-2")}></i>
 						Folder
 					</button>
+
+					<button onClick={() => {
+						setHostingPrompt(true);
+						setHostingPromptLoading(false);
+						setHostingPromptError("");
+					}} className={cssf(css, "col-12 cd-option-modal-button text")}>
+						<i className={cssf(css, "!fas !fa-server me-2")}></i>
+						Static Hosting
+					</button>
 				</div>
 			</DropDown>
 
@@ -172,6 +185,19 @@ function CreateDropdown(props) {
 				}}
 				onClose={() => {
 					setCreatePrompt(false);
+				}}
+			/>
+
+			<Prompt
+				title="Create Static Hosting"
+				open={hostingPrompt}
+				loading={hostingPromptLoading}
+				error={hostingPromptError}
+				onAccept={(input) => {
+					alert("Coming soon!");
+				}}
+				onClose={() => {
+					setHostingPrompt(false);
 				}}
 			/>
 					

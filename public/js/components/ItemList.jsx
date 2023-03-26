@@ -98,7 +98,7 @@ function ItemList(props) {
 					<>
 						<div className={cssf(css, "notice-container mt-2")} ref={menuRef}>
 							<p className={cssf(css, "notice-text text")}>This Folder is Empty</p>
-							<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon")}></i>	
+							<i className={cssf(css, "!fas !fa-folder-open notice-icon")}></i>	
 						</div>
 
 						<CreateDropdown 

@@ -14,26 +14,65 @@ function AccountManage(props) {
 	var token = useContext(TokenContext);
 	var dispatch = useContext(ChipDriveContext);
 
-	const [name, setName] = useState("...");
+	const [firstName, setFirstName] = useState("...");
+	const [lastName, setLastName] = useState("...");
 	const [username, setUsername] = useState("...");
+	const [quota, setQuota] = useState(0);
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(undefined);
 
-	var loadAccount = () => {
-		setLoading(true);
-		setError(undefined);
+	useEffect(() => {
+		if(props.open === true) {
+			setLoading(true);
+			setError(undefined);
 
+			fetch("/api/v2/sso/@me", {
+				method: "GET",
+				headers: {
+					token: token
+				}
+			}).then((response) => {
+				var {status, body} = response;
+
+				setFirstName(body.firstname);
+				setLastName(body.lastname);
+				setUsername(body.username);
+				setQuota(body.quota);
+			}).catch((response) => {
+				var {status, body} = response;
+
+				if(status === 401) {
+					dispatch({
+						type: "login",
+						data: true
+					});
+				} else {
+					setError(body.message);
+				}
+			}).finally(() => {
+				setLoading(false);
+			});
+		}
+	}, [dispatch, props.open, token]);
+
+	var update = () => {
 		fetch("/api/v2/sso/@me", {
-			method: "GET",
+			method: "PATCH",
+			body: new URLSearchParams({
+				firstname: firstName,
+				lastname: lastName,
+				username: username,
+				quota: quota
+			}).toString(),
 			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
 				token: token
 			}
 		}).then((response) => {
 			var {status, body} = response;
 
-			setName(body.name);
-			setUsername(body.username);
+
 		}).catch((response) => {
 			var {status, body} = response;
 
@@ -43,10 +82,10 @@ function AccountManage(props) {
 					data: true
 				});
 			} else {
-				setError(body.message);
+
 			}
 		}).finally(() => {
-			setLoading(false);
+
 		});
 	}
 
@@ -60,18 +99,21 @@ function AccountManage(props) {
 					<div className={cssf(css, "row mt-5")}>
 						<div className={cssf(css, "col-md-6 col-sm-12")}>
 							<label className={cssf(css, "label text")}>First Name</label>
-							<input type="text" className={cssf(css, "input text mt-1 mb-3")} />
+							<input type="text" className={cssf(css, "input text mt-1 mb-3")} onChange={e => setFirstName(e.target.value)} value={firstName} />
 
-							<label className={cssf(css, "label text")}>Email</label>
-							<input type="text" className={cssf(css, "input text mt-1 mb-3")} />		
+							<label className={cssf(css, "label text")}>Username</label>
+							<input type="text" className={cssf(css, "input text mt-1 mb-3")} onChange={e => setUsername(e.target.value)} value={username} />		
 						</div>
 						<div className={cssf(css, "col-md-6 col-sm-12")}>
 							<label className={cssf(css, "label text")}>Last Name</label>
-							<input type="text" className={cssf(css, "input text mt-1 mb-3")} />
+							<input type="text" className={cssf(css, "input text mt-1 mb-3")} onChange={e => setLastName(e.target.value)} value={lastName} />
 
-							<label className={cssf(css, "label text")}>Phone Number</label>
-							<input type="text" className={cssf(css, "input text mt-1 mb-3")} />						
-						</div>				
+							<label className={cssf(css, "label text")}>Quota</label>
+							<input type="number" className={cssf(css, "input text mt-1 mb-3")} onChange={e => setQuota(e.target.value)} value={quota} />						
+						</div>
+						<div className={cssf(css, "d-flex align-items-center justify-content-end")}>
+							<button type="button" className={cssf(css, "submit text")} onClick={update}>Save</button>
+						</div>			
 					</div>
 				</div>
 			);

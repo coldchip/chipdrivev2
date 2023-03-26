@@ -1,7 +1,7 @@
 const express = require('express');
 
 var md5 = require('md5');
-
+const crypto = require('crypto');
 const random = require("./../utils/random");
 const auth = require("./../middleware/auth");
 const enqueue = require("./../middleware/enqueue");
@@ -29,7 +29,7 @@ router.post('/login', enqueue("login", async (req, res) => {
 			});
 
 			if(user) {
-				let token = random(64);
+				var token = crypto.randomBytes(64).toString('hex');
 
 				await Token.create({
 					id: token,
@@ -81,9 +81,45 @@ router.get('/@me', auth, enqueue("main", async (req, res) => {
 	res.set('Cache-Control', 'no-store');
 		
 	return res.status(200).json({
-		name: `${req.user.firstname} ${req.user.lastname}`,
-		username: req.user.username
+		firstname: req.user.firstname,
+		lastname: req.user.lastname,
+		username: req.user.username,
+		quota: req.user.quota
 	});
+}));
+
+router.patch('/@me', auth, enqueue("main", async (req, res) => {
+	res.contentType("application/json");
+	res.set('Cache-Control', 'no-store');
+
+	var firstname = req.body.firstname;
+	var lastname = req.body.lastname;
+	var username = req.body.username;
+	var quota = req.body.quota;
+	if(firstname && lastname && username && quota) {
+		try {
+			await User.update({
+				firstname: firstname,
+				lastname: lastname, 
+				username: username,
+				quota: quota
+			}, {
+				where: {
+					id: req.user.id
+				}
+			});
+
+			return res.status(200).json({});
+		} catch(err) {
+			return res.status(500).json({
+				message: "Server Internal Error"
+			});
+		}
+	} else {
+		return res.status(400).json({
+			message: "The server can't process the request"
+		});
+	}
 }));
 
 module.exports = router;

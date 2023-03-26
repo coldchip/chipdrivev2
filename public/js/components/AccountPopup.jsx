@@ -38,7 +38,7 @@ function Account(props) {
 			}).then((response) => {
 				var {status, body} = response;
 
-				setName(body.name);
+				setName(body.firstname + " " + body.lastname);
 				setUsername(body.username);
 			}).catch((response) => {
 				var {status, body} = response;

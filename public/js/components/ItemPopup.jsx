@@ -24,47 +24,56 @@ function ItemPopup(props) {
 	}
 
 	var renderView = () => {
-
 		var {item} = props;
 
 		var ext = item.name.substr(item.name.lastIndexOf('.') + 1).toLowerCase();
 		if(Types.image.indexOf(ext) >= 0) {
 			return (
-				<img className={cssf(css, "preview-image")} src={ `/api/v2/drive/object/${item.id}` } />
+				<Popup fullscreen={true} {...props}>
+					<div className={cssf(css, "preview-popup")}>
+						<img className={cssf(css, "preview-image")} src={ `/api/v2/drive/object/${item.id}` } />
+					</div>
+				</Popup>
 			)
 		} else if(Types.video.indexOf(ext) >= 0) {
 			return (
-				<video className={cssf(css, "preview-video")} controls>
-					<source type="video/mp4" src={ `/api/v2/drive/object/${item.id}` } />
-				</video>
+				<Popup fullscreen={true} {...props}>
+					<div className={cssf(css, "preview-popup")}>
+						<video className={cssf(css, "preview-video")} controls>
+							<source type="video/mp4" src={ `/api/v2/drive/object/${item.id}` } />
+						</video>
+					</div>
+				</Popup>
 			)
 		} else if(Types.audio.indexOf(ext) >= 0) {
 			return (
-				<audio className={cssf(css, "preview-audio")} controls="true" preload="auto">
-					<source type="audio/mp3" src={ `/api/v2/drive/object/${item.id}` } />
-				</audio>
+				<Popup {...props}>
+					<div className={cssf(css, "preview-popup")}>
+						<audio className={cssf(css, "preview-audio")} controls="true" preload="auto">
+							<source type="audio/mp3" src={ `/api/v2/drive/object/${item.id}` } />
+						</audio>
+					</div>
+				</Popup>
 			)
 		} else {
 			return (
-				<div className={cssf(css, "notice-container mt-2")}>
-					<p className={cssf(css, "notice-text text")}>Unable to preview</p>
-					<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon mt-3")}></i>	
-					<button className={cssf(css, "notice-button text mt-4")} onClick={download}>
-						<i className={cssf(css, "!fa !fa-download me-2")}></i>
-						Download Instead
-					</button>
-				</div>
+				<Popup {...props}>
+					<div className={cssf(css, "preview-popup")}>
+						<div className={cssf(css, "notice-container mt-2")}>
+							<p className={cssf(css, "notice-text text")}>Unable to preview</p>
+							<i className={cssf(css, "!fas !fa-exclamation-circle notice-icon mt-3")}></i>	
+							<button className={cssf(css, "notice-button text mt-4")} onClick={download}>
+								<i className={cssf(css, "!fa !fa-download me-2")}></i>
+								Download Instead
+							</button>
+						</div>
+					</div>
+				</Popup>
 			)
 		}
 	}
 
-	return (
-		<Popup {...props}>
-			<div className={cssf(css, "preview-popup")}>
-				{renderView()}
-			</div>
-		</Popup>
-	);
+	return renderView();
 }
 
 export default ItemPopup;

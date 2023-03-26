@@ -21,7 +21,7 @@ function Popup(props) {
 					props.fullscreen && !props.unclosable &&
 					<i className={cssf(css, "!fas !fa-times-circle cross")} onClick={(e) => {
 						e.preventDefault();
-			    		if (e.target === e.currentTarget) {
+						if (e.target === e.currentTarget) {
 							if(typeof props.onClose === 'function') {
 								props.onClose();
 							}
